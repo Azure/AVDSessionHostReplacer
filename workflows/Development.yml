@@ -1,0 +1,24 @@
+on:
+  push:
+    branches:
+      - Development
+    paths:
+      - 'FunctionApp/**'
+jobs:
+  Build-Nightly-Zip:
+    runs-on: ubuntu-latest
+    if: github.sha == github.event.head_commit.id # Only run the job if the commit is the latest one
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.7.0
+      - name: Run-Build-Script
+        shell: pwsh
+        run: |
+          ./Build/Build-Zip-File.ps1 -Path ".\Nightly"
+      - name: Commit Changes
+        shell: pwsh
+        run: |
+          $timeStamp = Get-Date -Format "o"
+          ./Build/Update-Repo.ps1 -TokenAccount WillyMoselhy -GitToken $env:GITHUBPAT -AccountName WillyMoselhy -RepositoryName AVDReplacementPlans -Message "Dev Build ($timeStamp) [no ci]"
+        env:
+          GITHUBPAT: ${{ secrets.GITHUBPAT }}

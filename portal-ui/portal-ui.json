@@ -1,0 +1,362 @@
+{
+    "$schema": "<relative path to createFormUI.schema.json>",
+    "view": {
+        "kind": "Form",
+        "properties": {
+            "isWizard": false,
+            "title": "Azure Virtual Desktop - Replacement Plans Deployment",
+            "steps": [
+                {
+                    "name": "basics",
+                    "label": "Deployment Basics",
+                    "elements": [
+                        {
+                            "name": "resourceScope",
+                            "type": "Microsoft.Common.ResourceScope",
+                            "location": {
+                                "resourceTypes": [
+                                    "Microsoft.DesktopVirtualization/HostPools"
+                                ]
+                            }
+                        },
+                        {
+                            "name": "FunctionAppName",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Function App Name",
+                            "toolTip": "This name has to be globally unique",
+                            "constraints": {
+                                "required": true
+                            }
+                        },
+                        {
+                            "name": "EnableMonitoring",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Enable Monitoring",
+                            "toolTip": "[Recommended] If enabled, the replacement plan will use App Insights and Log Analytics to collect metrics and logs.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "MonitoringSection",
+                            "type": "Microsoft.Common.Section",
+                            "label": "Monitoring",
+                            "visible": "[steps('basics').EnableMonitoring]",
+                            "elements": [
+                                {
+                                    "name": "UseExistingLAW",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "label": "Select existing Log Analytics Workspace",
+                                    "toolTip": "If enabled, the replacement plan will use the selected Log Analytics Workspace. If disabled, the replacement plan will create a new Log Analytics Workspace.",
+                                    "defaultValue": true,
+                                    "constraints": {
+                                        "required": false
+                                    }
+                                },
+                                {
+                                    "name": "LAWSelector",
+                                    "type": "Microsoft.Solutions.ResourceSelector",
+                                    "visible": "[steps('basics').MonitoringSection.UseExistingLAW]",
+                                    "label": "Log Analytics Workspace",
+                                    "resourceType": "Microsoft.OperationalInsights/workspaces",
+                                    "constraints": {
+                                        "required": true
+                                    },
+                                    "options": {
+                                        "filter": {}
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "VersionInfo",
+                            "type": "Microsoft.Common.TextBlock",
+                            "visible": true,
+                            "options": {
+                                "text": "AVD Replacement Plans Portal UI Version: 230826-1504",
+                                "link": {
+                                    "label": "GitHub Repository",
+                                    "uri": "https://github.com/WillyMoselhy/AVDReplacementPlans"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RequiredParametersStep",
+                    "label": "Required Parameters",
+                    "elements": [
+                        {
+                            "name": "HostPoolSelector",
+                            "type": "Microsoft.Solutions.ResourceSelector",
+                            "label": "Select target Host Pool",
+                            "resourceType": "Microsoft.DesktopVirtualization/HostPools",
+                            "constraints": {
+                                "required": true
+                            },
+                            "options": {
+                                "filter": {
+                                    "subscription": "onBasics",
+                                    "location": "onBasics"
+                                }
+                            }
+                        },
+                        {
+                            "name": "sessionHostsCount",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Target Session Host Count",
+                            "toolTip": "The target number of session hosts in the host pool.",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^\\d+$",
+                                "validationMessage": "Must be an integer."
+                            }
+                        },
+                        {
+                            "name": "sessionHostNamePrefix",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Session Host Name Prefix",
+                            "toolTip": "The prefix for the session host names. The session host names will be in the format <prefix>-<number>.",
+                            "constraints": {
+                                "required": true,
+                                "validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
+                            }
+                        },
+                        {
+                            "name": "TemplateSpecSelector",
+                            "type": "Microsoft.Solutions.ResourceSelector",
+                            "label": "Select an existing Template Spec",
+                            "resourceType": "Microsoft.Resources/templateSpecs",
+                            "constraints": {
+                                "required": true
+                            },
+                            "options": {
+                                "filter": {}
+                            }
+                        },
+                        {
+                            "name": "TemplateParameters",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Template Parameters",
+                            "toolTip": "The parameters to pass to the template at deployment time. Use json format.",
+                            "multiLine": true,
+                            "constraints": {
+                                "required": true
+                            }
+                        },
+                        {
+                            "name": "TemplateSpecInfoBox",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[greater(length(steps('RequiredParametersStep').TemplateSpecSelector.id), 0)]",
+                            "options": {
+                                "icon": "Info",
+                                "text": "The system managed identity of the function app requires read access to the Template Spec.",
+                                "uri": ""
+                            }
+                        },
+                        {
+                            "name": "EntraJoined",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Session hosts are Entra Joined (Azure AD Joined)",
+                            "toolTip": "If the session hosts are Entra Joined, Replacement Plan will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by Replacement Plan. Please refer to the documentation for more information.",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "EntraJoinedInfoBox",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[steps('RequiredParametersStep').EntraJoined]",
+                            "options": {
+                                "icon": "Warning",
+                                "text": "When the VMs are Entra Joined, Replacement Plan will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by Replacement Plan. Please refer to the documentation for more information.",
+                                "uri": "https://www.microsoft.com"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "optionalParametersStep",
+                    "label": "Optional Parameters",
+                    "elements": [
+                        {
+                            "name": "_Tag_IncludeInAutomation",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Include in Automation Tag Name",
+                            "toolTip": "The name of the tag to use to determine if an existing session host should be included in the automation. After deployment, if the tag is present and set to 'true', the session host will be included. If the tag is not present or set to 'false', the session host will be excluded.",
+                            "defaultValue": "IncludeInAutoReplace",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_Tag_DeployTimestamp",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Deploy Timestamp Tag Name",
+                            "toolTip": "The name of the tag to use to determine when the session host was deployed. This is updated by the replacement plan function on new session hosts. After deployment, you can edit the value of this tag to force replace a VM.",
+                            "defaultValue": "AutoReplaceDeployTimestamp",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_Tag_PendingDrainTimestamp",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Pending Drain Timestamp Tag Name",
+                            "toolTip": "The name of the tag to use to determine when the session host was marked for drain. This is updated by the replacement plan function on hosts pending deletion.",
+                            "defaultValue": "AutoReplacePendingDrainTimestamp",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_Tag_ScalingPlanExclusionTag",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Scaling Plan Exclusion Tag Name",
+                            "toolTip": "The name of the tag Replacement Plan will set to exclude a session host from scaling plans actions.",
+                            "defaultValue": "ScalingPlanExclusion",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_TargetVMAgeDays",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Target VM Age (Days)",
+                            "toolTip": "The maximum age of a VM in days before it is replaced. This is compared to the value of the Deploy Timestamp Tag.",
+                            "defaultValue": 45,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_DrainGracePeriodHours",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Drain Grace Period (Hours)",
+                            "toolTip": "The number of hours to wait after marking a VM for drain before deleting it. This is to allow users to finish their sessions before the VM is deleted.",
+                            "defaultValue": 24,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_FixSessionHostTags",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Fix Existing Session Host Tags",
+                            "toolTip": "If enabled, the replacement plan will fix the tags on existing session hosts or if tags are mistakenly deleted. The tag values will NOT allow deletion of existing session hosts and must be changed post deployment. This is useful if you are deploying a new replacement plan to an existing host pool.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_SHRDeploymentPrefix",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Deployment Prefix",
+                            "toolTip": "The prefix of the deployment created in the session hosts resource group when replacement VMs are deploying. This is used to track running and failed deployments.",
+                            "defaultValue": "AVDSessionHostReplacer",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_AllowDownsizing",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Allow Downsizing",
+                            "toolTip": "If enabled, the replacement plan will delete older session hosts when the total number of good hosts is higher than target session host number.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_SessionHostInstanceNumberPadding",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Session Host VM Name Padding",
+                            "toolTip": "The number of digits to pad the session host instance number with. For example, if the value is 3, the session host names will be in the format <prefix>-001.",
+                            "defaultValue": 2,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_ReplaceSessionHostOnNewImageVersion",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Replace Session Hosts On New Image Version",
+                            "toolTip": "(Recommended) If enabled, the replacement plan will replace session hosts when a new image version is available. This works for both marketplace and custom images. If disabled, the replacement plan will only replace session hosts when the VM age is greater than the target VM age.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_ReplaceSessionHostOnNewImageVersionDelayDays",
+                            "type": "Microsoft.Common.TextBox",
+                            "visible": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
+                            "label": "Replace on New Image Version Delay (Days)",
+                            "toolTip": "The number of days to wait after a new image is available before replacing session hosts. This is to allow time for the image to be tested before replacing session hosts.",
+                            "defaultValue": "0",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_VMNamesTemplateParameterName",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "VM Names Template Parameter Name",
+                            "toolTip": "The name of the parameter in the template that specifies the VM Names array.",
+                            "defaultValue": "VMNames",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_SessionHostResourceGroupName",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Session Hosts Resource Group Name",
+                            "placeholder": "Same As Host Pool Resource Group",
+                            "toolTip": "Leave this empty to deploy to same resource group as the host pool.",
+                            "defaultValue": "",
+                            "constraints": {
+                                "required": false
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "outputs": {
+            "parameters": {
+                "FunctionAppName": "[steps('basics').FunctionAppName]",
+                "EnableMonitoring": "[steps('basics').EnableMonitoring]",
+                "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
+                "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
+                "HostPoolResourceGroupName": "[steps('RequiredParametersStep').HostPoolSelector.resourceGroup]",
+                "HostPoolName": "[steps('RequiredParametersStep').HostPoolSelector.name]",
+                "TargetSessionHostCount": "[steps('RequiredParametersStep').sessionHostsCount]",
+                "SessionHostNamePrefix": "[steps('RequiredParametersStep').sessionHostNamePrefix]",
+                "SessionHostTemplate": "[steps('RequiredParametersStep').TemplateSpecSelector.id]",
+                "SessionHostParameters": "[steps('RequiredParametersStep').TemplateParameters]",
+                "RemoveAzureADDevice": "[steps('RequiredParametersStep').EntraJoined]",
+                "TagIncludeInAutomation": "[steps('optionalParametersStep')._Tag_IncludeInAutomation]",
+                "TagDeployTimestamp": "[steps('optionalParametersStep')._Tag_DeployTimestamp]",
+                "TagPendingDrainTimestamp": "[steps('optionalParametersStep')._Tag_PendingDrainTimestamp]",
+                "TagScalingPlanExclusionTag": "[steps('optionalParametersStep')._Tag_ScalingPlanExclusionTag]",
+                "TargetVMAgeDays": "[steps('optionalParametersStep')._TargetVMAgeDays]",
+                "DrainGracePeriodHours": "[steps('optionalParametersStep')._DrainGracePeriodHours]",
+                "FixSessionHostTags": "[steps('optionalParametersStep')._FixSessionHostTags]",
+                "DeploymentPrefix": "[steps('optionalParametersStep')._SHRDeploymentPrefix]",
+                "AllowDownsizing": "[steps('optionalParametersStep')._AllowDownsizing]",
+                "SessionHostInstanceNumberPadding": "[steps('optionalParametersStep')._SessionHostInstanceNumberPadding]",
+                "ReplaceSessionHostOnNewImageVersion": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
+                "ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",
+                "VMNamesTemplateParameterName": "[steps('optionalParametersStep')._VMNamesTemplateParameterName]",
+                "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]"
+            },
+            "kind": "ResourceGroup",
+            "location": "[steps('basics').resourceScope.location.name]",
+            "resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]"
+        }
+    }
+}

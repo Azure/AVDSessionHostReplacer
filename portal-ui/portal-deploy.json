@@ -1,0 +1,474 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.18.4.5664",
+      "templateHash": "17994355629933899764"
+    }
+  },
+  "parameters": {
+    "Location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group."
+      }
+    },
+    "FunctionAppName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required: Yes | Name of the Function App."
+      }
+    },
+    "EnableMonitoring": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "UseExistingLAW": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "LogAnalyticsWorkspaceId": {
+      "type": "string",
+      "defaultValue": "none",
+      "metadata": {
+        "description": "Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights."
+      }
+    },
+    "HostPoolResourceGroupName": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]",
+      "metadata": {
+        "description": "Required: No | Name of the resource group containing the Azure Virtual Desktop Host Pool. | Default: The resource group of the Function App."
+      }
+    },
+    "HostPoolName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required: Yes | Name of the Azure Virtual Desktop Host Pool."
+      }
+    },
+    "SessionHostNamePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Required: Yes | Prefix used for the name of the session hosts."
+      }
+    },
+    "TargetSessionHostCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Required: Yes | Number of session hosts to maintain in the host pool."
+      }
+    },
+    "SessionHostTemplate": {
+      "type": "string",
+      "metadata": {
+        "description": "Required: Yes | URI or Template Spec Resource Id of the arm template used to deploy the session hosts."
+      }
+    },
+    "SessionHostParameters": {
+      "type": "string",
+      "metadata": {
+        "description": "Required: Yes | A compressed (one line) json string containing the parameters of the template used to deploy the session hosts."
+      }
+    },
+    "RemoveAzureADDevice": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "TagIncludeInAutomation": {
+      "type": "string",
+      "defaultValue": "IncludeInAutoReplace",
+      "metadata": {
+        "description": "Required: No | Tag name used to indicate that a session host should be included in the automatic replacement process. | Default: IncludeInAutoReplace."
+      }
+    },
+    "TagDeployTimestamp": {
+      "type": "string",
+      "defaultValue": "AutoReplaceDeployTimestamp",
+      "metadata": {
+        "description": "Required: No | Tag name used to indicate the timestamp of the last deployment of a session host. | Default: AutoReplaceDeployTimestamp."
+      }
+    },
+    "TagPendingDrainTimestamp": {
+      "type": "string",
+      "defaultValue": "AutoReplacePendingDrainTimestamp",
+      "metadata": {
+        "description": "Required: No | Tag name used to indicate drain timestamp of session host pending deletion. | Default: AutoReplacePendingDrainTimestamp."
+      }
+    },
+    "TagScalingPlanExclusionTag": {
+      "type": "string",
+      "defaultValue": "ScalingPlanExclusion",
+      "metadata": {
+        "description": "Required: No | Tag name used to exclude session host from Scaling Plan activities. | Default: ScalingPlanExclusion"
+      }
+    },
+    "TargetVMAgeDays": {
+      "type": "int",
+      "defaultValue": 45,
+      "metadata": {
+        "description": "Required: No | Target age of session hosts in days. | Default:  45 days."
+      }
+    },
+    "DrainGracePeriodHours": {
+      "type": "int",
+      "defaultValue": 24,
+      "metadata": {
+        "description": "Required: No | Grace period in hours for session hosts to drain before deletion. | Default: 24 hours."
+      }
+    },
+    "FixSessionHostTags": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Required: No | If true, will apply tags for Include In Auto Replace and Deployment Timestamp to existing session hosts. This will not enable automatic deletion of existing session hosts. | Default: True."
+      }
+    },
+    "SHRDeploymentPrefix": {
+      "type": "string",
+      "defaultValue": "AVDSessionHostReplacer",
+      "metadata": {
+        "description": "Required: No | Prefix used for the deployment name of the session hosts. | Default: AVDSessionHostReplacer"
+      }
+    },
+    "AllowDownsizing": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Required: No | Allow deleting session hosts if count exceeds target. | Default: true"
+      }
+    },
+    "SessionHostInstanceNumberPadding": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "Required: No | Number of digits to use for the instance number of the session hosts (eg. AVDVM-01). | Default: 2"
+      }
+    },
+    "ReplaceSessionHostOnNewImageVersion": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Required: No | If true, will replace session hosts when a new image version is detected. | Default: true"
+      }
+    },
+    "ReplaceSessionHostOnNewImageVersionDelayDays": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Required: No | Delay in days before replacing session hosts when a new image version is detected. | Default: 0 (no delay)."
+      }
+    },
+    "VMNamesTemplateParameterName": {
+      "type": "string",
+      "defaultValue": "VMNames",
+      "metadata": {
+        "description": "Required: No | The name of the parameter in the template that specifies the VM Names array."
+      }
+    },
+    "SessionHostResourceGroupName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Required: No | Leave this empty to deploy to same resource group as the host pool."
+      }
+    }
+  },
+  "variables": {
+    "varReplacementPlanSettings": [
+      {
+        "name": "_HostPoolResourceGroupName",
+        "value": "[parameters('HostPoolResourceGroupName')]"
+      },
+      {
+        "name": "_HostPoolName",
+        "value": "[parameters('HostPoolName')]"
+      },
+      {
+        "name": "_TargetSessionHostCount",
+        "value": "[parameters('TargetSessionHostCount')]"
+      },
+      {
+        "name": "_SessionHostNamePrefix",
+        "value": "[parameters('SessionHostNamePrefix')]"
+      },
+      {
+        "name": "_SessionHostTemplate",
+        "value": "[parameters('SessionHostTemplate')]"
+      },
+      {
+        "name": "_SessionHostParameters",
+        "value": "[string(parameters('SessionHostParameters'))]"
+      },
+      {
+        "name": "_SubscriptionId",
+        "value": "[subscription().subscriptionId]"
+      },
+      {
+        "name": "_RemoveAzureADDevice",
+        "value": "[parameters('RemoveAzureADDevice')]"
+      },
+      {
+        "name": "_Tag_IncludeInAutomation",
+        "value": "[parameters('TagIncludeInAutomation')]"
+      },
+      {
+        "name": "_Tag_DeployTimestamp",
+        "value": "[parameters('TagDeployTimestamp')]"
+      },
+      {
+        "name": "_Tag_PendingDrainTimestamp",
+        "value": "[parameters('TagPendingDrainTimestamp')]"
+      },
+      {
+        "name": "_Tag_ScalingPlanExclusionTag",
+        "value": "[parameters('TagScalingPlanExclusionTag')]"
+      },
+      {
+        "name": "_TargetVMAgeDays",
+        "value": "[parameters('TargetVMAgeDays')]"
+      },
+      {
+        "name": "_DrainGracePeriodHours",
+        "value": "[parameters('DrainGracePeriodHours')]"
+      },
+      {
+        "name": "_FixSessionHostTags",
+        "value": "[parameters('FixSessionHostTags')]"
+      },
+      {
+        "name": "_SHRDeploymentPrefix",
+        "value": "[parameters('SHRDeploymentPrefix')]"
+      },
+      {
+        "name": "_AllowDownsizing",
+        "value": "[parameters('AllowDownsizing')]"
+      },
+      {
+        "name": "_SessionHostInstanceNumberPadding",
+        "value": "[parameters('SessionHostInstanceNumberPadding')]"
+      },
+      {
+        "name": "_ReplaceSessionHostOnNewImageVersion",
+        "value": "[parameters('ReplaceSessionHostOnNewImageVersion')]"
+      },
+      {
+        "name": "_ReplaceSessionHostOnNewImageVersionDelayDays",
+        "value": "[parameters('ReplaceSessionHostOnNewImageVersionDelayDays')]"
+      },
+      {
+        "name": "_VMNamesTemplateParameterName",
+        "value": "[parameters('VMNamesTemplateParameterName')]"
+      },
+      {
+        "name": "_SessionHostResourceGroupName",
+        "value": "[parameters('SessionHostResourceGroupName')]"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "deployFunctionApp",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "FunctionAppName": {
+            "value": "[parameters('FunctionAppName')]"
+          },
+          "EnableMonitoring": {
+            "value": "[parameters('EnableMonitoring')]"
+          },
+          "UseExistingLAW": {
+            "value": "[parameters('UseExistingLAW')]"
+          },
+          "LogAnalyticsWorkspaceId": {
+            "value": "[parameters('LogAnalyticsWorkspaceId')]"
+          },
+          "ReplacementPlanSettings": {
+            "value": "[variables('varReplacementPlanSettings')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.18.4.5664",
+              "templateHash": "377734598623827096"
+            }
+          },
+          "parameters": {
+            "Location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group."
+              }
+            },
+            "EnableMonitoring": {
+              "type": "bool",
+              "defaultValue": true
+            },
+            "UseExistingLAW": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "LogAnalyticsWorkspaceId": {
+              "type": "string",
+              "defaultValue": "none",
+              "metadata": {
+                "description": "Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights."
+              }
+            },
+            "FunctionAppName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required: Yes | Name of the Function App."
+              }
+            },
+            "FunctionAppZipUrl": {
+              "type": "string",
+              "defaultValue": "https://github.com/WillyMoselhy/AVDReplacementPlans/releases/download/v0.2.0/FunctionApp.zip",
+              "metadata": {
+                "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
+              }
+            },
+            "AppPlanName": {
+              "type": "string",
+              "defaultValue": "Y1",
+              "metadata": {
+                "description": "Required: No | App Service Plan Name | Default: Y1 for consumption based plan"
+              }
+            },
+            "AppPlanTier": {
+              "type": "string",
+              "defaultValue": "Dynamic",
+              "metadata": {
+                "description": "Required: No | App Service Plan Tier | Default: Dynamic for consumption based plan"
+              }
+            },
+            "ReplacementPlanSettings": {
+              "type": "array",
+              "metadata": {
+                "description": "Required: Yes | The following settings are mandatory. Rest are optional.\r\n[\r\n  {\r\n    name: '_HostPoolResourceGroupName'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_HostPoolName'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_RemoveAzureADDevice'\r\n    value: 'bool'\r\n  }\r\n  {\r\n    name: '_SessionHostTemplate'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_SessionHostParameters'\r\n    value: 'hashtable'\r\n  }\r\n  {\r\n    name: '_SubscriptionId'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_TargetSessionHostCount'\r\n    value: 'int'\r\n  }\r\n  {\r\n    name: '_SessionHostNamePrefix'\r\n    value: 'string'\r\n  }\r\n]"
+              }
+            }
+          },
+          "variables": {
+            "varStorageAccountName": "[format('stavdrpfunc{0}', uniqueString(parameters('FunctionAppName')))]",
+            "varLogAnalyticsWorkspaceName": "[format('{0}-law', parameters('FunctionAppName'))]",
+            "varAppServicePlanName": "[format('{0}-asp', parameters('FunctionAppName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Web/sites/extensions",
+              "apiVersion": "2022-03-01",
+              "name": "[format('{0}/{1}', parameters('FunctionAppName'), 'MSDeploy')]",
+              "properties": {
+                "packageUri": "[parameters('FunctionAppZipUrl')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2022-05-01",
+              "name": "[variables('varStorageAccountName')]",
+              "location": "[parameters('Location')]",
+              "kind": "StorageV2",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "properties": {}
+            },
+            {
+              "condition": "[and(parameters('EnableMonitoring'), not(parameters('UseExistingLAW')))]",
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "this-is-a-test",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "sku": {
+                  "name": "PerGB2018"
+                },
+                "retentionInDays": 30
+              }
+            },
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2022-03-01",
+              "name": "[variables('varAppServicePlanName')]",
+              "location": "[parameters('Location')]",
+              "sku": {
+                "name": "[parameters('AppPlanName')]",
+                "tier": "[parameters('AppPlanTier')]"
+              }
+            },
+            {
+              "condition": "[parameters('EnableMonitoring')]",
+              "type": "Microsoft.Insights/components",
+              "apiVersion": "2020-02-02",
+              "name": "[variables('varAppServicePlanName')]",
+              "location": "[parameters('Location')]",
+              "kind": "web",
+              "properties": {
+                "Application_Type": "web",
+                "publicNetworkAccessForIngestion": "Enabled",
+                "publicNetworkAccessForQuery": "Enabled",
+                "WorkspaceResourceId": "[if(parameters('UseExistingLAW'), parameters('LogAnalyticsWorkspaceId'), resourceId('Microsoft.OperationalInsights/workspaces', 'this-is-a-test'))]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', 'this-is-a-test')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2022-03-01",
+              "name": "[parameters('FunctionAppName')]",
+              "location": "[parameters('Location')]",
+              "kind": "functionApp",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "httpsOnly": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('varAppServicePlanName'))]",
+                "siteConfig": {
+                  "use32BitWorkerProcess": false,
+                  "powerShellVersion": "7.2",
+                  "netFrameworkVersion": "v6.0",
+                  "appSettings": "[union(createArray(createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'AzureWebJobsStorage', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey), createObject('name', 'WEBSITE_CONTENTSHARE', 'value', toLower(parameters('FunctionAppName')))), if(parameters('EnableMonitoring'), createArray(createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey)), createArray()), parameters('ReplacementPlanSettings'))]",
+                  "ftpsState": "Disabled"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Insights/components', variables('varAppServicePlanName'))]",
+                "[resourceId('Microsoft.Web/serverfarms', variables('varAppServicePlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "functionAppPrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2022-03-01', 'full').identity.principalId]"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

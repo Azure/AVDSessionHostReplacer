@@ -1,0 +1,11 @@
+﻿TOPIC
+	about_SessionHostReplacer
+	
+SHORT DESCRIPTION
+	Explains how to use the SessionHostReplacer powershell module
+	
+LONG DESCRIPTION
+	<Insert Content here>
+
+KEYWORDS
+	SessionHostReplacer

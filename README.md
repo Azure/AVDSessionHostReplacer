@@ -24,8 +24,8 @@ You can deploy using one of the blow options. This will create,
 ## How it works?
 
 There are two criteria for replacing a session host,
-1. Image Version: Is there a new image version available? If so, we create a new session host with the new image version. This can be from Market Place or Image Gallery Definition.
-2. Session Host VM Age: If the session host is older than a certain age, default is 45 days, we create a new session host and drain the old one.
+1. **Image Version:** Is there a new image version available? If so, we create a new session host with the new image version. This can be from Market Place or Image Gallery Definition.
+2. **Session Host VM Age:** If the session host is older than a certain age, default is 45 days, we create a new session host and drain the old one.
 
 The core of an AVD Session Host Replacer is an Azure Function App built using PowerShell, the function is triggered every hour to check each session host against the above criteria.
 

@@ -29,7 +29,9 @@ There are two criteria for replacing a session host,
 
 The core of an AVD Session Host Replacer is an Azure Function App built using PowerShell, the function is triggered every hour to check each session host against the above criteria.
 
-When deploying, the function uses a template and a parameters PowerShell file for the session host. A sample is available [here](SampleSessionHostTemplate).
+To deploy new session hosts, the function uses an ARM Template. A sample is available [here](SampleSessionHostTemplate).
+
+The template is ideally stored as a [Template Spec](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/template-specs). The Session Host Replacer will pass configured parameters to the template to create the new session host(s).
 
 When deleting an old session host, the function will check if it has existing sessions and,
 

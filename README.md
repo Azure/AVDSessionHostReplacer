@@ -5,11 +5,11 @@
 This tool automates the deployment and replacement of session hosts in an Azure Virtual Desktop host pool.
 
 The best practice for AVD recommends replacing the session hosts instead of maintaining them,
-the AVD Session Host Replacer helps you automate the task of replacing old session hosts with new ones automatically.
+the AVD Session Host Replacer helps you manage the task of replacing old session hosts with new ones automatically.
 
 # Getting started
 
-You can deploy using Bicep. This will create,
+You can deploy using one of the blow options. This will create,
 
 1. **Function App**
 2. **App Service Plan:** Consumption tier. Used to host the function.

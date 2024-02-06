@@ -1,11 +1,11 @@
-# Welcome to Azure Virtual Desktop (AVD) Replacement Plans
+# Welcome to Azure Virtual Desktop (AVD) Session Host Replacer
 
 ## Overview
 
 This tool automates the deployment and replacement of session hosts in an Azure Virtual Desktop host pool.
 
 The best practice for AVD recommends replacing the session hosts instead of maintaining them,
-the AVD Replacement Plans helps you automate the task of replacing old session hosts with new ones automatically.
+the AVD Session Host Replacer helps you automate the task of replacing old session hosts with new ones automatically.
 
 # Getting started
 
@@ -27,7 +27,7 @@ There are two criteria for replacing a session host,
 1. Image Version: Is there a new image version available? If so, we create a new session host with the new image version. This can be from Market Place or Image Gallery Definition.
 2. Session Host VM Age: If the session host is older than a certain age, default is 45 days, we create a new session host and drain the old one.
 
-The core of an AVD Replacement Plan is an Azure Function App built using PowerShell, the function is triggered every hour to check each session host against the above criteria.
+The core of an AVD Session Host Replacer is an Azure Function App built using PowerShell, the function is triggered every hour to check each session host against the above criteria.
 
 When deploying, the function uses a template and a parameters PowerShell file for the session host. A sample is available [here](SampleSessionHostTemplate).
 

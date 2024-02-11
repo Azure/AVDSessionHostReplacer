@@ -58,7 +58,7 @@
                                 {
                                     "name": "LAWSelector",
                                     "type": "Microsoft.Solutions.ResourceSelector",
-                                    "visible": "[and(steps('basics').MonitoringSection.EnableMonitoring , steps('basics').MonitoringSection.UseExistingLAW] )",
+                                    "visible": "[and(steps('basics').MonitoringSection.EnableMonitoring , steps('basics').MonitoringSection.UseExistingLAW])",
                                     "label": "Log Analytics Workspace",
                                     "resourceType": "Microsoft.OperationalInsights/workspaces",
                                     "constraints": {
@@ -75,7 +75,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD Replacement Plans Portal UI Version: 230826-1504",
+                                "text": "AVD Replacement Plans Portal UI Version: 240211-2053",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/WillyMoselhy/AVDReplacementPlans"

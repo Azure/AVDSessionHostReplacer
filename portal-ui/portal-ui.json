@@ -29,23 +29,24 @@
                             }
                         },
                         {
-                            "name": "EnableMonitoring",
-                            "type": "Microsoft.Common.CheckBox",
-                            "label": "Enable Monitoring",
-                            "toolTip": "[Recommended] If enabled, the replacement plan will use App Insights and Log Analytics to collect metrics and logs.",
-                            "defaultValue": true,
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
                             "name": "MonitoringSection",
                             "type": "Microsoft.Common.Section",
                             "label": "Monitoring",
-                            "visible": "[steps('basics').EnableMonitoring]",
+                            "visible": true,
                             "elements": [
                                 {
+                                    "name": "EnableMonitoring",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "label": "Enable Monitoring",
+                                    "toolTip": "[Recommended] If enabled, the replacement plan will use App Insights and Log Analytics to collect metrics and logs.",
+                                    "defaultValue": true,
+                                    "constraints": {
+                                        "required": false
+                                    }
+                                },
+                                {
                                     "name": "UseExistingLAW",
+                                    "visible": "[steps('basics').MonitoringSection.EnableMonitoring]",
                                     "type": "Microsoft.Common.CheckBox",
                                     "label": "Select existing Log Analytics Workspace",
                                     "toolTip": "If enabled, the replacement plan will use the selected Log Analytics Workspace. If disabled, the replacement plan will create a new Log Analytics Workspace.",

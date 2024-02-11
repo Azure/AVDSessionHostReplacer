@@ -330,7 +330,7 @@
         "outputs": {
             "parameters": {
                 "FunctionAppName": "[steps('basics').FunctionAppName]",
-                "EnableMonitoring": "[steps('basics').EnableMonitoring]",
+                "EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
                 "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
                 "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
                 "HostPoolResourceGroupName": "[steps('RequiredParametersStep').HostPoolSelector.resourceGroup]",

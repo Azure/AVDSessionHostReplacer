@@ -58,7 +58,7 @@
                                 {
                                     "name": "LAWSelector",
                                     "type": "Microsoft.Solutions.ResourceSelector",
-                                    "visible": "[steps('basics').MonitoringSection.EnableMonitoring]",
+                                    "visible": "[and(steps('basics').MonitoringSection.EnableMonitoring,steps('basics').UseExistingLAW]",
                                     "label": "Log Analytics Workspace",
                                     "resourceType": "Microsoft.OperationalInsights/workspaces",
                                     "constraints": {
@@ -75,7 +75,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240211-2101",
+                                "text": "AVD session host replacer Portal UI Version: 240211-2103",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/WillyMoselhy/AVDReplacementPlans"

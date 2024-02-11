@@ -50,7 +50,7 @@
                                     "type": "Microsoft.Common.CheckBox",
                                     "label": "Select existing Log Analytics Workspace",
                                     "toolTip": "If enabled, the replacement plan will use the selected Log Analytics Workspace. If disabled, the replacement plan will create a new Log Analytics Workspace.",
-                                    "defaultValue": true,
+                                    "defaultValue": false,
                                     "constraints": {
                                         "required": false
                                     }
@@ -58,11 +58,11 @@
                                 {
                                     "name": "LAWSelector",
                                     "type": "Microsoft.Solutions.ResourceSelector",
-                                    "visible": "[steps('basics').MonitoringSection.UseExistingLAW]",
+                                    "visible": "[and(steps('basics').MonitoringSection.EnableMonitoring , steps('basics').MonitoringSection.UseExistingLAW] )",
                                     "label": "Log Analytics Workspace",
                                     "resourceType": "Microsoft.OperationalInsights/workspaces",
                                     "constraints": {
-                                        "required": true
+                                        "required": "[steps('basics').MonitoringSection.UseExistingLAW]"
                                     },
                                     "options": {
                                         "filter": {}

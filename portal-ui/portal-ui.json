@@ -110,9 +110,22 @@
                             "visible": true
                         },
                         {
+                            "name": "TemplateSpecSelector",
+                            "type": "Microsoft.Solutions.ResourceSelector",
+                            "label": "Select an existing Template Spec",
+                            "visible": "[equals(steps('SessionHostsTemplate').TemplateSpecRadioButton, 'Custom')]",
+                            "resourceType": "Microsoft.Resources/templateSpecs",
+                            "constraints": {
+                                "required": true
+                            },
+                            "options": {
+                                "filter": {}
+                            }
+                        },
+                        {
                             "name": "TemplateParameters",
                             "type": "Microsoft.Common.TextBox",
-
+                            "visible": "[equals(steps('SessionHostsTemplate').TemplateSpecRadioButton, 'Custom')]",
                             "label": "Template Parameters",
                             "toolTip": "The parameters to pass to the template at deployment time. Use json format.",
                             "multiLine": true,
@@ -123,7 +136,7 @@
                         {
                             "name": "TemplateSpecInfoBox",
                             "type": "Microsoft.Common.InfoBox",
-                            "visible": "[greater(length(steps('RequiredParametersStep').TemplateSpecSelector.id), 0)]",
+                            "visible": "[greater(length(steps('SessionHostsTemplate').TemplateSpecSelector.id), 0)]",
                             "options": {
                                 "icon": "Info",
                                 "text": "The system managed identity of the function app requires read access to the Template Spec.",
@@ -142,7 +155,7 @@
                         {
                             "name": "EntraJoinedInfoBox",
                             "type": "Microsoft.Common.InfoBox",
-                            "visible": "[steps('RequiredParametersStep').EntraJoined]",
+                            "visible": "[steps('SessionHostsTemplate').EntraJoined]",
                             "options": {
                                 "icon": "Warning",
                                 "text": "When the VMs are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",

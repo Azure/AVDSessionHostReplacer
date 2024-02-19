@@ -6,13 +6,14 @@ param Location string = resourceGroup().location
 @description('Required: Yes | Name of the Function App.')
 param FunctionAppName string
 
-
-
 //Monitoring
 param EnableMonitoring bool = true
 param UseExistingLAW bool = false
 @description('Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights.')
 param LogAnalyticsWorkspaceId string = 'none'
+
+// Sample Template
+param CreateSampleTemplate bool = false
 
 //Optional Parameters//
 @description('Required: No | Name of the resource group containing the Azure Virtual Desktop Host Pool. | Default: The resource group of the Function App.')
@@ -185,5 +186,13 @@ module FunctionApp 'modules/deployFunctionApp.bicep' = {
     UseExistingLAW: UseExistingLAW
     LogAnalyticsWorkspaceId: LogAnalyticsWorkspaceId
     ReplacementPlanSettings: varReplacementPlanSettings
+  }
+}
+
+module SampleTemplate 'modules/deploySampleTemplateSpec.bicep' = if (CreateSampleTemplate) {
+  name: 'deploySampleTemplateSpec'
+  params: {
+    Location: Location
+    Name: '${HostPoolName}-Spec'
   }
 }

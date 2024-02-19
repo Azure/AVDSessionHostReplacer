@@ -75,12 +75,39 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240211-2107",
+                                "text": "AVD session host replacer Portal UI Version: 240219-1735",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/WillyMoselhy/AVDReplacementPlans"
                                 }
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "SessionHostsTemplate",
+                    "label": "Session Hosts Template",
+                    "steps": [
+                        {
+                            "name": "TemplateSpecRadioButton",
+                            "type": "Microsoft.Common.OptionsGroup",
+                            "label": "Template Spec Selection",
+                            "defaultValue": "Value one",
+                            "toolTip": "Selecting the sample template spec will deploy a simple session host using a market place image. Selecting the custom template spec will allow you to customize the session hosts deployment.",
+                            "constraints": {
+                                "allowedValues": [
+                                    {
+                                        "label": "Sample Template Spec",
+                                        "value": "Sample"
+                                    },
+                                    {
+                                        "label": "Custom Template Spec",
+                                        "value": "Custom"
+                                    }
+                                ],
+                                "required": true
+                            },
+                            "visible": true
                         }
                     ]
                 },

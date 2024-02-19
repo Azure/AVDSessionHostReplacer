@@ -110,6 +110,52 @@
                             "visible": true
                         },
                         {
+                            "name": "SampleTemplateSpecSection",
+                            "type": "Microsoft.Common.Section",
+                            "label": "Sample Template Spec",
+                            "visible": true,
+                            "elements":[
+                                {
+                                    "name": "SubnetId",
+                                    "type": "Microsoft.Common.TextBox",
+                                    "label": "Subnet Id",
+                                    "toolTip": "The resource ID of the subnet to deploy the session hosts to.",
+                                    "constraints": {
+                                        "required": true,
+                                        "regex": "^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft.Network/virtualNetworks/[^/]+/subnets/[^/]+$",
+                                        "validationMessage": "Must be a resource ID of a subnet."
+                                    }
+                                },
+                                {
+                                    "name": "VMSize",
+                                    "type": "Microsoft.Compute.SizeSelector",
+                                    "label": "VM Size",
+                                    "toolTip": "",
+                                    "recommendedSizes": [
+                                        "Standard_D4ds_v5",
+                                        "Standard_B4ms"
+                                    ],
+                                    "constraints": {
+                                      "allowedSizes": [],
+                                      "excludedSizes": [],
+                                      "numAvailabilityZonesRequired": 3,
+                                      "zone": "3"
+                                    },
+                                    "options": {
+                                      "hideDiskTypeFilter": false
+                                    },
+                                    "osPlatform": "Windows",
+                                    "imageReference": {
+                                      "publisher": "MicrosoftWindowsServer",
+                                      "offer": "WindowsServer",
+                                      "sku": "2012-R2-Datacenter"
+                                    },
+                                    "count": 1,
+                                    "visible": true
+                                  }
+                            ]
+                        },
+                        {
                             "name": "TemplateSpecSelector",
                             "type": "Microsoft.Solutions.ResourceSelector",
                             "label": "Select an existing Template Spec",

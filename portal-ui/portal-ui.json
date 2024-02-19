@@ -87,7 +87,7 @@
                 {
                     "name": "SessionHostsTemplate",
                     "label": "Session Hosts Template",
-                    "steps": [
+                    "elements": [
                         {
                             "name": "TemplateSpecRadioButton",
                             "type": "Microsoft.Common.OptionsGroup",

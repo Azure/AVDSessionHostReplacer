@@ -108,6 +108,46 @@
                                 "required": true
                             },
                             "visible": true
+                        },
+                        {
+                            "name": "TemplateParameters",
+                            "type": "Microsoft.Common.TextBox",
+
+                            "label": "Template Parameters",
+                            "toolTip": "The parameters to pass to the template at deployment time. Use json format.",
+                            "multiLine": true,
+                            "constraints": {
+                                "required": true
+                            }
+                        },
+                        {
+                            "name": "TemplateSpecInfoBox",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[greater(length(steps('RequiredParametersStep').TemplateSpecSelector.id), 0)]",
+                            "options": {
+                                "icon": "Info",
+                                "text": "The system managed identity of the function app requires read access to the Template Spec.",
+                                "uri": ""
+                            }
+                        },
+                        {
+                            "name": "EntraJoined",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Session hosts are Entra Joined",
+                            "toolTip": "If the session hosts are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "EntraJoinedInfoBox",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[steps('RequiredParametersStep').EntraJoined]",
+                            "options": {
+                                "icon": "Warning",
+                                "text": "When the VMs are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
+                                "uri": "https://www.microsoft.com"
+                            }
                         }
                     ]
                 },

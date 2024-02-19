@@ -75,10 +75,10 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240219-1735",
+                                "text": "AVD session host replacer Portal UI Version: 240219-1737",
                                 "link": {
                                     "label": "GitHub Repository",
-                                    "uri": "https://github.com/WillyMoselhy/AVDReplacementPlans"
+                                    "uri": "https://github.com/Azure/AVDSessionHostReplacer"
                                 }
                             }
                         }

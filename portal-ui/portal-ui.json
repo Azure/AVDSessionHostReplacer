@@ -75,7 +75,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240219-1737",
+                                "text": "AVD session host replacer Portal UI Version: 240222-1153",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/Azure/AVDSessionHostReplacer"
@@ -174,7 +174,7 @@
                                         {
                                             "name": "sessionHostsOsImage",
                                             "type": "Microsoft.Common.DropDown",
-                                            "visible": "[not(steps('SessionHostsTemplate').sessionHostsOsSection.sessionHostsImageSource)]",
+                                            "visible": "[not(steps('SessionHostsTemplate').StandardTemplateSpecSection.sessionHostsOsSection.sessionHostsImageSource)]",
                                             "label": "OS version",
                                             "filter": true,
                                             "defaultValue": "Windows 11 22H2 (Gen2)",
@@ -228,7 +228,7 @@
                                         {
                                             "name": "sessionHostsComputeGalleryImage",
                                             "type": "Microsoft.Solutions.ResourceSelector",
-                                            "visible": "[steps('SessionHostsTemplate').sessionHostsOsSection.sessionHostsImageSource]",
+                                            "visible": "[steps('SessionHostsTemplate').StandardTemplateSpecSection.sessionHostsOsSection.sessionHostsImageSource]",
                                             "label": "Image",
                                             "resourceType": "Microsoft.Compute/galleries/images",
                                             "constraints": {

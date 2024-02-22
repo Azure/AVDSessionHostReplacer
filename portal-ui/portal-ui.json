@@ -93,12 +93,12 @@
                             "type": "Microsoft.Common.OptionsGroup",
                             "label": "Template Spec Selection",
                             "defaultValue": "Value one",
-                            "toolTip": "Selecting the sample template spec will deploy a simple session host using a market place image. Selecting the custom template spec will allow you to customize the session hosts deployment.",
+                            "toolTip": "Selecting the standard template spec will deploy a simple session host using a market place image with default settings. Selecting the custom template spec will allow you to customize the session hosts deployment.",
                             "constraints": {
                                 "allowedValues": [
                                     {
-                                        "label": "Sample Template Spec",
-                                        "value": "Sample"
+                                        "label": "Standard Template Spec",
+                                        "value": "Standard"
                                     },
                                     {
                                         "label": "Custom Template Spec",
@@ -110,11 +110,11 @@
                             "visible": true
                         },
                         {
-                            "name": "SampleTemplateSpecSection",
+                            "name": "StandardTemplateSpecSection",
                             "type": "Microsoft.Common.Section",
-                            "label": "Sample Template Spec",
-                            "visible": true,
-                            "elements":[
+                            "label": "Standard Template Spec",
+                            "visible": "[steps('SessionHostsTemplate').TemplateSpecRadioButton, 'Standard']",
+                            "elements": [
                                 {
                                     "name": "SubnetId",
                                     "type": "Microsoft.Common.TextBox",
@@ -136,15 +136,107 @@
                                         "Standard_B4ms"
                                     ],
                                     "constraints": {
-                                      "allowedSizes": [],
-                                      "excludedSizes": []
+                                        "allowedSizes": [],
+                                        "excludedSizes": []
                                     },
                                     "options": {
-                                      "hideDiskTypeFilter": false
+                                        "hideDiskTypeFilter": false
                                     },
-                                    "osPlatform": "Windows",
-                                    "visible": true
-                                  }
+                                    "osPlatform": "Windows"
+                                },
+                                {
+                                    "name": "sessionHostsOsSection",
+                                    "type": "Microsoft.Common.Section",
+                                    "visible": true,
+                                    "label": "OS selection",
+                                    "elements": [
+                                        {
+                                            "name": "sessionHostsImageSource",
+                                            "type": "Microsoft.Common.DropDown",
+                                            "label": "OS image source",
+                                            "filter": true,
+                                            "defaultValue": "Marketplace",
+                                            "toolTip": "Select marketplace or build custom image to deploy the session hosts.",
+                                            "constraints": {
+                                                "required": true,
+                                                "allowedValues": [
+                                                    {
+                                                        "label": "Marketplace",
+                                                        "value": false
+                                                    },
+                                                    {
+                                                        "label": "Compute Gallery",
+                                                        "value": true
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "name": "sessionHostsOsImage",
+                                            "type": "Microsoft.Common.DropDown",
+                                            "visible": "[not(steps('SessionHostsTemplate').sessionHostsOsSection.sessionHostsImageSource)]",
+                                            "label": "OS version",
+                                            "filter": true,
+                                            "defaultValue": "Windows 11 22H2 (Gen2)",
+                                            "toolTip": "Select the operating system version of the session hosts.",
+                                            "constraints": {
+                                                "required": true,
+                                                "allowedValues": [
+                                                    {
+                                                        "label": "Windows 10 21H2",
+                                                        "value": "win10_21h2"
+                                                    },
+                                                    {
+                                                        "label": "Windows 10 21H2 - Office 365",
+                                                        "value": "win10_21h2_office"
+                                                    },
+                                                    {
+                                                        "label": "Windows 10 22H2 (Gen2)",
+                                                        "value": "win10_22h2_g2"
+                                                    },
+                                                    {
+                                                        "label": "Windows 10 22H2 - Office 365 (Gen2)",
+                                                        "value": "win10_22h2_office_g2"
+                                                    },
+                                                    {
+                                                        "label": "Windows 11",
+                                                        "value": "win11_21h2"
+                                                    },
+                                                    {
+                                                        "label": "Windows 11 - Office 365",
+                                                        "value": "win11_21h2_office"
+                                                    },
+                                                    {
+                                                        "label": "Windows 11 22H2 (Gen2)",
+                                                        "value": "win11_22h2"
+                                                    },
+                                                    {
+                                                        "label": "Windows 11 22H2 - Office 365 (Gen2)",
+                                                        "value": "win11_22h2_office"
+                                                    },
+                                                    {
+                                                        "label": "Windows 11 23H2 (Gen2)",
+                                                        "value": "win11_23h2"
+                                                    },
+                                                    {
+                                                        "label": "Windows 11 23H2 - Office 365 (Gen2)",
+                                                        "value": "win11_23h2_office"
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "name": "sessionHostsComputeGalleryImage",
+                                            "type": "Microsoft.Solutions.ResourceSelector",
+                                            "visible": "[steps('SessionHostsTemplate').sessionHostsOsSection.sessionHostsImageSource]",
+                                            "label": "Image",
+                                            "resourceType": "Microsoft.Compute/galleries/images",
+                                            "constraints": {
+                                                "required": true
+                                            }
+                                        }
+                                    ]
+                                }
                             ]
                         },
                         {

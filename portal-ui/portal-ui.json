@@ -75,7 +75,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240222-1153",
+                                "text": "AVD session host replacer Portal UI Version: 240225-1153",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/Azure/AVDSessionHostReplacer"
@@ -89,208 +89,50 @@
                     "label": "Session Hosts Template",
                     "elements": [
                         {
-                            "name": "TemplateSpecRadioButton",
-                            "type": "Microsoft.Common.OptionsGroup",
-                            "label": "Template Spec Selection",
-                            "defaultValue": "Value one",
-                            "toolTip": "Selecting the standard template spec will deploy a simple session host using a market place image with default settings. Selecting the custom template spec will allow you to customize the session hosts deployment.",
-                            "constraints": {
-                                "allowedValues": [
-                                    {
-                                        "label": "Standard Template Spec",
-                                        "value": "Standard"
-                                    },
-                                    {
-                                        "label": "Custom Template Spec",
-                                        "value": "Custom"
-                                    }
-                                ],
-                                "required": true
-                            },
-                            "visible": true
-                        },
-                        {
-                            "name": "StandardTemplateSpecSection",
+                            "name": "sessionHostsRegionSection",
                             "type": "Microsoft.Common.Section",
-                            "label": "Standard Template Spec",
-                            "visible": "[steps('SessionHostsTemplate').TemplateSpecRadioButton, 'Standard']",
+                            "label": "Region Settings",
+                            "tooltip": "The section allows you to specify the region where the compute, storage, and key vault resources are deployed.",
                             "elements": [
                                 {
-                                    "name": "SubnetId",
-                                    "type": "Microsoft.Common.TextBox",
-                                    "label": "Subnet Id",
-                                    "toolTip": "The resource ID of the subnet to deploy the session hosts to.",
-                                    "constraints": {
-                                        "required": true,
-                                        "regex": "^/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft.Network/virtualNetworks/[^/]+/subnets/[^/]+$",
-                                        "validationMessage": "Must be a resource ID of a subnet."
+                                    "name": "computeApi",
+                                    "type": "Microsoft.Solutions.ArmApiControl",
+                                    "request": {
+                                        "method": "GET",
+                                        "path": "[concat(steps('basics').resourceScope.subscription.id,'/providers/Microsoft.Compute/resourceTypes?api-version=2021-04-01')]"
                                     }
                                 },
                                 {
-                                    "name": "VMSize",
-                                    "type": "Microsoft.Compute.SizeSelector",
-                                    "label": "VM Size",
-                                    "toolTip": "",
-                                    "recommendedSizes": [
-                                        "Standard_D4ds_v5",
-                                        "Standard_B4ms"
-                                    ],
-                                    "constraints": {
-                                        "allowedSizes": [],
-                                        "excludedSizes": []
-                                    },
+                                    "name": "infoAvailZones",
+                                    "type": "Microsoft.Common.InfoBox",
+                                    "visible": true,
                                     "options": {
-                                        "hideDiskTypeFilter": false
-                                    },
-                                    "osPlatform": "Windows"
+                                        "text": "If you select 'Use availability zones' below, some regions may not be available for deployment of session hosts because not all regions support Availability Zones. \n\nThe 'Session hosts region' drop down will automatically update based on this selection. If the value changes to blank, select an alternate region or set 'Use availability zones' to 'No'.",
+                                        "uri": "https://learn.microsoft.com/azure/reliability/availability-zones-service-support#azure-regions-with-availability-zone-support",
+                                        "style": "Info"
+                                    }
                                 },
                                 {
-                                    "name": "sessionHostsOsSection",
-                                    "type": "Microsoft.Common.Section",
+                                    "name": "sessionHostsAvailabilitySettings",
+                                    "type": "Microsoft.Common.CheckBox",
                                     "visible": true,
-                                    "label": "OS selection",
-                                    "elements": [
-                                        {
-                                            "name": "sessionHostsImageSource",
-                                            "type": "Microsoft.Common.DropDown",
-                                            "label": "OS image source",
-                                            "filter": true,
-                                            "defaultValue": "Marketplace",
-                                            "toolTip": "Select marketplace or build custom image to deploy the session hosts.",
-                                            "constraints": {
-                                                "required": true,
-                                                "allowedValues": [
-                                                    {
-                                                        "label": "Marketplace",
-                                                        "value": false
-                                                    },
-                                                    {
-                                                        "label": "Compute Gallery",
-                                                        "value": true
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "name": "sessionHostsOsImage",
-                                            "type": "Microsoft.Common.DropDown",
-                                            "visible": "[not(steps('SessionHostsTemplate').StandardTemplateSpecSection.sessionHostsOsSection.sessionHostsImageSource)]",
-                                            "label": "OS version",
-                                            "filter": true,
-                                            "defaultValue": "Windows 11 22H2 (Gen2)",
-                                            "toolTip": "Select the operating system version of the session hosts.",
-                                            "constraints": {
-                                                "required": true,
-                                                "allowedValues": [
-                                                    {
-                                                        "label": "Windows 10 21H2",
-                                                        "value": "win10_21h2"
-                                                    },
-                                                    {
-                                                        "label": "Windows 10 21H2 - Office 365",
-                                                        "value": "win10_21h2_office"
-                                                    },
-                                                    {
-                                                        "label": "Windows 10 22H2 (Gen2)",
-                                                        "value": "win10_22h2_g2"
-                                                    },
-                                                    {
-                                                        "label": "Windows 10 22H2 - Office 365 (Gen2)",
-                                                        "value": "win10_22h2_office_g2"
-                                                    },
-                                                    {
-                                                        "label": "Windows 11",
-                                                        "value": "win11_21h2"
-                                                    },
-                                                    {
-                                                        "label": "Windows 11 - Office 365",
-                                                        "value": "win11_21h2_office"
-                                                    },
-                                                    {
-                                                        "label": "Windows 11 22H2 (Gen2)",
-                                                        "value": "win11_22h2"
-                                                    },
-                                                    {
-                                                        "label": "Windows 11 22H2 - Office 365 (Gen2)",
-                                                        "value": "win11_22h2_office"
-                                                    },
-                                                    {
-                                                        "label": "Windows 11 23H2 (Gen2)",
-                                                        "value": "win11_23h2"
-                                                    },
-                                                    {
-                                                        "label": "Windows 11 23H2 - Office 365 (Gen2)",
-                                                        "value": "win11_23h2_office"
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "name": "sessionHostsComputeGalleryImage",
-                                            "type": "Microsoft.Solutions.ResourceSelector",
-                                            "visible": "[steps('SessionHostsTemplate').StandardTemplateSpecSection.sessionHostsOsSection.sessionHostsImageSource]",
-                                            "label": "Image",
-                                            "resourceType": "Microsoft.Compute/galleries/images",
-                                            "constraints": {
-                                                "required": true
-                                            }
-                                        }
-                                    ]
+                                    "label": "Availability zones",
+                                    "defaultValue": true,
+                                    "toolTip": "Distribute compute resources across availability zones. If 'No' is selected then an availability set will be created to host the VMs."
+                                },
+                                {
+                                    "name": "sessionHostsRegion",
+                                    "type": "Microsoft.Common.DropDown",
+                                    "label": "Session hosts region",
+                                    "defaultValue": "[steps('basics').resourceScope.location.displayName]",
+                                    "filter": true,
+                                    "toolTip": "Select the region where the session hosts and required resources are to be deployed.",
+                                    "constraints": {
+                                        "required": true,
+                                        "allowedValues": "[if(equals(steps('SessionHostsTemplate').sessionHostsRegionSection.sessionHostsAvailabilitySettings, false), map(first(map(filter(steps('sessionHosts').sessionHostsRegionSection.computeApi.value, (resourceTypes) => equals(resourceTypes.resourceType, 'virtualMachines')), (item) => item.locations)), (item) => parse(concat('{\"label\":\"', item, '\",\"value\":\"', toLower(replace(item, ' ', '')), '\"}'))), map(filter(first(map(filter(steps('sessionHosts').sessionHostsRegionSection.computeApi.value, (resourceTypes) => equals(resourceTypes.resourceType, 'virtualMachines')), (item) => item.zoneMappings)), (item) => equals(length(item.zones), 3)), (item) => parse(concat('{\"label\":\"', item.location, '\",\"value\":\"', toLower(replace(item.location, ' ', '')), '\"}'))))]"
+                                    }
                                 }
                             ]
-                        },
-                        {
-                            "name": "TemplateSpecSelector",
-                            "type": "Microsoft.Solutions.ResourceSelector",
-                            "label": "Select an existing Template Spec",
-                            "visible": "[equals(steps('SessionHostsTemplate').TemplateSpecRadioButton, 'Custom')]",
-                            "resourceType": "Microsoft.Resources/templateSpecs",
-                            "constraints": {
-                                "required": true
-                            },
-                            "options": {
-                                "filter": {}
-                            }
-                        },
-                        {
-                            "name": "TemplateParameters",
-                            "type": "Microsoft.Common.TextBox",
-                            "visible": "[equals(steps('SessionHostsTemplate').TemplateSpecRadioButton, 'Custom')]",
-                            "label": "Template Parameters",
-                            "toolTip": "The parameters to pass to the template at deployment time. Use json format.",
-                            "multiLine": true,
-                            "constraints": {
-                                "required": true
-                            }
-                        },
-                        {
-                            "name": "TemplateSpecInfoBox",
-                            "type": "Microsoft.Common.InfoBox",
-                            "visible": "[greater(length(steps('SessionHostsTemplate').TemplateSpecSelector.id), 0)]",
-                            "options": {
-                                "icon": "Info",
-                                "text": "The system managed identity of the function app requires read access to the Template Spec.",
-                                "uri": ""
-                            }
-                        },
-                        {
-                            "name": "EntraJoined",
-                            "type": "Microsoft.Common.CheckBox",
-                            "label": "Session hosts are Entra Joined",
-                            "toolTip": "If the session hosts are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "EntraJoinedInfoBox",
-                            "type": "Microsoft.Common.InfoBox",
-                            "visible": "[steps('SessionHostsTemplate').EntraJoined]",
-                            "options": {
-                                "icon": "Warning",
-                                "text": "When the VMs are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
-                                "uri": "https://www.microsoft.com"
-                            }
                         }
                     ]
                 },

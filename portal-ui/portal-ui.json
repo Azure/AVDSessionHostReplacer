@@ -175,7 +175,7 @@
                               ],
                               "required": true
                             },
-                            "visible": "[steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage == 'Marketplace']"
+                            "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Marketplace']"
                           }
                     ]
                 },

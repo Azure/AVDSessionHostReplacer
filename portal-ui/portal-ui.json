@@ -75,7 +75,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240225-1153",
+                                "text": "AVD session host replacer Portal UI Version: 240228-1047",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/Azure/AVDSessionHostReplacer"
@@ -139,10 +139,6 @@
                                         "publisher": "MicrosoftWindowsDesktop",
                                         "offer": "Windows-11",
                                         "sku": "21h2-avd"
-                                    },
-                                    "scope": {
-                                        "location": "[steps('SessionHostsTemplate').sessionHostsRegionSection.sessionHostsRegion]",
-                                        "subscriptionId": "[steps('basics').resourceScope.subscription.subscriptionId]"
                                     }
                                 }
                             ]

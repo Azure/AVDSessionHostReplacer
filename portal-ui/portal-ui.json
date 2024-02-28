@@ -89,60 +89,94 @@
                     "label": "Session Hosts Template",
                     "elements": [
                         {
-                            "name": "sessionHostsRegionSection",
-                            "type": "Microsoft.Common.Section",
-                            "label": "Region Settings",
-                            "elements": [
-                                {
-                                    "name": "SessionHostsRegion",
-                                    "type": "Microsoft.Common.TextBox",
-                                    "label": "Session Hosts Region",
-                                    "defaultValue": "[steps('Basics').resourceGroup.location]",
-                                    "constraints": {
-                                        "required": true
-                                    },
-                                    "visible": true
-                                },
-                                {
-                                    "name": "UseAvailabilityZones",
-                                    "type": "Microsoft.Common.CheckBox",
-                                    "visible": true,
-                                    "label": "Availability zones",
-                                    "defaultValue": true,
-                                    "toolTip": "Distribute compute resources across availability zones. If 'No' is selected then an availability set will be created to host the VMs."
-                                }
-                            ]
+                            "name": "SessionHostsRegion",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Session Hosts Region",
+                            "defaultValue": "[steps('Basics').resourceGroup.location]",
+                            "constraints": {
+                                "required": true
+                            },
+                            "visible": true
                         },
                         {
-                            "name": "SessionHostsSetting",
-                            "type": "Microsoft.Common.Section",
-                            "label": "Region Settings",
-                            "elements": [
+                            "name": "UseAvailabilityZones",
+                            "type": "Microsoft.Common.CheckBox",
+                            "visible": true,
+                            "label": "Availability zones",
+                            "defaultValue": true,
+                            "toolTip": "Distribute compute resources across availability zones. If 'No' is selected then an availability set will be created to host the VMs."
+                        },
+                        {
+                            "name": "sessionHostSize",
+                            "type": "Microsoft.Compute.SizeSelector",
+                            "label": "VM Size",
+                            "toolTip": "",
+                            "recommendedSizes": [
+                                "Standard_D4ads_v5"
+                            ],
+                            "constraints": {
+                                "allowedSizes": [],
+                                "excludedSizes": [],
+                                "required": true
+                            },
+                            "options": {
+                                "hideDiskTypeFilter": true
+                            },
+                            "osPlatform": "Windows",
+                            "imageReference": {
+                                "publisher": "MicrosoftWindowsDesktop",
+                                "offer": "Windows-11",
+                                "sku": "21h2-avd"
+                            }
+                        },
+                        {
+                            "name": "optionMarketPlaceOrCustomImage",
+                            "type": "Microsoft.Common.OptionsGroup",
+                            "label": "Image Source",
+                            "defaultValue": "Marketplace",
+                            "toolTip": "",
+                            "constraints": {
+                              "allowedValues": [
                                 {
-                                    "name": "sessionHostSize",
-                                    "type": "Microsoft.Compute.SizeSelector",
-                                    "label": "VM Size",
-                                    "toolTip": "",
-                                    "recommendedSizes": [
-                                        "Standard_D4ads_v5"
-                                    ],
-                                    "constraints": {
-                                        "allowedSizes": [],
-                                        "excludedSizes": [],
-                                        "required": true
-                                    },
-                                    "options": {
-                                        "hideDiskTypeFilter": true
-                                    },
-                                    "osPlatform": "Windows",
-                                    "imageReference": {
-                                        "publisher": "MicrosoftWindowsDesktop",
-                                        "offer": "Windows-11",
-                                        "sku": "21h2-avd"
-                                    }
+                                  "label": "Marketplace",
+                                  "value": "Marketplace"
+                                },
+                                {
+                                  "label": "Gallery Image",
+                                  "value": "Gallery"
                                 }
-                            ]
-                        }
+                              ],
+                              "required": true
+                            },
+                            "visible": true
+                          },
+                          {
+                            "name": "dropDownMarketPlaceImage",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "Select a Marketplace Image",
+                            "placeholder": "",
+                            "defaultValue": ["win11-23h2-avd"],
+                            "toolTip": "Marketplace images are updated on monthly basis. The Session Host Replacer will replace the session hosts when a new image is available.",
+                            "multiselect": false,
+                            "selectAll": false,
+                            "filter": true,
+                            "filterPlaceholder": "Filter items ...",
+                            "multiLine": true,
+                            "constraints": {
+                              "allowedValues": [
+                                {
+                                  "label": "Windows 11 22H2 multi-session",
+                                  "value": "win11-22h2-avd"
+                                },
+                                {
+                                    "label": "Windows 11 23H2 multi-session",
+                                    "value": "win11-23h2-avd"
+                                }
+                              ],
+                              "required": true
+                            },
+                            "visible": "[steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage == 'Marketplace']"
+                          }
                     ]
                 },
                 {

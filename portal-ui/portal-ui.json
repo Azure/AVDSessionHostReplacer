@@ -582,7 +582,7 @@
 
                 "SessionHostsRegion": "[steps('SessionHostsTemplate').SessionHostsRegion]",
                 "UseAvailabilityZones": "[steps('SessionHostsTemplate').UseAvailabilityZones]",
-                "SessionHostSize": "[steps('SessionHostsTemplate').sessionHostSize]",
+                "SessionHostSize": "[steps('SessionHostsTemplate').SessionHostSize]",
                 "AcceleratedNetworking": "[steps('SessionHostsTemplate').AcceleratedNetworking]",
                 "SessionHostDiskType":  "[steps('SessionHostsTemplate').SessionHostDiskType]",
                 "MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').MarketPlaceOrCustomImage]",

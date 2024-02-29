@@ -12,10 +12,28 @@ param UseExistingLAW bool = false
 @description('Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights.')
 param LogAnalyticsWorkspaceId string = 'none'
 
-// Sample Template
-param CreateSampleTemplate bool = false
+// Session Host Template
+param SessionHostsRegion string
+param UseAvailabilityZones bool
+param SessionHostSize string
+param AcceleratedNetworking bool
+param SessionHostDiskType string
+param MarketPlaceOrCustomImage string
+param MarketPlaceImage string = ''
+param GalleryImageId string = ''
+param SecurityType string
+param SecureBootEnabled bool
+param TpmEnabled bool
+param IdentityServiceProvider string
+param IntuneEnrollment bool
+param ADDomainName string = ''
+param ADDomainJoinUserName string = ''
+@secure()
+param ADJoinUserPassword string = ''
+param ADOUPath string = ''
+param LocalAdminUsername string
 
-//Optional Parameters//
+//Required Parameters
 @description('Required: No | Name of the resource group containing the Azure Virtual Desktop Host Pool. | Default: The resource group of the Function App.')
 param HostPoolResourceGroupName string = resourceGroup().name
 
@@ -28,14 +46,7 @@ param SessionHostNamePrefix string
 @description('Required: Yes | Number of session hosts to maintain in the host pool.')
 param TargetSessionHostCount int
 
-@description('Required: Yes | URI or Template Spec Resource Id of the arm template used to deploy the session hosts.')
-param SessionHostTemplate string
-
-@description('Required: Yes | A compressed (one line) json string containing the parameters of the template used to deploy the session hosts.')
-param SessionHostParameters string
-
-param RemoveAzureADDevice bool = false
-
+// Optional Parameters
 @description('Required: No | Tag name used to indicate that a session host should be included in the automatic replacement process. | Default: IncludeInAutoReplace.')
 param TagIncludeInAutomation string = 'IncludeInAutoReplace'
 
@@ -81,7 +92,7 @@ param SessionHostResourceGroupName string = ''
 /////////////////
 
 //---- Variables ----//
-
+var SessionHostTemplateParameters = {}
 var varReplacementPlanSettings = [
   // Required Parameters //
   {
@@ -102,11 +113,11 @@ var varReplacementPlanSettings = [
   }
   {
     name: '_SessionHostTemplate'
-    value: SessionHostTemplate
+    value: deploySampleTemplateSpec.outputs.TemplateSpecResourceId
   }
   {
     name: '_SessionHostParameters'
-    value: string(SessionHostParameters)
+    value: string(SessionHostTemplateParameters)
   }
   {
     name: '_SubscriptionId'
@@ -114,7 +125,7 @@ var varReplacementPlanSettings = [
   }
   {
     name: '_RemoveAzureADDevice'
-    value: RemoveAzureADDevice
+    value: IdentityServiceProvider == 'EntraID'
   }
 
   // Optional Parameters //
@@ -189,7 +200,7 @@ module FunctionApp 'modules/deployFunctionApp.bicep' = {
   }
 }
 
-module SampleTemplate 'modules/deploySampleTemplateSpec.bicep' = if (CreateSampleTemplate) {
+module deploySampleTemplateSpec 'modules/deploySampleTemplateSpec.bicep' =  {
   name: 'deploySampleTemplateSpec'
   params: {
     Location: Location

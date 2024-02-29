@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.18.4.5664",
-      "templateHash": "17994355629933899764"
+      "version": "0.25.53.49325",
+      "templateHash": "5617876997907511479"
     }
   },
   "parameters": {
@@ -37,6 +37,66 @@
         "description": "Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights."
       }
     },
+    "SessionHostsRegion": {
+      "type": "string"
+    },
+    "UseAvailabilityZones": {
+      "type": "bool"
+    },
+    "SessionHostSize": {
+      "type": "string"
+    },
+    "AcceleratedNetworking": {
+      "type": "bool"
+    },
+    "SessionHostDiskType": {
+      "type": "string"
+    },
+    "MarketPlaceOrCustomImage": {
+      "type": "string"
+    },
+    "MarketPlaceImage": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "GalleryImageId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "SecurityType": {
+      "type": "string"
+    },
+    "SecureBootEnabled": {
+      "type": "bool"
+    },
+    "TpmEnabled": {
+      "type": "bool"
+    },
+    "IdentityServiceProvider": {
+      "type": "string"
+    },
+    "IntuneEnrollment": {
+      "type": "bool"
+    },
+    "ADDomainName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "ADDomainJoinUserName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "ADJoinUserPassword": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+    "ADOUPath": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "LocalAdminUsername": {
+      "type": "string"
+    },
     "HostPoolResourceGroupName": {
       "type": "string",
       "defaultValue": "[resourceGroup().name]",
@@ -61,22 +121,6 @@
       "metadata": {
         "description": "Required: Yes | Number of session hosts to maintain in the host pool."
       }
-    },
-    "SessionHostTemplate": {
-      "type": "string",
-      "metadata": {
-        "description": "Required: Yes | URI or Template Spec Resource Id of the arm template used to deploy the session hosts."
-      }
-    },
-    "SessionHostParameters": {
-      "type": "string",
-      "metadata": {
-        "description": "Required: Yes | A compressed (one line) json string containing the parameters of the template used to deploy the session hosts."
-      }
-    },
-    "RemoveAzureADDevice": {
-      "type": "bool",
-      "defaultValue": false
     },
     "TagIncludeInAutomation": {
       "type": "string",
@@ -178,96 +222,7 @@
     }
   },
   "variables": {
-    "varReplacementPlanSettings": [
-      {
-        "name": "_HostPoolResourceGroupName",
-        "value": "[parameters('HostPoolResourceGroupName')]"
-      },
-      {
-        "name": "_HostPoolName",
-        "value": "[parameters('HostPoolName')]"
-      },
-      {
-        "name": "_TargetSessionHostCount",
-        "value": "[parameters('TargetSessionHostCount')]"
-      },
-      {
-        "name": "_SessionHostNamePrefix",
-        "value": "[parameters('SessionHostNamePrefix')]"
-      },
-      {
-        "name": "_SessionHostTemplate",
-        "value": "[parameters('SessionHostTemplate')]"
-      },
-      {
-        "name": "_SessionHostParameters",
-        "value": "[string(parameters('SessionHostParameters'))]"
-      },
-      {
-        "name": "_SubscriptionId",
-        "value": "[subscription().subscriptionId]"
-      },
-      {
-        "name": "_RemoveAzureADDevice",
-        "value": "[parameters('RemoveAzureADDevice')]"
-      },
-      {
-        "name": "_Tag_IncludeInAutomation",
-        "value": "[parameters('TagIncludeInAutomation')]"
-      },
-      {
-        "name": "_Tag_DeployTimestamp",
-        "value": "[parameters('TagDeployTimestamp')]"
-      },
-      {
-        "name": "_Tag_PendingDrainTimestamp",
-        "value": "[parameters('TagPendingDrainTimestamp')]"
-      },
-      {
-        "name": "_Tag_ScalingPlanExclusionTag",
-        "value": "[parameters('TagScalingPlanExclusionTag')]"
-      },
-      {
-        "name": "_TargetVMAgeDays",
-        "value": "[parameters('TargetVMAgeDays')]"
-      },
-      {
-        "name": "_DrainGracePeriodHours",
-        "value": "[parameters('DrainGracePeriodHours')]"
-      },
-      {
-        "name": "_FixSessionHostTags",
-        "value": "[parameters('FixSessionHostTags')]"
-      },
-      {
-        "name": "_SHRDeploymentPrefix",
-        "value": "[parameters('SHRDeploymentPrefix')]"
-      },
-      {
-        "name": "_AllowDownsizing",
-        "value": "[parameters('AllowDownsizing')]"
-      },
-      {
-        "name": "_SessionHostInstanceNumberPadding",
-        "value": "[parameters('SessionHostInstanceNumberPadding')]"
-      },
-      {
-        "name": "_ReplaceSessionHostOnNewImageVersion",
-        "value": "[parameters('ReplaceSessionHostOnNewImageVersion')]"
-      },
-      {
-        "name": "_ReplaceSessionHostOnNewImageVersionDelayDays",
-        "value": "[parameters('ReplaceSessionHostOnNewImageVersionDelayDays')]"
-      },
-      {
-        "name": "_VMNamesTemplateParameterName",
-        "value": "[parameters('VMNamesTemplateParameterName')]"
-      },
-      {
-        "name": "_SessionHostResourceGroupName",
-        "value": "[parameters('SessionHostResourceGroupName')]"
-      }
-    ]
+    "SessionHostTemplateParameters": {}
   },
   "resources": [
     {
@@ -296,7 +251,96 @@
             "value": "[parameters('LogAnalyticsWorkspaceId')]"
           },
           "ReplacementPlanSettings": {
-            "value": "[variables('varReplacementPlanSettings')]"
+            "value": [
+              {
+                "name": "_HostPoolResourceGroupName",
+                "value": "[parameters('HostPoolResourceGroupName')]"
+              },
+              {
+                "name": "_HostPoolName",
+                "value": "[parameters('HostPoolName')]"
+              },
+              {
+                "name": "_TargetSessionHostCount",
+                "value": "[parameters('TargetSessionHostCount')]"
+              },
+              {
+                "name": "_SessionHostNamePrefix",
+                "value": "[parameters('SessionHostNamePrefix')]"
+              },
+              {
+                "name": "_SessionHostTemplate",
+                "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploySampleTemplateSpec'), '2022-09-01').outputs.TemplateSpecResourceId.value]"
+              },
+              {
+                "name": "_SessionHostParameters",
+                "value": "[string(variables('SessionHostTemplateParameters'))]"
+              },
+              {
+                "name": "_SubscriptionId",
+                "value": "[subscription().subscriptionId]"
+              },
+              {
+                "name": "_RemoveAzureADDevice",
+                "value": "[equals(parameters('IdentityServiceProvider'), 'EntraID')]"
+              },
+              {
+                "name": "_Tag_IncludeInAutomation",
+                "value": "[parameters('TagIncludeInAutomation')]"
+              },
+              {
+                "name": "_Tag_DeployTimestamp",
+                "value": "[parameters('TagDeployTimestamp')]"
+              },
+              {
+                "name": "_Tag_PendingDrainTimestamp",
+                "value": "[parameters('TagPendingDrainTimestamp')]"
+              },
+              {
+                "name": "_Tag_ScalingPlanExclusionTag",
+                "value": "[parameters('TagScalingPlanExclusionTag')]"
+              },
+              {
+                "name": "_TargetVMAgeDays",
+                "value": "[parameters('TargetVMAgeDays')]"
+              },
+              {
+                "name": "_DrainGracePeriodHours",
+                "value": "[parameters('DrainGracePeriodHours')]"
+              },
+              {
+                "name": "_FixSessionHostTags",
+                "value": "[parameters('FixSessionHostTags')]"
+              },
+              {
+                "name": "_SHRDeploymentPrefix",
+                "value": "[parameters('SHRDeploymentPrefix')]"
+              },
+              {
+                "name": "_AllowDownsizing",
+                "value": "[parameters('AllowDownsizing')]"
+              },
+              {
+                "name": "_SessionHostInstanceNumberPadding",
+                "value": "[parameters('SessionHostInstanceNumberPadding')]"
+              },
+              {
+                "name": "_ReplaceSessionHostOnNewImageVersion",
+                "value": "[parameters('ReplaceSessionHostOnNewImageVersion')]"
+              },
+              {
+                "name": "_ReplaceSessionHostOnNewImageVersionDelayDays",
+                "value": "[parameters('ReplaceSessionHostOnNewImageVersionDelayDays')]"
+              },
+              {
+                "name": "_VMNamesTemplateParameterName",
+                "value": "[parameters('VMNamesTemplateParameterName')]"
+              },
+              {
+                "name": "_SessionHostResourceGroupName",
+                "value": "[parameters('SessionHostResourceGroupName')]"
+              }
+            ]
           }
         },
         "template": {
@@ -305,8 +349,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.18.4.5664",
-              "templateHash": "377734598623827096"
+              "version": "0.25.53.49325",
+              "templateHash": "14513711949241447227"
             }
           },
           "parameters": {
@@ -465,6 +509,466 @@
             "functionAppPrincipalId": {
               "type": "string",
               "value": "[reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2022-03-01', 'full').identity.principalId]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'deploySampleTemplateSpec')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "deploySampleTemplateSpec",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "Name": {
+            "value": "[format('{0}-Spec', parameters('HostPoolName'))]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.25.53.49325",
+              "templateHash": "10410516945499591429"
+            }
+          },
+          "parameters": {
+            "Name": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            }
+          },
+          "variables": {
+            "$fxv#0": {
+              "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+              "contentVersion": "1.0.0.0",
+              "metadata": {
+                "_generator": {
+                  "name": "bicep",
+                  "version": "0.24.24.22086",
+                  "templateHash": "4642262244956004834"
+                }
+              },
+              "parameters": {
+                "VMNames": {
+                  "type": "array"
+                },
+                "VMSize": {
+                  "type": "string"
+                },
+                "TimeZone": {
+                  "type": "string"
+                },
+                "Location": {
+                  "type": "string",
+                  "defaultValue": "[[resourceGroup().location]"
+                },
+                "SubnetID": {
+                  "type": "string",
+                  "metadata": {
+                    "description": "This parameter name is mandatory and is passed using this name from AVDMF"
+                  }
+                },
+                "AdminUsername": {
+                  "type": "string"
+                },
+                "AcceleratedNetworking": {
+                  "type": "bool"
+                },
+                "Tags": {
+                  "type": "object",
+                  "defaultValue": {}
+                },
+                "imageReference": {
+                  "type": "object"
+                },
+                "HostPoolName": {
+                  "type": "string"
+                },
+                "HostPoolToken": {
+                  "type": "securestring"
+                },
+                "WVDArtifactsURL": {
+                  "type": "string"
+                },
+                "DomainJoinObject": {
+                  "type": "object",
+                  "defaultValue": {}
+                },
+                "DomainJoinPassword": {
+                  "type": "securestring",
+                  "defaultValue": ""
+                }
+              },
+              "resources": [
+                {
+                  "[string('copy')]": {
+                    "name": "deploySessionHosts",
+                    "count": "[[length(parameters('VMNames'))]"
+                  },
+                  "type": "Microsoft.Resources/deployments",
+                  "apiVersion": "2022-09-01",
+                  "name": "[[format('deploySessionHosts-{0}', parameters('VMNames')[copyIndex()])]",
+                  "properties": {
+                    "expressionEvaluationOptions": {
+                      "scope": "inner"
+                    },
+                    "mode": "Incremental",
+                    "parameters": {
+                      "AcceleratedNetworking": {
+                        "value": "[[parameters('AcceleratedNetworking')]"
+                      },
+                      "AdminUsername": {
+                        "value": "[[parameters('AdminUsername')]"
+                      },
+                      "HostPoolName": {
+                        "value": "[[parameters('HostPoolName')]"
+                      },
+                      "HostPoolToken": {
+                        "value": "[[parameters('HostPoolToken')]"
+                      },
+                      "imageReference": {
+                        "value": "[[parameters('imageReference')]"
+                      },
+                      "SubnetID": {
+                        "value": "[[parameters('SubnetID')]"
+                      },
+                      "TimeZone": {
+                        "value": "[[parameters('TimeZone')]"
+                      },
+                      "VMName": {
+                        "value": "[[parameters('VMNames')[copyIndex()]]"
+                      },
+                      "VMSize": {
+                        "value": "[[parameters('VMSize')]"
+                      },
+                      "WVDArtifactsURL": {
+                        "value": "[[parameters('WVDArtifactsURL')]"
+                      },
+                      "DomainJoinObject": {
+                        "value": "[[parameters('DomainJoinObject')]"
+                      },
+                      "DomainJoinPassword": {
+                        "value": "[[parameters('DomainJoinPassword')]"
+                      },
+                      "Location": {
+                        "value": "[[parameters('Location')]"
+                      },
+                      "Tags": {
+                        "value": "[[parameters('Tags')]"
+                      }
+                    },
+                    "template": {
+                      "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                      "contentVersion": "1.0.0.0",
+                      "metadata": {
+                        "_generator": {
+                          "name": "bicep",
+                          "version": "0.24.24.22086",
+                          "templateHash": "14793981568639137314"
+                        }
+                      },
+                      "parameters": {
+                        "VMName": {
+                          "type": "string"
+                        },
+                        "VMSize": {
+                          "type": "string"
+                        },
+                        "TimeZone": {
+                          "type": "string"
+                        },
+                        "Location": {
+                          "type": "string",
+                          "defaultValue": "[[resourceGroup().location]"
+                        },
+                        "SubnetID": {
+                          "type": "string"
+                        },
+                        "AdminUsername": {
+                          "type": "string"
+                        },
+                        "AdminPassword": {
+                          "type": "securestring",
+                          "defaultValue": "[[newGuid()]"
+                        },
+                        "AcceleratedNetworking": {
+                          "type": "bool"
+                        },
+                        "Tags": {
+                          "type": "object",
+                          "defaultValue": {}
+                        },
+                        "imageReference": {
+                          "type": "object"
+                        },
+                        "HostPoolName": {
+                          "type": "string"
+                        },
+                        "HostPoolToken": {
+                          "type": "securestring"
+                        },
+                        "WVDArtifactsURL": {
+                          "type": "string"
+                        },
+                        "DomainJoinObject": {
+                          "type": "object",
+                          "defaultValue": {}
+                        },
+                        "DomainJoinPassword": {
+                          "type": "securestring",
+                          "defaultValue": ""
+                        }
+                      },
+                      "variables": {
+                        "varRequireNvidiaGPU": "[[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]"
+                      },
+                      "resources": [
+                        {
+                          "type": "Microsoft.Compute/virtualMachines/extensions",
+                          "apiVersion": "2023-07-01",
+                          "name": "[[format('{0}/{1}', parameters('VMName'), 'deployIntegrityMonitoring')]",
+                          "location": "[[parameters('Location')]",
+                          "properties": {
+                            "publisher": "Microsoft.Azure.Security.WindowsAttestation",
+                            "type": "GuestAttestation",
+                            "typeHandlerVersion": "1.0",
+                            "autoUpgradeMinorVersion": true,
+                            "settings": {
+                              "AttestationConfig": {
+                                "MaaSettings": {
+                                  "maaEndpoint": "",
+                                  "maaTenantName": "Guest Attestation"
+                                },
+                                "AscSettings": {
+                                  "ascReportingEndpoint": "",
+                                  "ascReportingFrequency": ""
+                                },
+                                "useCustomToken": "false",
+                                "disableAlerts": "false"
+                              }
+                            }
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                          ]
+                        },
+                        {
+                          "condition": "[[variables('varRequireNvidiaGPU')]",
+                          "type": "Microsoft.Compute/virtualMachines/extensions",
+                          "apiVersion": "2023-07-01",
+                          "name": "[[format('{0}/{1}', parameters('VMName'), 'deployGPUDriversNvidia')]",
+                          "location": "[[parameters('Location')]",
+                          "properties": {
+                            "publisher": "Microsoft.HpcCompute",
+                            "type": "NvidiaGpuDriverWindows",
+                            "typeHandlerVersion": "1.6",
+                            "autoUpgradeMinorVersion": true
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployIntegrityMonitoring')]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                          ]
+                        },
+                        {
+                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'AzureActiveDirectory')]",
+                          "type": "Microsoft.Compute/virtualMachines/extensions",
+                          "apiVersion": "2023-07-01",
+                          "name": "[[format('{0}/{1}', parameters('VMName'), 'AADLoginForWindows')]",
+                          "location": "[[parameters('Location')]",
+                          "properties": {
+                            "publisher": "Microsoft.Azure.ActiveDirectory",
+                            "type": "AADLoginForWindows",
+                            "typeHandlerVersion": "2.0",
+                            "autoUpgradeMinorVersion": true,
+                            "settings": "[[if(contains(parameters('DomainJoinObject'), 'IntuneJoin'), if(parameters('DomainJoinObject').IntuneJoin, createObject('mdmId', '0000000a-0000-0000-c000-000000000000'), null()), null())]"
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                          ]
+                        },
+                        {
+                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'ActiveDirectory')]",
+                          "type": "Microsoft.Compute/virtualMachines/extensions",
+                          "apiVersion": "2023-07-01",
+                          "name": "[[format('{0}/{1}', parameters('VMName'), 'DomainJoin')]",
+                          "location": "[[parameters('Location')]",
+                          "properties": {
+                            "publisher": "Microsoft.Compute",
+                            "type": "JSonADDomainExtension",
+                            "typeHandlerVersion": "1.3",
+                            "autoUpgradeMinorVersion": true,
+                            "settings": {
+                              "Name": "[[parameters('DomainJoinObject').DomainName]",
+                              "OUPath": "[[parameters('DomainJoinObject').OUPath]",
+                              "User": "[[format('{0}\\{1}', parameters('DomainJoinObject').DomainName, parameters('DomainJoinObject').UserName)]",
+                              "Restart": "true",
+                              "Options": 3
+                            },
+                            "protectedSettings": {
+                              "Password": "[[parameters('DomainJoinPassword')]"
+                            }
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                          ]
+                        },
+                        {
+                          "condition": "[[not(equals(parameters('HostPoolName'), ''))]",
+                          "type": "Microsoft.Compute/virtualMachines/extensions",
+                          "apiVersion": "2023-03-01",
+                          "name": "[[format('{0}/{1}', parameters('VMName'), 'JoinHostPool')]",
+                          "location": "[[parameters('Location')]",
+                          "properties": {
+                            "publisher": "Microsoft.PowerShell",
+                            "type": "DSC",
+                            "typeHandlerVersion": "2.77",
+                            "autoUpgradeMinorVersion": true,
+                            "settings": {
+                              "modulesUrl": "[[parameters('WVDArtifactsURL')]",
+                              "configurationFunction": "Configuration.ps1\\AddSessionHost",
+                              "properties": {
+                                "hostPoolName": "[[parameters('HostPoolName')]",
+                                "registrationInfoToken": "[[parameters('HostPoolToken')]",
+                                "aadJoin": "[[if(equals(parameters('DomainJoinObject').DomainType, 'AzureActiveDirectory'), true(), false())]",
+                                "useAgentDownloadEndpoint": true,
+                                "mdmId": "[[if(contains(parameters('DomainJoinObject'), 'IntuneJoin'), if(parameters('DomainJoinObject').IntuneJoin, '0000000a-0000-0000-c000-000000000000', ''), '')]"
+                              }
+                            }
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'AADLoginForWindows')]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'DomainJoin')]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                          ]
+                        },
+                        {
+                          "type": "Microsoft.Network/networkInterfaces",
+                          "apiVersion": "2023-05-01",
+                          "name": "[[format('{0}-vNIC', parameters('VMName'))]",
+                          "location": "[[parameters('Location')]",
+                          "properties": {
+                            "ipConfigurations": [
+                              {
+                                "name": "ipconfig1",
+                                "properties": {
+                                  "subnet": {
+                                    "id": "[[parameters('SubnetID')]"
+                                  }
+                                }
+                              }
+                            ],
+                            "enableAcceleratedNetworking": "[[parameters('AcceleratedNetworking')]"
+                          },
+                          "tags": "[[parameters('Tags')]"
+                        },
+                        {
+                          "type": "Microsoft.Compute/virtualMachines",
+                          "apiVersion": "2023-07-01",
+                          "name": "[[parameters('VMName')]",
+                          "location": "[[parameters('Location')]",
+                          "identity": "[[if(equals(parameters('DomainJoinObject').DomainType, 'AzureActiveDirectory'), createObject('type', 'SystemAssigned'), null())]",
+                          "properties": {
+                            "osProfile": {
+                              "computerName": "[[parameters('VMName')]",
+                              "adminUsername": "[[parameters('AdminUsername')]",
+                              "adminPassword": "[[parameters('AdminPassword')]",
+                              "windowsConfiguration": {
+                                "timeZone": "[[parameters('TimeZone')]"
+                              }
+                            },
+                            "hardwareProfile": {
+                              "vmSize": "[[parameters('VMSize')]"
+                            },
+                            "storageProfile": {
+                              "osDisk": {
+                                "name": "[[format('{0}-OSDisk', parameters('VMName'))]",
+                                "createOption": "FromImage",
+                                "deleteOption": "Delete"
+                              },
+                              "imageReference": "[[parameters('imageReference')]"
+                            },
+                            "securityProfile": {
+                              "securityType": "TrustedLaunch",
+                              "uefiSettings": {
+                                "secureBootEnabled": true,
+                                "vTpmEnabled": true
+                              }
+                            },
+                            "diagnosticsProfile": {
+                              "bootDiagnostics": {
+                                "enabled": true
+                              }
+                            },
+                            "networkProfile": {
+                              "networkInterfaces": [
+                                {
+                                  "id": "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]",
+                                  "properties": {
+                                    "deleteOption": "Delete"
+                                  }
+                                }
+                              ]
+                            },
+                            "licenseType": "Windows_Client"
+                          },
+                          "tags": "[[parameters('Tags')]",
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/templateSpecs/versions",
+              "apiVersion": "2022-02-01",
+              "name": "[format('{0}/{1}', parameters('Name'), 'deploymentTemplateSpecVersion')]",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "mainTemplate": "[variables('$fxv#0')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Resources/templateSpecs', parameters('Name'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/templateSpecs",
+              "apiVersion": "2022-02-01",
+              "name": "[parameters('Name')]",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "description": "Template Spec for deploying VMs through the AVD Replacement Plan",
+                "displayName": "AVD Replacement Plan Session Host Template"
+              }
+            }
+          ],
+          "outputs": {
+            "TemplateSpecResourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Resources/templateSpecs', parameters('Name'))]"
             }
           }
         }

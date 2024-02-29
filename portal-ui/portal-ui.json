@@ -107,7 +107,7 @@
                             "toolTip": "Distribute compute resources across availability zones. If 'No' is selected then an availability set will be created to host the VMs."
                         },
                         {
-                            "name": "sessionHostSize",
+                            "name": "SessionHostSize",
                             "type": "Microsoft.Compute.SizeSelector",
                             "label": "VM Size",
                             "toolTip": "",
@@ -130,14 +130,14 @@
                             }
                         },
                         {
-                            "name": "acceleratedNetworking",
+                            "name": "AcceleratedNetworking",
                             "type": "Microsoft.Common.CheckBox",
                             "label": "Enable accelerated networking",
                             "defaultValue": true,
                             "toolTip": "Enables low latency and high throughput on the network interface."
                         },
                         {
-                            "name": "sessionHostDiskType",
+                            "name": "SessionHostDiskType",
                             "type": "Microsoft.Common.DropDown",
                             "label": "OS Disk type",
                             "filter": false,
@@ -227,7 +227,7 @@
                             "label": "Security profile",
                             "elements": [
                                 {
-                                    "name": "securityType",
+                                    "name": "SecurityType",
                                     "type": "Microsoft.Common.DropDown",
                                     "label": "Security type",
                                     "filter": true,
@@ -252,7 +252,7 @@
                                     }
                                 },
                                 {
-                                    "name": "secureBootEnabled",
+                                    "name": "SecureBootEnabled",
                                     "type": "Microsoft.Common.CheckBox",
                                     "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'ConfidentialVM'))]",
                                     "label": "Enable secure boot",
@@ -260,7 +260,7 @@
                                     "toolTip": "Secure boot helps protect your VMs against boot kits, rootkits, and kernel-level malware."
                                 },
                                 {
-                                    "name": "vTpmEnabled",
+                                    "name": "TpmEnabled",
                                     "type": "Microsoft.Common.CheckBox",
                                     "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'ConfidentialVM'))]",
                                     "label": "Enable vTPM",
@@ -276,7 +276,7 @@
                             "label": "Domain Join",
                             "elements": [
                                 {
-                                    "name": "identityServiceProvider",
+                                    "name": "IdentityServiceProvider",
                                     "type": "Microsoft.Common.OptionsGroup",
                                     "visible": true,
                                     "label": "Identity service provider",
@@ -329,7 +329,7 @@
                                     }
                                 },
                                 {
-                                    "name": "ADJoinUserName",
+                                    "name": "ADDomainJoinUserName",
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "User principal name",
                                     "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.identityServiceProvider, 'EntraID'))]",
@@ -356,7 +356,7 @@
                                     }
                                 },
                                 {
-                                    "name": "ADOuPath",
+                                    "name": "ADOUPath",
                                     "type": "Microsoft.Common.TextBox",
                                     "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.identityServiceProvider, 'EntraID'))]",
                                     "label": "Custom OU path (Optional)",
@@ -367,7 +367,7 @@
                             ]
                         },
                         {
-                            "name": "identityLocalUserName",
+                            "name": "LocalAdminUsername",
                             "type": "Microsoft.Common.TextBox",
                             "label": "Local Administrator Username",
                             "toolTip": "Provide username for session host local admin account. Administrator can't be used as username, it is reserved by the system. The password is randomly generated at deployment time.",
@@ -579,10 +579,31 @@
                 "EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
                 "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
                 "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
+                "SessionHostsRegion": "[steps(SessionHostsTemplate).SessionHostsRegion]",
+                "UseAvailabilityZones": "[steps(SessionHostsTemplate).UseAvailabilityZones]",
+                "SessionHostSize": "[steps(SessionHostsTemplate).sessionHostSize]",
+                "AcceleratedNetworking": "[steps(SessionHostsTemplate).AcceleratedNetworking]",
+                "SessionHostDiskType":  "[steps(SessionHostsTemplate).SessionHostDiskType]",
+                "MarketPlaceOrCustomImage": "[steps(SessionHostsTemplate).MarketPlaceOrCustomImage]",
+                "MarketPlaceImage": "[steps(SessionHostsTemplate).dropDownMarketPlaceImage]",
+                "GalleryImageId":  "[steps(SessionHostsTemplate).resourceSelectorSessionHostGalleryImageId]",
+                "SecurityType":  "[steps(SessionHostsTemplate).sessionHostsSecuritySection.SecurityType]",
+                "SecureBootEnabled": "[steps(SessionHostsTemplate).sessionHostsSecuritySection.SecureBootEnabled]",
+                "TpmEnabled": "[steps(SessionHostsTemplate).sessionHostsSecuritySection.TpmEnabled]",
+                "IdentityServiceProvider": "[steps(SessionHostsTemplate).DomainJoinSection.IdentityServiceProvider]",
+                "IntuneEnrollment":  "[steps(SessionHostsTemplate).DomainJoinSection.IntuneEnrollment]",
+                "ADDomainName": "[steps(SessionHostsTemplate).DomainJoinSection.ADDomainName]",
+                "ADDomainJoinUserName": "[steps(SessionHostsTemplate).DomainJoinSection.ADDomainJoinUserName]",
+                "ADJoinUserPassword":  "[steps(SessionHostsTemplate).DomainJoinSection.ADJoinUserPassword]",
+                "ADOUPath": "[steps(SessionHostsTemplate).DomainJoinSection.ADOuPath]",
+                "LocalAdminUsername": "[steps(SessionHostsTemplate).ADOuPath]",
+
+
+
                 "HostPoolResourceGroupName": "[steps('RequiredParametersStep').HostPoolSelector.resourceGroup]",
                 "HostPoolName": "[steps('RequiredParametersStep').HostPoolSelector.name]",
-                "TargetSessionHostCount": "[steps('RequiredParametersStep').sessionHostsCount]",
                 "SessionHostNamePrefix": "[steps('RequiredParametersStep').sessionHostNamePrefix]",
+                "TargetSessionHostCount": "[steps('RequiredParametersStep').sessionHostsCount]",
                 "TagIncludeInAutomation": "[steps('optionalParametersStep')._Tag_IncludeInAutomation]",
                 "TagDeployTimestamp": "[steps('optionalParametersStep')._Tag_DeployTimestamp]",
                 "TagPendingDrainTimestamp": "[steps('optionalParametersStep')._Tag_PendingDrainTimestamp]",

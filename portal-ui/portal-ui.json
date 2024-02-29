@@ -217,8 +217,66 @@
                                 "filter": {}
                             },
                             "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]"
+                        },
+                        {
+                            "name": "sessionHostsSecuritySection",
+                            "type": "Microsoft.Common.Section",
+                            "visible": "[and(equals(steps('SessionHostsTemplate').deploySessionHosts, true), or(contains(steps('SessionHostsTemplate').sessionHostsOsSection.sessionHostsOsImage, 'win11'), contains(steps('SessionHostsTemplate').sessionHostsOsSection.sessionHostsOsImage, 'g2'), not(empty(steps('SessionHostsTemplate').sessionHostsOsSection.sessionHostsComputeGalleryImage))))]",
+                            "label": "Security profile",
+                            "elements": [
+                                {
+                                    "name": "sessionHostSecurityTypeWarning",
+                                    "type": "Microsoft.Common.InfoBox",
+                                    "visible": "[not(empty(steps('SessionHostsTemplate').sessionHostsOsSection.sessionHostsComputeGalleryImage))]",
+                                    "options": {
+                                        "text": "Setting the Security Type to anything other than 'Standard' requires that the Azure Compute Gallery Image Definition be configured with the Security Type feature set to the appropriate value. You can determine if the image definition supports the required feature by reviewing the 'Properties' tab on the 'Overview' node of the Gallery Image Definition in the portal. If the image definition does not contain these feature options, then the deployment will fail.",
+                                        "uri": "https://learn.microsoft.com/azure/templates/microsoft.compute/galleries/images?pivots=deployment-language-bicep",
+                                        "style": "Warning"
+                                    }
+                                },
+                                {
+                                    "name": "securityType",
+                                    "type": "Microsoft.Common.DropDown",
+                                    "label": "Security type",
+                                    "filter": true,
+                                    "defaultValue": "Trusted Launch Virtual Machines",
+                                    "toolTip": "Choose a type of security that matches your needs: Standard includes basic protections at no additional cost. Trusted launch virtual machines provide additional security features on Gen2 virtual machines to protect against persistent and advanced attacks.",
+                                    "constraints": {
+                                        "required": true,
+                                        "allowedValues": [
+                                            {
+                                                "label": "Standard",
+                                                "value": "Standard"
+                                            },
+                                            {
+                                                "label": "Trusted Launch Virtual Machines",
+                                                "value": "TrustedLaunch"
+                                            },
+                                            {
+                                                "label": "Confidential Virtual Machines",
+                                                "value": "ConfidentialVM"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "secureBootEnabled",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'ConfidentialVM'))]",
+                                    "label": "Enable secure boot",
+                                    "defaultValue": true,
+                                    "toolTip": "Secure boot helps protect your VMs against boot kits, rootkits, and kernel-level malware."
+                                },
+                                {
+                                    "name": "vTpmEnabled",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'ConfidentialVM'))]",
+                                    "label": "Enable vTPM",
+                                    "defaultValue": true,
+                                    "toolTip": "Virtual Trusted Platform Module (vTPM) is TPM2.0 compliant and validates your VM boot integrity apart from securely storing keys and secrets."
+                                }
+                            ]
                         }
-
                     ]
                 },
                 {

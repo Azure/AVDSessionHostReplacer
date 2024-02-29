@@ -579,7 +579,6 @@
                 "EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
                 "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
                 "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
-                "SessionHostsRegion": "[steps(SessionHostsTemplate).SessionHostsRegion]",
                 "UseAvailabilityZones": "[steps(SessionHostsTemplate).UseAvailabilityZones]",
                 "SessionHostSize": "[steps(SessionHostsTemplate).sessionHostSize]",
                 "AcceleratedNetworking": "[steps(SessionHostsTemplate).AcceleratedNetworking]",

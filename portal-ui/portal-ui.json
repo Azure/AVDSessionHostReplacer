@@ -585,7 +585,7 @@
                 "SessionHostSize": "[steps('SessionHostsTemplate').SessionHostSize]",
                 "AcceleratedNetworking": "[steps('SessionHostsTemplate').AcceleratedNetworking]",
                 "SessionHostDiskType":  "[steps('SessionHostsTemplate').SessionHostDiskType]",
-                "MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').MarketPlaceOrCustomImage]",
+                "MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage]",
                 "MarketPlaceImage": "[steps('SessionHostsTemplate').dropDownMarketPlaceImage]",
                 "GalleryImageId":  "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId]",
                 "SecurityType":  "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType]",

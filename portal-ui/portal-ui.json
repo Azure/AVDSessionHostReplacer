@@ -580,7 +580,7 @@
                 "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
                 "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
                 "SessionHostsRegion": "WestEurope",
-                "UseAvailabilityZones": "[steps(SessionHostsTemplate).UseAvailabilityZones]",
+                "UseAvailabilityZones": true,
                 "SessionHostSize": "[steps(SessionHostsTemplate).sessionHostSize]",
                 "AcceleratedNetworking": "[steps(SessionHostsTemplate).AcceleratedNetworking]",
                 "SessionHostDiskType":  "[steps(SessionHostsTemplate).SessionHostDiskType]",

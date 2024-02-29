@@ -596,8 +596,8 @@
                 "ADDomainName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainName]",
                 "ADDomainJoinUserName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainJoinUserName]",
                 "ADJoinUserPassword":  "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",
-                "ADOUPath": "[steps('SessionHostsTemplate').DomainJoinSection.ADOuPath]",
-                "LocalAdminUsername": "[steps('SessionHostsTemplate').ADOuPath]",
+                "ADOUPath": "[steps('SessionHostsTemplate').DomainJoinSection.ADOUPath]",
+                "LocalAdminUsername": "[steps('SessionHostsTemplate').LocalAdminUsername]",
 
                 "HostPoolResourceGroupName": "[steps('RequiredParametersStep').HostPoolSelector.resourceGroup]",
                 "HostPoolName": "[steps('RequiredParametersStep').HostPoolSelector.name]",

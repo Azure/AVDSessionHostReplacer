@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "177862624223272742"
+      "templateHash": "14569351066773811282"
     }
   },
   "parameters": {
@@ -40,8 +40,9 @@
     "SessionHostsRegion": {
       "type": "string"
     },
-    "UseAvailabilityZones": {
-      "type": "bool"
+    "AvailabilityZones": {
+      "type": "array",
+      "defaultValue": []
     },
     "SessionHostSize": {
       "type": "string"
@@ -300,7 +301,7 @@
     "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'MarketPlace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('id', parameters('GalleryImageId')))]",
     "varSessionHostTemplateParameters": {
       "Location": "[parameters('SessionHostsRegion')]",
-      "UseAvailabilityZones": "[parameters('UseAvailabilityZones')]",
+      "AvailabilityZones": "[parameters('AvailabilityZones')]",
       "VMSize": "[parameters('SessionHostSize')]",
       "AcceleratedNetworking": "[parameters('AcceleratedNetworking')]",
       "DiskType": "[parameters('SessionHostDiskType')]",

@@ -15,6 +15,7 @@ param LogAnalyticsWorkspaceId string = 'none'
 // Session Host Template
 param SessionHostsRegion string
 param UseAvailabilityZones bool
+param AvailabilityZones array = []
 param SessionHostSize string
 param AcceleratedNetworking bool
 param SessionHostDiskType string
@@ -176,6 +177,7 @@ var varImageReference = MarketPlaceOrCustomImage == 'MarketPlace' ? {
 var varSessionHostTemplateParameters = {
   Location: SessionHostsRegion
   UseAvailabilityZones: UseAvailabilityZones
+  AvailableZones: AvailabilityZones
   VMSize: SessionHostSize
   AcceleratedNetworking: AcceleratedNetworking
   DiskType: SessionHostDiskType

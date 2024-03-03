@@ -312,10 +312,15 @@
                             },
                             "defaultValue": {},
                             "constraints": {
-                                "minAddressPrefixSize": "/29"
+                                "minAddressPrefixSize": "/29",
+                                "required": true
                             },
                             "options": {
-                                "hideExisting": false
+                                "hideExisting": false,
+                                "filter": {
+                                    "subscription": "onBasics",
+                                    "location": "[steps('SessionHostsTemplate').SessionHostsRegion]"
+                                }
                             },
                             "subnets": {
                                 "subnet1": {
@@ -324,7 +329,8 @@
                                     "constraints": {
                                         "minAddressPrefixSize": "/29",
                                         "minAddressCount": 1,
-                                        "requireContiguousAddresses": false
+                                        "requireContiguousAddresses": false,
+                                        "required": true
                                     }
                                 }
                             },
@@ -653,7 +659,7 @@
                 "TpmEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled]",
                 "IdentityServiceProvider": "[steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider]",
                 "IntuneEnrollment": "[steps('SessionHostsTemplate').DomainJoinSection.IntuneEnrollment]",
-                "SubnetId": "[steps('SessionHostsTemplate').SubnetId]",
+                "SubnetId": "[steps('SessionHostsTemplate').SubnetSelector",
                 "ADDomainName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainName]",
                 "ADDomainJoinUserName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainJoinUserName]",
                 "ADJoinUserPassword": "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",

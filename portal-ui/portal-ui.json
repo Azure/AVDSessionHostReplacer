@@ -296,45 +296,14 @@
                             "visible": true,
                             "placeholder": "Add resource id of subnet in the same region",
                             "constraints": {
-                                "required": true
-                            }
-                        },
-                        {
-                            "name": "SubnetSelector",
-                            "type": "Microsoft.Network.VirtualNetworkCombo",
-                            "label": {
-                                "virtualNetwork": "Virtual network",
-                                "subnets": "Subnets"
-                            },
-                            "toolTip": {
-                                "virtualNetwork": "",
-                                "subnets": ""
-                            },
-                            "defaultValue": {},
-                            "constraints": {
-                                "minAddressPrefixSize": "/29",
-                                "required": true
-                            },
-                            "options": {
-                                "hideExisting": false,
-                                "filter": {
-                                    "subscription": "onBasics",
-                                    "location": "[steps('SessionHostsTemplate').SessionHostsRegion]"
-                                }
-                            },
-                            "subnets": {
-                                "subnet1": {
-                                    "label": "Subnet",
-                                    "defaultValue": {},
-                                    "constraints": {
-                                        "minAddressPrefixSize": "/29",
-                                        "minAddressCount": 1,
-                                        "requireContiguousAddresses": false,
-                                        "required": true
+                                "required": true,
+                                "validations":[
+                                    {
+                                        "regex": ".*/subnets/[A-Za-z0-9]+$",
+                                        "message": "Invalid Subnet Resource ID. Make sure it ends with /subnets/SubnetName"
                                     }
-                                }
-                            },
-                            "visible": true
+                                ]
+                            }
                         },
                         {
                             "name": "DomainJoinSection",
@@ -347,7 +316,7 @@
                                     "type": "Microsoft.Common.OptionsGroup",
                                     "visible": true,
                                     "label": "Identity service provider",
-                                    "defaultValue": "EntraID",
+                                    "defaultValue": "Microsoft Entra ID",
                                     "toolTip": "Identity service provider (ADDS or EntraDS) that already exist and will be used for Azure Virtual Desktop.",
                                     "constraints": {
                                         "required": true,

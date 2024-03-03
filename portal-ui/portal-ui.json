@@ -92,7 +92,7 @@
                             "name": "SessionHostsRegion",
                             "type": "Microsoft.Common.TextBox",
                             "label": "Session Hosts Region",
-                            "defaultValue": "[steps('Basics').resourceGroup.location]",
+                            "defaultValue": "[steps('Basics').resourceScope.resourceGroup.location]",
                             "constraints": {
                                 "required": true
                             },
@@ -105,6 +105,33 @@
                             "label": "Availability zones",
                             "defaultValue": true,
                             "toolTip": "Distribute compute resources across availability zones. If 'No' is selected then an availability set will be created to host the VMs."
+                        },
+                        {
+                            "name": "AvailabilityZones",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "Availability Zone",
+                            "visible": "[steps('SessionHostsTemplate').UseAvailabilityZones]",
+                            "filter": false,
+                            "defaultValue": ["1", "2", "3"],
+                            "multiselect": true,
+                            "toolTip": "Select Availability Zones for the session hosts. Make sure the selected size is available in the selected zones. Session hosts will be deployed across the zones.",
+                            "constraints": {
+                                "required": true,
+                                "allowedValues": [
+                                    {
+                                        "label": "Zone 1",
+                                        "value": "1"
+                                    },
+                                    {
+                                        "label": "Zone 2",
+                                        "value": "2"
+                                    },
+                                    {
+                                        "label": "Zone 3",
+                                        "value": "3"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "name": "SessionHostSize",

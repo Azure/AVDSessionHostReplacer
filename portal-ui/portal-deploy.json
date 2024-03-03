@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "6791722064814611010"
+      "templateHash": "177862624223272742"
     }
   },
   "parameters": {
@@ -71,6 +71,9 @@
     },
     "TpmEnabled": {
       "type": "bool"
+    },
+    "SubnetId": {
+      "type": "string"
     },
     "IdentityServiceProvider": {
       "type": "string"
@@ -306,6 +309,7 @@
       "SecurityType": "[parameters('SecurityType')]",
       "SecureBootEnabled": "[parameters('SecureBootEnabled')]",
       "TpmEnabled": "[parameters('TpmEnabled')]",
+      "SubnetId": "[parameters('SubnetId')]",
       "DomainJoinObject": "[if(not(equals(parameters('IdentityServiceProvider'), 'EntraId')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')), createObject('DomainType', 'EntraId', 'IntuneJoin', parameters('IntuneEnrollment')))]",
       "ADJoinUserPassword": "[format('Placeholder for Keyvault: {0}', parameters('ADJoinUserPassword'))]",
       "AdminUsername": "[parameters('LocalAdminUsername')]"
@@ -357,7 +361,7 @@
               },
               {
                 "name": "_SessionHostTemplate",
-                "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deploySampleTemplateSpec'), '2022-09-01').outputs.TemplateSpecResourceId.value]"
+                "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deployStandardSessionHostTemplate'), '2022-09-01').outputs.TemplateSpecResourceId.value]"
               },
               {
                 "name": "_SessionHostParameters",
@@ -601,13 +605,13 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'deploySampleTemplateSpec')]"
+        "[resourceId('Microsoft.Resources/deployments', 'deployStandardSessionHostTemplate')]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "deploySampleTemplateSpec",
+      "name": "deployStandardSessionHostTemplate",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"

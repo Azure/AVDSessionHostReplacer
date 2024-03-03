@@ -24,6 +24,7 @@ param GalleryImageId string = ''
 param SecurityType string
 param SecureBootEnabled bool
 param TpmEnabled bool
+param SubnetId string
 param IdentityServiceProvider string
 param IntuneEnrollment bool
 param ADDomainName string = ''
@@ -183,6 +184,7 @@ var varSessionHostTemplateParameters = {
   SecurityType: SecurityType
   SecureBootEnabled: SecureBootEnabled
   TpmEnabled: TpmEnabled
+  SubnetId: SubnetId
   DomainJoinObject: IdentityServiceProvider != 'EntraId' ? {
     DomainType: 'ActiveDirectory'
     DomainName: ADDomainName
@@ -215,7 +217,7 @@ value: SessionHostNamePrefix
 }
 {
 name: '_SessionHostTemplate'
-value: deploySampleTemplateSpec.outputs.TemplateSpecResourceId
+value: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
 }
 {
 name: '_SessionHostParameters'
@@ -302,8 +304,8 @@ module FunctionApp 'modules/deployFunctionApp.bicep' = {
   }
 }
 
-module deploySampleTemplateSpec 'modules/deploySampleTemplateSpec.bicep' = {
-  name: 'deploySampleTemplateSpec'
+module deployStandardSessionHostTemplate 'modules/deploySampleTemplateSpec.bicep' = {
+  name: 'deployStandardSessionHostTemplate'
   params: {
     Location: Location
     Name: '${HostPoolName}-Spec'

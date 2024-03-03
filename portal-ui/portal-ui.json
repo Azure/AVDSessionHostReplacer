@@ -254,7 +254,7 @@
                                 {
                                     "name": "SecureBootEnabled",
                                     "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'ConfidentialVM'))]",
+                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'ConfidentialVM'))]",
                                     "label": "Enable secure boot",
                                     "defaultValue": true,
                                     "toolTip": "Secure boot helps protect your VMs against boot kits, rootkits, and kernel-level malware."
@@ -262,7 +262,7 @@
                                 {
                                     "name": "TpmEnabled",
                                     "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.securityType, 'ConfidentialVM'))]",
+                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'ConfidentialVM'))]",
                                     "label": "Enable vTPM",
                                     "defaultValue": true,
                                     "toolTip": "Virtual Trusted Platform Module (vTPM) is TPM2.0 compliant and validates your VM boot integrity apart from securely storing keys and secrets."
@@ -303,7 +303,7 @@
                                 {
                                     "name": "EntraJoinedInfoBox",
                                     "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.identityServiceProvider, 'EntraID')]",
+                                    "visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID')]",
                                     "options": {
                                         "icon": "Warning",
                                         "text": "When the VMs are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
@@ -313,7 +313,7 @@
                                 {
                                     "name": "IntuneEnrollment",
                                     "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.identityServiceProvider, 'EntraID')]",
+                                    "visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID')]",
                                     "label": "Intune enrollment",
                                     "defaultValue": false,
                                     "toolTip": "If Intune is configured in your Microsoft Entra ID tenant, you can choose to have the VM automatically enrolled during the deployment by selecting this box."
@@ -322,7 +322,7 @@
                                     "name": "ADDomainName",
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "AD Domain name",
-                                    "visible": "[or(equals(steps('SessionHostsTemplate').DomainJoinSection.identityServiceProvider, 'ADDS'), equals(steps('SessionHostsTemplate').DomainJoinSection.identityServiceProvider, 'EntraDS'))]",
+                                    "visible": "[or(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'ADDS'), equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraDS'))]",
                                     "placeholder": "Example: contoso.com",
                                     "constraints": {
                                         "required": true
@@ -332,7 +332,7 @@
                                     "name": "ADDomainJoinUserName",
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "User principal name",
-                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.identityServiceProvider, 'EntraID'))]",
+                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
                                     "toolTip": "Provide username with permissions to join session host to the domain.",
                                     "placeholder": "Example: avdadmin@contoso.com",
                                     "defaultValue": "",
@@ -346,7 +346,7 @@
                                     "label": {
                                         "password": "Password"
                                     },
-                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.identityServiceProvider, 'EntraID'))]",
+                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
                                     "toolTip": "Provide password for domain join account. This will be stored in a new Azure Key Vault.",
                                     "constraints": {
                                         "required": true
@@ -358,7 +358,7 @@
                                 {
                                     "name": "ADOUPath",
                                     "type": "Microsoft.Common.TextBox",
-                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.identityServiceProvider, 'EntraID'))]",
+                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
                                     "label": "Custom OU path (Optional)",
                                     "toolTip": "Provide OU where to locate session hosts, if not provided session hosts will be placed on the default (computers) OU.",
                                     "placeholder": "Example: OU=session-hosts,OU=avd,DC=contoso,DC=com",

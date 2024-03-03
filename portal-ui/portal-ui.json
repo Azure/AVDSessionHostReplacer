@@ -109,7 +109,7 @@
                             "selectAll": false,
                             "toolTip": "Select Availability Zones for the session hosts. Make sure the selected size is available in the selected zones. Session hosts will be deployed across the zones.",
                             "constraints": {
-                                "required": true,
+                                "required": false,
                                 "allowedValues": [
                                     {
                                         "label": "Zone 1",
@@ -297,6 +297,18 @@
                             "placeholder": "Add resource id of subnet in the same region",
                             "constraints": {
                                 "required": true
+                            }
+                        },
+                        {
+                            "name": "SubnetSelector",
+                            "type": "Microsoft.Solutions.ResourceSelector",
+                            "label": "Select Subnet",
+                            "resourceType": "Microsoft.Network/virtualNetworks/subnets",
+                            "options": {
+                                "filter": {
+                                    "subscription": "onBasics",
+                                    "location": "onBasics"
+                                }
                             }
                         },
                         {
@@ -609,27 +621,25 @@
                 "EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
                 "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
                 "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
-
                 "SessionHostsRegion": "[steps('SessionHostsTemplate').SessionHostsRegion]",
                 "AvailabilityZones": "[steps('SessionHostsTemplate').AvailabilityZones]",
                 "SessionHostSize": "[steps('SessionHostsTemplate').SessionHostSize]",
                 "AcceleratedNetworking": "[steps('SessionHostsTemplate').AcceleratedNetworking]",
-                "SessionHostDiskType":  "[steps('SessionHostsTemplate').SessionHostDiskType]",
+                "SessionHostDiskType": "[steps('SessionHostsTemplate').SessionHostDiskType]",
                 "MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage]",
                 "MarketPlaceImage": "[steps('SessionHostsTemplate').dropDownMarketPlaceImage]",
-                "GalleryImageId":  "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId]",
-                "SecurityType":  "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType]",
+                "GalleryImageId": "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId]",
+                "SecurityType": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType]",
                 "SecureBootEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecureBootEnabled]",
                 "TpmEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled]",
                 "IdentityServiceProvider": "[steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider]",
-                "IntuneEnrollment":  "[steps('SessionHostsTemplate').DomainJoinSection.IntuneEnrollment]",
+                "IntuneEnrollment": "[steps('SessionHostsTemplate').DomainJoinSection.IntuneEnrollment]",
                 "SubnetId": "[steps('SessionHostsTemplate').SubnetId]",
                 "ADDomainName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainName]",
                 "ADDomainJoinUserName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainJoinUserName]",
-                "ADJoinUserPassword":  "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",
+                "ADJoinUserPassword": "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",
                 "ADOUPath": "[steps('SessionHostsTemplate').DomainJoinSection.ADOUPath]",
                 "LocalAdminUsername": "[steps('SessionHostsTemplate').LocalAdminUsername]",
-
                 "HostPoolResourceGroupName": "[steps('RequiredParametersStep').HostPoolSelector.resourceGroup]",
                 "HostPoolName": "[steps('RequiredParametersStep').HostPoolSelector.name]",
                 "SessionHostNamePrefix": "[steps('RequiredParametersStep').sessionHostNamePrefix]",

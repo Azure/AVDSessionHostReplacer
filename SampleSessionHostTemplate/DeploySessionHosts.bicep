@@ -1,12 +1,11 @@
 // This is a sample bicep file //
 
 param Location string = resourceGroup().location
-param UseAvailabilityZones bool = false
+param AvailabilityZones bool = false
 param VMNames array
 param VMSize string
 param TimeZone string
 
-@description('This parameter name is mandatory and is passed using this name from AVDMF')
 param SubnetID string
 
 param AdminUsername string

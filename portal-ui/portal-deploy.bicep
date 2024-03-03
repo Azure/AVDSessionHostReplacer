@@ -92,99 +92,201 @@ param SessionHostResourceGroupName string = ''
 /////////////////
 
 //---- Variables ----//
-var SessionHostTemplateParameters = {}
+var varMarketPlaceImages = {
+  win10_21h2: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'windows-10'
+    sku: 'win10-21h2-avd'
+  }
+  win10_21h2_office: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win10-21h2-avd-m365'
+  }
+  win10_22h2_g2: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'windows-10'
+    sku: 'win10-22h2-avd-g2'
+  }
+  win10_22h2_office_g2: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win10-22h2-avd-m365-g2'
+  }
+  win11_21h2: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'Windows-11'
+    sku: 'win11-21h2-avd'
+  }
+  win11_21h2_office: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-21h2-avd-m365'
+  }
+  win11_22h2: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'Windows-11'
+    sku: 'win11-22h2-avd'
+  }
+  win11_22h2_office: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-22h2-avd-m365'
+  }
+  win11_23h2: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'Windows-11'
+    sku: 'win11-23h2-avd'
+  }
+  win11_23h2_office: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-23h2-avd-m365'
+  }
+  winServer_2022_Datacenter: {
+    publisher: 'MicrosoftWindowsServer'
+    offer: 'WindowsServer'
+    sku: '2022-datacenter-g2'
+  }
+  winServer_2022_Datacenter_smalldisk_g2: {
+    publisher: 'MicrosoftWindowsServer'
+    offer: 'WindowsServer'
+    sku: '2022-datacenter-smalldisk-g2'
+  }
+  winServer_2022_datacenter_core: {
+    publisher: 'MicrosoftWindowsServer'
+    offer: 'WindowsServer'
+    sku: '2022-datacenter-core-g2'
+  }
+  winServer_2022_Datacenter_core_smalldisk_g2: {
+    publisher: 'MicrosoftWindowsServer'
+    offer: 'WindowsServer'
+    sku: '2022-datacenter-core-smalldisk-g2'
+  }
+}
+var varImageReference = MarketPlaceOrCustomImage == 'MarketPlace' ? {
+  publisher: varMarketPlaceImages[MarketPlaceImage].publisher
+  offer: varMarketPlaceImages[MarketPlaceImage].offer
+  sku: varMarketPlaceImages[MarketPlaceImage].sku
+  version: 'latest'
+} : {
+  id: GalleryImageId
+}
+var varSessionHostTemplateParameters = {
+  Location: SessionHostsRegion
+  UseAvailabilityZones: UseAvailabilityZones
+  VMSize: SessionHostSize
+  AcceleratedNetworking: AcceleratedNetworking
+  DiskType: SessionHostDiskType
+  ImageType: MarketPlaceOrCustomImage
+  imageReference: varImageReference
+  SecurityType: SecurityType
+  SecureBootEnabled: SecureBootEnabled
+  TpmEnabled: TpmEnabled
+  DomainJoinObject: IdentityServiceProvider != 'EntraId' ? {
+    DomainType: 'ActiveDirectory'
+    DomainName: ADDomainName
+    DomainJoinUserName: ADDomainJoinUserName
+    ADOUPath: ADOUPath
+  }: {
+    DomainType: 'EntraId'
+    IntuneJoin: IntuneEnrollment
+  }
+  ADJoinUserPassword: 'Placeholder for Keyvault: ${ADJoinUserPassword}'
+  AdminUsername: LocalAdminUsername
+}
 var varReplacementPlanSettings = [
   // Required Parameters //
   {
     name: '_HostPoolResourceGroupName'
     value: HostPoolResourceGroupName
   }
-  {
-    name: '_HostPoolName'
-    value: HostPoolName
-  }
-  {
-    name: '_TargetSessionHostCount'
-    value: TargetSessionHostCount
-  }
-  {
-    name: '_SessionHostNamePrefix'
-    value: SessionHostNamePrefix
-  }
-  {
-    name: '_SessionHostTemplate'
-    value: deploySampleTemplateSpec.outputs.TemplateSpecResourceId
-  }
-  {
-    name: '_SessionHostParameters'
-    value: string(SessionHostTemplateParameters)
-  }
-  {
-    name: '_SubscriptionId'
-    value: subscription().subscriptionId
-  }
-  {
-    name: '_RemoveAzureADDevice'
-    value: IdentityServiceProvider == 'EntraID'
-  }
+{
+name: '_HostPoolName'
+value: HostPoolName
+}
+{
+name: '_TargetSessionHostCount'
+value: TargetSessionHostCount
+}
+{
+name: '_SessionHostNamePrefix'
+value: SessionHostNamePrefix
+}
+{
+name: '_SessionHostTemplate'
+value: deploySampleTemplateSpec.outputs.TemplateSpecResourceId
+}
+{
+name: '_SessionHostParameters'
+value: string(varSessionHostTemplateParameters)
+}
+{
+name: '_SubscriptionId'
+value: subscription().subscriptionId
+}
+{
+name: '_RemoveAzureADDevice'
+value: IdentityServiceProvider == 'EntraID'
+}
 
-  // Optional Parameters //
-  {
-    name: '_Tag_IncludeInAutomation'
-    value: TagIncludeInAutomation
-  }
-  {
-    name: '_Tag_DeployTimestamp'
-    value: TagDeployTimestamp
-  }
-  {
-    name: '_Tag_PendingDrainTimestamp'
-    value: TagPendingDrainTimestamp
-  }
-  {
-    name: '_Tag_ScalingPlanExclusionTag'
-    value: TagScalingPlanExclusionTag
-  }
-  {
-    name: '_TargetVMAgeDays'
-    value: TargetVMAgeDays
-  }
-  {
-    name: '_DrainGracePeriodHours'
-    value: DrainGracePeriodHours
-  }
-  {
-    name: '_FixSessionHostTags'
-    value: FixSessionHostTags
-  }
-  {
-    name: '_SHRDeploymentPrefix'
-    value: SHRDeploymentPrefix
-  }
-  {
-    name: '_AllowDownsizing'
-    value: AllowDownsizing
-  }
-  {
-    name: '_SessionHostInstanceNumberPadding'
-    value: SessionHostInstanceNumberPadding
-  }
-  {
-    name: '_ReplaceSessionHostOnNewImageVersion'
-    value: ReplaceSessionHostOnNewImageVersion
-  }
-  {
-    name: '_ReplaceSessionHostOnNewImageVersionDelayDays'
-    value: ReplaceSessionHostOnNewImageVersionDelayDays
-  }
-  {
-    name: '_VMNamesTemplateParameterName'
-    value: VMNamesTemplateParameterName
-  }
-  {
-    name: '_SessionHostResourceGroupName'
-    value: SessionHostResourceGroupName
-  }
+// Optional Parameters //
+{
+name: '_Tag_IncludeInAutomation'
+value: TagIncludeInAutomation
+}
+{
+name: '_Tag_DeployTimestamp'
+value: TagDeployTimestamp
+}
+{
+name: '_Tag_PendingDrainTimestamp'
+value: TagPendingDrainTimestamp
+}
+{
+name: '_Tag_ScalingPlanExclusionTag'
+value: TagScalingPlanExclusionTag
+}
+{
+name: '_TargetVMAgeDays'
+value: TargetVMAgeDays
+}
+{
+name: '_DrainGracePeriodHours'
+value: DrainGracePeriodHours
+}
+{
+name: '_FixSessionHostTags'
+value: FixSessionHostTags
+}
+{
+name: '_SHRDeploymentPrefix'
+value: SHRDeploymentPrefix
+}
+{
+name: '_AllowDownsizing'
+value: AllowDownsizing
+}
+{
+name: '_SessionHostInstanceNumberPadding'
+value: SessionHostInstanceNumberPadding
+}
+{
+name: '_ReplaceSessionHostOnNewImageVersion'
+value: ReplaceSessionHostOnNewImageVersion
+}
+{
+name: '_ReplaceSessionHostOnNewImageVersionDelayDays'
+value: ReplaceSessionHostOnNewImageVersionDelayDays
+}
+{
+name: '_VMNamesTemplateParameterName'
+value: VMNamesTemplateParameterName
+}
+{
+name: '_SessionHostResourceGroupName'
+value: SessionHostResourceGroupName
+}
 ]
 
 //---- Modules ----//
@@ -200,7 +302,7 @@ module FunctionApp 'modules/deployFunctionApp.bicep' = {
   }
 }
 
-module deploySampleTemplateSpec 'modules/deploySampleTemplateSpec.bicep' =  {
+module deploySampleTemplateSpec 'modules/deploySampleTemplateSpec.bicep' = {
   name: 'deploySampleTemplateSpec'
   params: {
     Location: Location

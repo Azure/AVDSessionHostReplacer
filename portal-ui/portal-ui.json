@@ -101,7 +101,7 @@
                         {
                             "name": "AvailabilityZones",
                             "type": "Microsoft.Common.DropDown",
-                            "label": "Availability Zone",
+                            "label": "Availability Zones",
                             "visible": true,
                             "filter": false,
                             "defaultValue": [],

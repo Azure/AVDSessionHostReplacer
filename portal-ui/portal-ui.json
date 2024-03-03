@@ -75,7 +75,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240303-1614",
+                                "text": "AVD session host replacer Portal UI Version: 240303-1623",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/Azure/AVDSessionHostReplacer"
@@ -301,15 +301,34 @@
                         },
                         {
                             "name": "SubnetSelector",
-                            "type": "Microsoft.Solutions.ResourceSelector",
-                            "label": "Select Subnet",
-                            "resourceType": "Microsoft.Network/virtualNetworks/subnets",
+                            "type": "Microsoft.Network.VirtualNetworkCombo",
+                            "label": {
+                                "virtualNetwork": "Virtual network",
+                                "subnets": "Subnets"
+                            },
+                            "toolTip": {
+                                "virtualNetwork": "",
+                                "subnets": ""
+                            },
+                            "defaultValue": {},
+                            "constraints": {
+                                "minAddressPrefixSize": "/29"
+                            },
                             "options": {
-                                "filter": {
-                                    "subscription": "onBasics",
-                                    "location": "onBasics"
+                                "hideExisting": false
+                            },
+                            "subnets": {
+                                "subnet1": {
+                                    "label": "Subnet",
+                                    "defaultValue": {},
+                                    "constraints": {
+                                        "minAddressPrefixSize": "/29",
+                                        "minAddressCount": 1,
+                                        "requireContiguousAddresses": false
+                                    }
                                 }
-                            }
+                            },
+                            "visible": true
                         },
                         {
                             "name": "DomainJoinSection",

@@ -15,7 +15,7 @@ param DiskType string
 
 param Tags object = {}
 
-param imageReference object
+param ImageReference object
 param SecurityProfile object
 
 //HostPool join
@@ -37,7 +37,7 @@ module deploySessionHosts 'modules/AVDStandardSessionHost.bicep' = [for vm in VM
     AdminUsername: AdminUsername
     HostPoolName: HostPoolName
     HostPoolToken:  HostPoolToken
-    imageReference: imageReference
+    ImageReference: ImageReference
     SecurityProfile: SecurityProfile
     SubnetID: SubnetID
     TimeZone: TimeZone

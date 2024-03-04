@@ -16,7 +16,7 @@ param AcceleratedNetworking bool
 
 param Tags object = {}
 
-param imageReference object
+param ImageReference object
 param SecurityProfile object
 
 //HostPool join
@@ -84,7 +84,7 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
           storageAccountType: DiskType
         }
       }
-      imageReference: imageReference
+      ImageReference: ImageReference
     }
     securityProfile: SecurityProfile
     diagnosticsProfile: {

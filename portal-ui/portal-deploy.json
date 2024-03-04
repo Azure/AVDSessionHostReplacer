@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "14165378908957973752"
+      "templateHash": "7542024005726780378"
     }
   },
   "parameters": {
@@ -296,7 +296,7 @@
         "sku": "2022-datacenter-core-smalldisk-g2"
       }
     },
-    "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'MarketPlace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('id', parameters('GalleryImageId')))]",
+    "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'MarketPlace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
     "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('securityProfile', createObject('securityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled')))))]",
     "varDomainJoinObject": "[if(not(equals(parameters('IdentityServiceProvider'), 'EntraId')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')), createObject('DomainType', 'EntraId', 'IntuneJoin', parameters('IntuneEnrollment')))]",
     "varSessionHostTemplateParameters": {
@@ -306,7 +306,7 @@
       "AcceleratedNetworking": "[parameters('AcceleratedNetworking')]",
       "DiskType": "[parameters('SessionHostDiskType')]",
       "ImageType": "[parameters('MarketPlaceOrCustomImage')]",
-      "imageReference": "[variables('varImageReference')]",
+      "ImageReference": "[variables('varImageReference')]",
       "SecurityProfile": "[variables('varSecurityProfile')]",
       "SubnetId": "[parameters('SubnetId')]",
       "DomainJoinObject": "[variables('varDomainJoinObject')]",
@@ -440,7 +440,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.25.53.49325",
-              "templateHash": "10846970836458713838"
+              "templateHash": "8574985085639068185"
             }
           },
           "parameters": {
@@ -508,7 +508,7 @@
           "resources": [
             {
               "type": "Microsoft.Web/sites/extensions",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2023-01-01",
               "name": "[format('{0}/{1}', parameters('FunctionAppName'), 'MSDeploy')]",
               "properties": {
                 "packageUri": "[parameters('FunctionAppZipUrl')]"
@@ -570,7 +570,7 @@
             },
             {
               "type": "Microsoft.Web/sites",
-              "apiVersion": "2022-03-01",
+              "apiVersion": "2023-01-01",
               "name": "[parameters('FunctionAppName')]",
               "location": "[parameters('Location')]",
               "kind": "functionApp",
@@ -585,7 +585,12 @@
                   "powerShellVersion": "7.2",
                   "netFrameworkVersion": "v6.0",
                   "appSettings": "[union(createArray(createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'AzureWebJobsStorage', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey), createObject('name', 'WEBSITE_CONTENTSHARE', 'value', toLower(parameters('FunctionAppName')))), if(parameters('EnableMonitoring'), createArray(createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey)), createArray()), parameters('ReplacementPlanSettings'))]",
-                  "ftpsState": "Disabled"
+                  "ftpsState": "Disabled",
+                  "cors": {
+                    "allowedOrigins": [
+                      "https://portal.azure.com"
+                    ]
+                  }
                 }
               },
               "dependsOn": [
@@ -598,7 +603,7 @@
           "outputs": {
             "functionAppPrincipalId": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2022-03-01', 'full').identity.principalId]"
+              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2023-01-01', 'full').identity.principalId]"
             }
           }
         }

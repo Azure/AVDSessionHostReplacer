@@ -159,7 +159,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = if (EnableMoni
 }
 
 // Create ReplaceSessionHost function with Managed System Identity (MSI)
-resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
+resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: FunctionAppName
   location: Location
   kind: 'functionApp'
@@ -175,9 +175,12 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
       netFrameworkVersion: 'v6.0'
       appSettings: varFunctionAppSettingsAndReplacementPlanSettings
       ftpsState: 'Disabled'
+      cors: {
+        allowedOrigins: [ 'https://portal.azure.com' ]
+      }
     }
   }
-  resource deployFromZip 'extensions@2022-03-01' = {
+  resource deployFromZip 'extensions@2023-01-01' = {
     name: 'MSDeploy'
     properties: {
       packageUri: FunctionAppZipUrl

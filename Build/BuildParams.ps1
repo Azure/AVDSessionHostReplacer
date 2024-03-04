@@ -42,7 +42,7 @@ $param = @{
 
             Tags                  = @{}
 
-            imageReference        = @{
+            ImageReference        = @{
                 publisher = 'MicrosoftWindowsDesktop'
                 offer     = 'Windows-11'
                 sku       = 'win11-22h2-avd'

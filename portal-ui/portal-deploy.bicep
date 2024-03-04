@@ -169,7 +169,7 @@ var varImageReference = MarketPlaceOrCustomImage == 'MarketPlace' ? {
   sku: varMarketPlaceImages[MarketPlaceImage].sku
   version: 'latest'
 } : {
-  id: GalleryImageId
+  Id: GalleryImageId
 }
 
 var varSecurityProfile = SecurityType == 'Standard' ? null: {    securityProfile: {
@@ -197,7 +197,7 @@ var varSessionHostTemplateParameters = {
   AcceleratedNetworking: AcceleratedNetworking
   DiskType: SessionHostDiskType
   ImageType: MarketPlaceOrCustomImage
-  imageReference: varImageReference
+  ImageReference: varImageReference
   SecurityProfile: varSecurityProfile
   SubnetId: SubnetId
   DomainJoinObject: varDomainJoinObject

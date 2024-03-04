@@ -86,6 +86,8 @@ param VMNamesTemplateParameterName string = 'VMNames'
 @description('Required: No | Leave this empty to deploy to same resource group as the host pool.')
 param SessionHostResourceGroupName string = ''
 
+param TimeStamp string = utcNow() // Used for unique deployment names. Do Not supply a value for this parameter.
+
 /////////////////
 
 //---- Variables ----//
@@ -296,8 +298,8 @@ var varReplacementPlanSettings = [
   }
 ]
 
-//---- Modules ----//
-module FunctionApp 'modules/deployFunctionApp.bicep' = {
+//---- Resources ----//
+module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'
   params: {
     Location: Location
@@ -314,5 +316,24 @@ module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec.bic
   params: {
     Location: Location
     Name: '${HostPoolName}-Spec'
+  }
+}
+//---- Role Assignments ----//
+module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = {
+  name: 'RBAC-vdiVMContributor-${TimeStamp}'
+  scope: subscription()
+  params: {
+    PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
+    RoleDefinitionId: 'a959dbd1-f747-45e3-8ba6-dd80f235f97c' // Desktop Virtualization Virtual Machine Contributor
+    Scope: subscription().id
+  }
+}
+module RoleAssignments 'modules/RBACRoleAssignment.bicep' = {
+  name: 'RBAC-TemplateSpecReader-${TimeStamp}'
+  scope: subscription()
+  params: {
+    PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
+    RoleDefinitionId: '392ae280-861d-42bd-9ea5-08ee6d83b80e' // Template Spec Reader
+    Scope: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
   }
 }

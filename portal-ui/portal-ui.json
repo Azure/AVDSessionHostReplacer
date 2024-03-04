@@ -468,7 +468,7 @@
                             "label": "Select a Marketplace Image",
                             "placeholder": "",
                             "defaultValue": [
-                                "win11-23h2-avd"
+                                "Windows 11 23H2 multi-session"
                             ],
                             "toolTip": "Marketplace images are updated on monthly basis. The Session Host Replacer will replace the session hosts when a new image is available.",
                             "multiselect": false,

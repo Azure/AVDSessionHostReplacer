@@ -693,7 +693,7 @@
                   "type": "object",
                   "defaultValue": {}
                 },
-                "imageReference": {
+                "ImageReference": {
                   "type": "object"
                 },
                 "SecurityProfile": {
@@ -744,8 +744,8 @@
                       "HostPoolToken": {
                         "value": "[[parameters('HostPoolToken')]"
                       },
-                      "imageReference": {
-                        "value": "[[parameters('imageReference')]"
+                      "ImageReference": {
+                        "value": "[[parameters('ImageReference')]"
                       },
                       "SecurityProfile": {
                         "value": "[[parameters('SecurityProfile')]"
@@ -832,7 +832,7 @@
                           "type": "object",
                           "defaultValue": {}
                         },
-                        "imageReference": {
+                        "ImageReference": {
                           "type": "object"
                         },
                         "SecurityProfile": {
@@ -1030,7 +1030,7 @@
                                   "storageAccountType": "[[parameters('DiskType')]"
                                 }
                               },
-                              "imageReference": "[[parameters('imageReference')]"
+                              "ImageReference": "[[parameters('ImageReference')]"
                             },
                             "securityProfile": "[[parameters('SecurityProfile')]",
                             "diagnosticsProfile": {

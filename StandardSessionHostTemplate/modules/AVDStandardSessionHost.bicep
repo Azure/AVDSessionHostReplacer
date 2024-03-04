@@ -3,7 +3,6 @@
 param VMName string
 param VMSize string
 param DiskType string
-param TimeZone string
 param Location string = resourceGroup().location
 param AvailabilityZones array = []
 param SubnetID string
@@ -68,9 +67,6 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
       computerName: VMName
       adminUsername: AdminUsername
       adminPassword: AdminPassword
-      windowsConfiguration: {
-        timeZone: TimeZone
-      }
     }
     hardwareProfile: {
       vmSize: VMSize

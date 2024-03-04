@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "18357323802641365488"
+      "templateHash": "965061763803638809"
     }
   },
   "parameters": {
@@ -637,7 +637,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.25.53.49325",
-              "templateHash": "14591927611534159579"
+              "templateHash": "16106885443552864447"
             }
           },
           "parameters": {
@@ -657,7 +657,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.25.53.49325",
-                  "templateHash": "294150133018280047"
+                  "templateHash": "11946856797471845609"
                 }
               },
               "parameters": {
@@ -673,9 +673,6 @@
                   "type": "array"
                 },
                 "VMSize": {
-                  "type": "string"
-                },
-                "TimeZone": {
                   "type": "string"
                 },
                 "SubnetID": {
@@ -707,7 +704,8 @@
                   "type": "securestring"
                 },
                 "WVDArtifactsURL": {
-                  "type": "string"
+                  "type": "string",
+                  "defaultValue": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_01-19-2023.zip"
                 },
                 "DomainJoinObject": {
                   "type": "object",
@@ -754,9 +752,6 @@
                       "SubnetID": {
                         "value": "[[parameters('SubnetID')]"
                       },
-                      "TimeZone": {
-                        "value": "[[parameters('TimeZone')]"
-                      },
                       "VMName": {
                         "value": "[[parameters('VMNames')[copyIndex()]]"
                       },
@@ -792,7 +787,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.25.53.49325",
-                          "templateHash": "7619746339126792054"
+                          "templateHash": "5801241672683395031"
                         }
                       },
                       "parameters": {
@@ -803,9 +798,6 @@
                           "type": "string"
                         },
                         "DiskType": {
-                          "type": "string"
-                        },
-                        "TimeZone": {
                           "type": "string"
                         },
                         "Location": {
@@ -1014,10 +1006,7 @@
                             "osProfile": {
                               "computerName": "[[parameters('VMName')]",
                               "adminUsername": "[[parameters('AdminUsername')]",
-                              "adminPassword": "[[parameters('AdminPassword')]",
-                              "windowsConfiguration": {
-                                "timeZone": "[[parameters('TimeZone')]"
-                              }
+                              "adminPassword": "[[parameters('AdminPassword')]"
                             },
                             "hardwareProfile": {
                               "vmSize": "[[parameters('VMSize')]"

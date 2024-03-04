@@ -4,7 +4,6 @@ param Location string = resourceGroup().location
 param AvailabilityZones array = []
 param VMNames array
 param VMSize string
-param TimeZone string
 
 param SubnetID string
 
@@ -22,7 +21,7 @@ param SecurityProfile object
 param HostPoolName string
 @secure()
 param HostPoolToken string
-param WVDArtifactsURL string
+param WVDArtifactsURL string = 'https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_01-19-2023.zip'
 
 //Domain Join
 param DomainJoinObject object = {}
@@ -40,7 +39,6 @@ module deploySessionHosts 'modules/AVDStandardSessionHost.bicep' = [for vm in VM
     ImageReference: ImageReference
     SecurityProfile: SecurityProfile
     SubnetID: SubnetID
-    TimeZone: TimeZone
     VMName: vm
     VMSize: VMSize
     DiskType: DiskType

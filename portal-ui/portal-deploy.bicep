@@ -92,75 +92,75 @@ param TimeStamp string = utcNow() // Used for unique deployment names. Do Not su
 
 //---- Variables ----//
 var varMarketPlaceImages = {
-  win10_21h2: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'windows-10'
-    sku: 'win10-21h2-avd'
-  }
-  win10_21h2_office: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win10-21h2-avd-m365'
-  }
-  win10_22h2_g2: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'windows-10'
-    sku: 'win10-22h2-avd-g2'
-  }
-  win10_22h2_office_g2: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win10-22h2-avd-m365-g2'
-  }
-  win11_21h2: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'Windows-11'
-    sku: 'win11-21h2-avd'
-  }
-  win11_21h2_office: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win11-21h2-avd-m365'
-  }
-  win11_22h2: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'Windows-11'
-    sku: 'win11-22h2-avd'
-  }
-  win11_22h2_office: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win11-22h2-avd-m365'
-  }
-  win11_23h2: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'Windows-11'
-    sku: 'win11-23h2-avd'
-  }
-  win11_23h2_office: {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win11-23h2-avd-m365'
-  }
-  winServer_2022_Datacenter: {
-    publisher: 'MicrosoftWindowsServer'
-    offer: 'WindowsServer'
-    sku: '2022-datacenter-g2'
-  }
-  winServer_2022_Datacenter_smalldisk_g2: {
+  '2022-datacenter-smalldisk-g2': {
     publisher: 'MicrosoftWindowsServer'
     offer: 'WindowsServer'
     sku: '2022-datacenter-smalldisk-g2'
   }
-  winServer_2022_datacenter_core: {
+  'win10-21h2-avd': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'windows-10'
+    sku: 'win10-21h2-avd'
+  }
+  '2022-datacenter-core-g2': {
     publisher: 'MicrosoftWindowsServer'
     offer: 'WindowsServer'
     sku: '2022-datacenter-core-g2'
   }
-  winServer_2022_Datacenter_core_smalldisk_g2: {
+  'win10-22h2-avd-m365-g2': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win10-22h2-avd-m365-g2'
+  }
+  'win11-21h2-avd': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'Windows-11'
+    sku: 'win11-21h2-avd'
+  }
+  'win10-21h2-avd-m365': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win10-21h2-avd-m365'
+  }
+  'win11-22h2-avd-m365': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-22h2-avd-m365'
+  }
+  '2022-datacenter-core-smalldisk-g2': {
     publisher: 'MicrosoftWindowsServer'
     offer: 'WindowsServer'
     sku: '2022-datacenter-core-smalldisk-g2'
+  }
+  'win11-21h2-avd-m365': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-21h2-avd-m365'
+  }
+  'win11-23h2-avd': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'Windows-11'
+    sku: 'win11-23h2-avd'
+  }
+  'win11-23h2-avd-m365': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-23h2-avd-m365'
+  }
+  'win11-22h2-avd': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'Windows-11'
+    sku: 'win11-22h2-avd'
+  }
+  '2022-datacenter-g2': {
+    publisher: 'MicrosoftWindowsServer'
+    offer: 'WindowsServer'
+    sku: '2022-datacenter-g2'
+  }
+  'win10-22h2-avd-g2': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'windows-10'
+    sku: 'win10-22h2-avd-g2'
   }
 }
 var varImageReference = MarketPlaceOrCustomImage == 'Marketplace' ? {

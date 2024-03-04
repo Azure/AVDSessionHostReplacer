@@ -66,7 +66,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240304-1713",
+                                "text": "AVD session host replacer Portal UI Version: 240304-1804",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/Azure/AVDSessionHostReplacer"
@@ -581,7 +581,7 @@
                                     "visible": true,
                                     "label": "Identity service provider",
                                     "defaultValue": "Microsoft Entra ID",
-                                    "toolTip": "Identity service provider (ADDS or EntraDS) that already exist and will be used for Azure Virtual Desktop.",
+                                    "toolTip": "Identity service provider (Active Directory or EntraDS) that already exist and will be used for Azure Virtual Desktop.",
                                     "constraints": {
                                         "required": true,
                                         "allowedValues": [
@@ -591,7 +591,7 @@
                                             },
                                             {
                                                 "label": "Active Directory (AD DS)",
-                                                "value": "ADDS"
+                                                "value": "ActiveDirectory"
                                             },
                                             {
                                                 "label": "Microsoft Entra Domain Services",
@@ -622,7 +622,7 @@
                                     "name": "ADDomainName",
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "AD Domain name",
-                                    "visible": "[or(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'ADDS'), equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraDS'))]",
+                                    "visible": "[or(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'ActiveDirectory'), equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraDS'))]",
                                     "placeholder": "Example: contoso.com",
                                     "constraints": {
                                         "required": true
@@ -891,7 +891,7 @@
                 "TpmEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled]",
                 "IdentityServiceProvider": "[steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider]",
                 "IntuneEnrollment": "[steps('SessionHostsTemplate').DomainJoinSection.IntuneEnrollment]",
-                "SubnetId": "[steps('SessionHostsTemplate').SubnetSelector",
+                "SubnetId": "[steps('SessionHostsTemplate').SubnetSelector]",
                 "ADDomainName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainName]",
                 "ADDomainJoinUserName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainJoinUserName]",
                 "ADJoinUserPassword": "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",

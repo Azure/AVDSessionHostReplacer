@@ -296,9 +296,9 @@
         "sku": "2022-datacenter-core-smalldisk-g2"
       }
     },
-    "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'MarketPlace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
+    "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'Marketplace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
     "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('securityProfile', createObject('securityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled')))))]",
-    "varDomainJoinObject": "[if(not(equals(parameters('IdentityServiceProvider'), 'EntraId')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')), createObject('DomainType', 'EntraId', 'IntuneJoin', parameters('IntuneEnrollment')))]",
+    "varDomainJoinObject": "[if(not(equals(parameters('IdentityServiceProvider'), 'EntraID')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('IntuneEnrollment')))]",
     "varSessionHostTemplateParameters": {
       "Location": "[parameters('SessionHostsRegion')]",
       "AvailabilityZones": "[parameters('AvailabilityZones')]",

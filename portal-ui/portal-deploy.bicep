@@ -163,7 +163,7 @@ var varMarketPlaceImages = {
     sku: '2022-datacenter-core-smalldisk-g2'
   }
 }
-var varImageReference = MarketPlaceOrCustomImage == 'MarketPlace' ? {
+var varImageReference = MarketPlaceOrCustomImage == 'Marketplace' ? {
   publisher: varMarketPlaceImages[MarketPlaceImage].publisher
   offer: varMarketPlaceImages[MarketPlaceImage].offer
   sku: varMarketPlaceImages[MarketPlaceImage].sku
@@ -180,13 +180,13 @@ var varSecurityProfile = SecurityType == 'Standard' ? null: {    securityProfile
   }
 }}
 
-var varDomainJoinObject = IdentityServiceProvider != 'EntraId' ? {
+var varDomainJoinObject = IdentityServiceProvider != 'EntraID' ? {
   DomainType: 'ActiveDirectory'
   DomainName: ADDomainName
   DomainJoinUserName: ADDomainJoinUserName
   ADOUPath: ADOUPath
 } : {
-  DomainType: 'EntraId'
+  DomainType: 'EntraID'
   IntuneJoin: IntuneEnrollment
 }
 

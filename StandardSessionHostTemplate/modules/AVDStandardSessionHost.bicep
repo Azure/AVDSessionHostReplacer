@@ -2,8 +2,10 @@
 
 param VMName string
 param VMSize string
+param DiskType string
 param TimeZone string
 param Location string = resourceGroup().location
+param AvailabilityZones array = []
 param SubnetID string
 param AdminUsername string
 
@@ -15,6 +17,7 @@ param AcceleratedNetworking bool
 param Tags object = {}
 
 param imageReference object
+param SecurityProfile object
 
 //HostPool join
 param HostPoolName string
@@ -28,8 +31,13 @@ param DomainJoinObject object = {}
 @secure()
 param DomainJoinPassword string = ''
 
+
 //---- Variables ----//
-var varRequireNvidiaGPU =  startsWith(VMSize, 'Standard_NC') || contains(VMSize, '_A10_v5')
+var varRequireNvidiaGPU = startsWith(VMSize, 'Standard_NC') || contains(VMSize, '_A10_v5')
+
+var varVMNumber = int(substring(VMName, (lastIndexOf(VMName, '-') + 1),(length(VMName) - (lastIndexOf(VMName, '-') - 1))))
+
+var varAvailabilityZone = AvailabilityZones == [] ? [] : ['${AvailabilityZones[varVMNumber % length(AvailabilityZones)]}']
 
 resource vNIC 'Microsoft.Network/networkInterfaces@2023-05-01' = {
   name: '${VMName}-vNIC'
@@ -53,7 +61,8 @@ resource vNIC 'Microsoft.Network/networkInterfaces@2023-05-01' = {
 resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
   name: VMName
   location: Location
-  identity: (DomainJoinObject.DomainType == 'AzureActiveDirectory') ? { type: 'SystemAssigned' } : any(null)
+  zones: varAvailabilityZone
+  identity: (DomainJoinObject.DomainType == 'EntraId') ? { type: 'SystemAssigned' } : any(null)
   properties: {
     osProfile: {
       computerName: VMName
@@ -71,16 +80,13 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
         name: '${VMName}-OSDisk'
         createOption: 'FromImage'
         deleteOption: 'Delete'
+        managedDisk: {
+          storageAccountType: DiskType
+        }
       }
       imageReference: imageReference
     }
-    securityProfile: {
-      securityType: 'TrustedLaunch'
-      uefiSettings: {
-        secureBootEnabled: true
-        vTpmEnabled: true
-      }
-    }
+    securityProfile: SecurityProfile
     diagnosticsProfile: {
       bootDiagnostics: {
         enabled: true

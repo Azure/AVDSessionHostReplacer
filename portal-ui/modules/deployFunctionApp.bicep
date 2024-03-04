@@ -124,8 +124,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
 }
 
 // Deploy or use Log Analytics Workspace
-resource deployLogAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = if (EnableMonitoring && !UseExistingLAW) {
-  name: 'this-is-a-test'//varLogAnalyticsWorkspaceName
+resource deployLogAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = if (EnableMonitoring && !UseExistingLAW) {
+  name: varLogAnalyticsWorkspaceName
   location: Location
   properties: {
     sku: {

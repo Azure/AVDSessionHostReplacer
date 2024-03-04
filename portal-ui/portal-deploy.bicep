@@ -2,10 +2,6 @@
 @description('Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group.')
 param Location string = resourceGroup().location
 
-//FunctionApp
-@description('Required: Yes | Name of the Function App.')
-param FunctionAppName string
-
 //Monitoring
 param EnableMonitoring bool = true
 param UseExistingLAW bool = false
@@ -173,6 +169,25 @@ var varImageReference = MarketPlaceOrCustomImage == 'MarketPlace' ? {
 } : {
   id: GalleryImageId
 }
+
+var varSecurityProfile = SecurityType == 'Standard' ? null: {    securityProfile: {
+  securityType: SecurityType
+  uefiSettings: {
+    secureBootEnabled: SecureBootEnabled
+    vTpmEnabled: TpmEnabled
+  }
+}}
+
+var varDomainJoinObject = IdentityServiceProvider != 'EntraId' ? {
+  DomainType: 'ActiveDirectory'
+  DomainName: ADDomainName
+  DomainJoinUserName: ADDomainJoinUserName
+  ADOUPath: ADOUPath
+} : {
+  DomainType: 'EntraId'
+  IntuneJoin: IntuneEnrollment
+}
+
 var varSessionHostTemplateParameters = {
   Location: SessionHostsRegion
   AvailabilityZones: AvailabilityZones
@@ -181,19 +196,9 @@ var varSessionHostTemplateParameters = {
   DiskType: SessionHostDiskType
   ImageType: MarketPlaceOrCustomImage
   imageReference: varImageReference
-  SecurityType: SecurityType
-  SecureBootEnabled: SecureBootEnabled
-  TpmEnabled: TpmEnabled
+  SecurityProfile: varSecurityProfile
   SubnetId: SubnetId
-  DomainJoinObject: IdentityServiceProvider != 'EntraId' ? {
-    DomainType: 'ActiveDirectory'
-    DomainName: ADDomainName
-    DomainJoinUserName: ADDomainJoinUserName
-    ADOUPath: ADOUPath
-  }: {
-    DomainType: 'EntraId'
-    IntuneJoin: IntuneEnrollment
-  }
+  DomainJoinObject: varDomainJoinObject
   ADJoinUserPassword: 'Placeholder for Keyvault: ${ADJoinUserPassword}'
   AdminUsername: LocalAdminUsername
 }
@@ -203,92 +208,92 @@ var varReplacementPlanSettings = [
     name: '_HostPoolResourceGroupName'
     value: HostPoolResourceGroupName
   }
-{
-name: '_HostPoolName'
-value: HostPoolName
-}
-{
-name: '_TargetSessionHostCount'
-value: TargetSessionHostCount
-}
-{
-name: '_SessionHostNamePrefix'
-value: SessionHostNamePrefix
-}
-{
-name: '_SessionHostTemplate'
-value: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
-}
-{
-name: '_SessionHostParameters'
-value: string(varSessionHostTemplateParameters)
-}
-{
-name: '_SubscriptionId'
-value: subscription().subscriptionId
-}
-{
-name: '_RemoveAzureADDevice'
-value: IdentityServiceProvider == 'EntraID'
-}
+  {
+    name: '_HostPoolName'
+    value: HostPoolName
+  }
+  {
+    name: '_TargetSessionHostCount'
+    value: TargetSessionHostCount
+  }
+  {
+    name: '_SessionHostNamePrefix'
+    value: SessionHostNamePrefix
+  }
+  {
+    name: '_SessionHostTemplate'
+    value: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
+  }
+  {
+    name: '_SessionHostParameters'
+    value: string(varSessionHostTemplateParameters)
+  }
+  {
+    name: '_SubscriptionId'
+    value: subscription().subscriptionId
+  }
+  {
+    name: '_RemoveAzureADDevice'
+    value: IdentityServiceProvider == 'EntraID'
+  }
 
-// Optional Parameters //
-{
-name: '_Tag_IncludeInAutomation'
-value: TagIncludeInAutomation
-}
-{
-name: '_Tag_DeployTimestamp'
-value: TagDeployTimestamp
-}
-{
-name: '_Tag_PendingDrainTimestamp'
-value: TagPendingDrainTimestamp
-}
-{
-name: '_Tag_ScalingPlanExclusionTag'
-value: TagScalingPlanExclusionTag
-}
-{
-name: '_TargetVMAgeDays'
-value: TargetVMAgeDays
-}
-{
-name: '_DrainGracePeriodHours'
-value: DrainGracePeriodHours
-}
-{
-name: '_FixSessionHostTags'
-value: FixSessionHostTags
-}
-{
-name: '_SHRDeploymentPrefix'
-value: SHRDeploymentPrefix
-}
-{
-name: '_AllowDownsizing'
-value: AllowDownsizing
-}
-{
-name: '_SessionHostInstanceNumberPadding'
-value: SessionHostInstanceNumberPadding
-}
-{
-name: '_ReplaceSessionHostOnNewImageVersion'
-value: ReplaceSessionHostOnNewImageVersion
-}
-{
-name: '_ReplaceSessionHostOnNewImageVersionDelayDays'
-value: ReplaceSessionHostOnNewImageVersionDelayDays
-}
-{
-name: '_VMNamesTemplateParameterName'
-value: VMNamesTemplateParameterName
-}
-{
-name: '_SessionHostResourceGroupName'
-value: SessionHostResourceGroupName
-}
+  // Optional Parameters //
+  {
+    name: '_Tag_IncludeInAutomation'
+    value: TagIncludeInAutomation
+  }
+  {
+    name: '_Tag_DeployTimestamp'
+    value: TagDeployTimestamp
+  }
+  {
+    name: '_Tag_PendingDrainTimestamp'
+    value: TagPendingDrainTimestamp
+  }
+  {
+    name: '_Tag_ScalingPlanExclusionTag'
+    value: TagScalingPlanExclusionTag
+  }
+  {
+    name: '_TargetVMAgeDays'
+    value: TargetVMAgeDays
+  }
+  {
+    name: '_DrainGracePeriodHours'
+    value: DrainGracePeriodHours
+  }
+  {
+    name: '_FixSessionHostTags'
+    value: FixSessionHostTags
+  }
+  {
+    name: '_SHRDeploymentPrefix'
+    value: SHRDeploymentPrefix
+  }
+  {
+    name: '_AllowDownsizing'
+    value: AllowDownsizing
+  }
+  {
+    name: '_SessionHostInstanceNumberPadding'
+    value: SessionHostInstanceNumberPadding
+  }
+  {
+    name: '_ReplaceSessionHostOnNewImageVersion'
+    value: ReplaceSessionHostOnNewImageVersion
+  }
+  {
+    name: '_ReplaceSessionHostOnNewImageVersionDelayDays'
+    value: ReplaceSessionHostOnNewImageVersionDelayDays
+  }
+  {
+    name: '_VMNamesTemplateParameterName'
+    value: VMNamesTemplateParameterName
+  }
+  {
+    name: '_SessionHostResourceGroupName'
+    value: SessionHostResourceGroupName
+  }
 ]
 
 //---- Modules ----//
@@ -296,7 +301,7 @@ module FunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'
   params: {
     Location: Location
-    FunctionAppName: FunctionAppName
+    FunctionAppName: 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id,HostPoolName)}'
     EnableMonitoring: EnableMonitoring
     UseExistingLAW: UseExistingLAW
     LogAnalyticsWorkspaceId: LogAnalyticsWorkspaceId
@@ -304,7 +309,7 @@ module FunctionApp 'modules/deployFunctionApp.bicep' = {
   }
 }
 
-module deployStandardSessionHostTemplate 'modules/deploySampleTemplateSpec.bicep' = {
+module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec.bicep' = {
   name: 'deployStandardSessionHostTemplate'
   params: {
     Location: Location

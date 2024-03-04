@@ -563,7 +563,7 @@
                                 "required": true,
                                 "validations": [
                                     {
-                                        "regex": ".*/subnets/[A-Za-z0-9]+$",
+                                        "regex": ".*/subnets/[A-Za-z0-9_\\.-]+$",
                                         "message": "Invalid Subnet Resource ID. Make sure it ends with /subnets/SubnetName"
                                     }
                                 ]

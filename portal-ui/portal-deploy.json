@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "5596054019402755500"
+      "templateHash": "18357323802641365488"
     }
   },
   "parameters": {
@@ -297,7 +297,7 @@
       }
     },
     "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'Marketplace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
-    "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('securityProfile', createObject('securityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled')))))]",
+    "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('securityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled'))))]",
     "varDomainJoinObject": "[if(not(equals(parameters('IdentityServiceProvider'), 'EntraID')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('IntuneEnrollment')))]",
     "varSessionHostTemplateParameters": {
       "Location": "[parameters('SessionHostsRegion')]",
@@ -311,7 +311,8 @@
       "SubnetId": "[parameters('SubnetId')]",
       "DomainJoinObject": "[variables('varDomainJoinObject')]",
       "ADJoinUserPassword": "[format('Placeholder for Keyvault: {0}', parameters('ADJoinUserPassword'))]",
-      "AdminUsername": "[parameters('LocalAdminUsername')]"
+      "AdminUsername": "[parameters('LocalAdminUsername')]",
+      "tags": {}
     }
   },
   "resources": [

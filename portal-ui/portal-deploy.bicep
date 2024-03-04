@@ -172,13 +172,13 @@ var varImageReference = MarketPlaceOrCustomImage == 'Marketplace' ? {
   Id: GalleryImageId
 }
 
-var varSecurityProfile = SecurityType == 'Standard' ? null: {    securityProfile: {
+var varSecurityProfile = SecurityType == 'Standard' ? null : {
   securityType: SecurityType
   uefiSettings: {
     secureBootEnabled: SecureBootEnabled
     vTpmEnabled: TpmEnabled
   }
-}}
+}
 
 var varDomainJoinObject = IdentityServiceProvider != 'EntraID' ? {
   DomainType: 'ActiveDirectory'
@@ -203,6 +203,7 @@ var varSessionHostTemplateParameters = {
   DomainJoinObject: varDomainJoinObject
   ADJoinUserPassword: 'Placeholder for Keyvault: ${ADJoinUserPassword}'
   AdminUsername: LocalAdminUsername
+  tags: {}
 }
 var varReplacementPlanSettings = [
   // Required Parameters //
@@ -303,7 +304,7 @@ module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'
   params: {
     Location: Location
-    FunctionAppName: 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id,HostPoolName)}'
+    FunctionAppName: 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
     EnableMonitoring: EnableMonitoring
     UseExistingLAW: UseExistingLAW
     LogAnalyticsWorkspaceId: LogAnalyticsWorkspaceId

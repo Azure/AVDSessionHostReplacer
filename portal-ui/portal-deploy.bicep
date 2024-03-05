@@ -196,12 +196,11 @@ var varSessionHostTemplateParameters = {
   VMSize: SessionHostSize
   AcceleratedNetworking: AcceleratedNetworking
   DiskType: SessionHostDiskType
-  ImageType: MarketPlaceOrCustomImage
   ImageReference: varImageReference
   SecurityProfile: varSecurityProfile
   SubnetId: SubnetId
   DomainJoinObject: varDomainJoinObject
-  ADJoinUserPassword: 'Placeholder for Keyvault: ${ADJoinUserPassword}'
+  DomainJoinPassword: 'Placeholder for Keyvault: ${ADJoinUserPassword}'
   AdminUsername: LocalAdminUsername
   tags: {}
 }

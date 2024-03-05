@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "10342229994275012369"
+      "templateHash": "17436382268809867662"
     }
   },
   "parameters": {
@@ -636,7 +636,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.25.53.49325",
-              "templateHash": "15537484189098848553"
+              "templateHash": "17702527997280175531"
             }
           },
           "parameters": {
@@ -656,7 +656,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.25.53.49325",
-                  "templateHash": "2802635162645144830"
+                  "templateHash": "8286586008382207877"
                 }
               },
               "parameters": {
@@ -786,7 +786,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.25.53.49325",
-                          "templateHash": "5489753956665378564"
+                          "templateHash": "6908079971974050968"
                         }
                       },
                       "parameters": {
@@ -856,7 +856,7 @@
                       "resources": [
                         {
                           "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-07-01",
+                          "apiVersion": "2023-09-01",
                           "name": "[[format('{0}/{1}', parameters('VMName'), 'deployIntegrityMonitoring')]",
                           "location": "[[parameters('Location')]",
                           "properties": {
@@ -886,7 +886,7 @@
                         {
                           "condition": "[[variables('varRequireNvidiaGPU')]",
                           "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-07-01",
+                          "apiVersion": "2023-09-01",
                           "name": "[[format('{0}/{1}', parameters('VMName'), 'deployGPUDriversNvidia')]",
                           "location": "[[parameters('Location')]",
                           "properties": {
@@ -901,54 +901,9 @@
                           ]
                         },
                         {
-                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'EntraID')]",
-                          "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-07-01",
-                          "name": "[[format('{0}/{1}', parameters('VMName'), 'AADLoginForWindows')]",
-                          "location": "[[parameters('Location')]",
-                          "properties": {
-                            "publisher": "Microsoft.Azure.ActiveDirectory",
-                            "type": "AADLoginForWindows",
-                            "typeHandlerVersion": "2.0",
-                            "autoUpgradeMinorVersion": true,
-                            "settings": "[[if(contains(parameters('DomainJoinObject'), 'IntuneJoin'), if(parameters('DomainJoinObject').IntuneJoin, createObject('mdmId', '0000000a-0000-0000-c000-000000000000'), null()), null())]"
-                          },
-                          "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
-                          ]
-                        },
-                        {
-                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'ActiveDirectory')]",
-                          "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-07-01",
-                          "name": "[[format('{0}/{1}', parameters('VMName'), 'DomainJoin')]",
-                          "location": "[[parameters('Location')]",
-                          "properties": {
-                            "publisher": "Microsoft.Compute",
-                            "type": "JSonADDomainExtension",
-                            "typeHandlerVersion": "1.3",
-                            "autoUpgradeMinorVersion": true,
-                            "settings": {
-                              "Name": "[[parameters('DomainJoinObject').DomainName]",
-                              "OUPath": "[[parameters('DomainJoinObject').OUPath]",
-                              "User": "[[format('{0}\\{1}', parameters('DomainJoinObject').DomainName, parameters('DomainJoinObject').UserName)]",
-                              "Restart": "true",
-                              "Options": 3
-                            },
-                            "protectedSettings": {
-                              "Password": "[[parameters('DomainJoinPassword')]"
-                            }
-                          },
-                          "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
-                          ]
-                        },
-                        {
                           "condition": "[[not(equals(parameters('HostPoolName'), ''))]",
                           "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-03-01",
+                          "apiVersion": "2023-09-01",
                           "name": "[[format('{0}/{1}', parameters('VMName'), 'JoinHostPool')]",
                           "location": "[[parameters('Location')]",
                           "properties": {
@@ -969,14 +924,58 @@
                             }
                           },
                           "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'AADLoginForWindows')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'DomainJoin')]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                          ]
+                        },
+                        {
+                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'EntraID')]",
+                          "type": "Microsoft.Compute/virtualMachines/extensions",
+                          "apiVersion": "2023-09-01",
+                          "name": "[[format('{0}/{1}', parameters('VMName'), 'AADLoginForWindows')]",
+                          "location": "[[parameters('Location')]",
+                          "properties": {
+                            "publisher": "Microsoft.Azure.ActiveDirectory",
+                            "type": "AADLoginForWindows",
+                            "typeHandlerVersion": "2.0",
+                            "autoUpgradeMinorVersion": true,
+                            "settings": "[[if(contains(parameters('DomainJoinObject'), 'IntuneJoin'), if(parameters('DomainJoinObject').IntuneJoin, createObject('mdmId', '0000000a-0000-0000-c000-000000000000'), null()), null())]"
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                          ]
+                        },
+                        {
+                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'ActiveDirectory')]",
+                          "type": "Microsoft.Compute/virtualMachines/extensions",
+                          "apiVersion": "2023-09-01",
+                          "name": "[[format('{0}/{1}', parameters('VMName'), 'DomainJoin')]",
+                          "location": "[[parameters('Location')]",
+                          "properties": {
+                            "publisher": "Microsoft.Compute",
+                            "type": "JSonADDomainExtension",
+                            "typeHandlerVersion": "1.3",
+                            "autoUpgradeMinorVersion": true,
+                            "settings": {
+                              "Name": "[[parameters('DomainJoinObject').DomainName]",
+                              "OUPath": "[[parameters('DomainJoinObject').OUPath]",
+                              "User": "[[format('{0}\\{1}', parameters('DomainJoinObject').DomainName, parameters('DomainJoinObject').UserName)]",
+                              "Restart": "true",
+                              "Options": 3
+                            },
+                            "protectedSettings": {
+                              "Password": "[[parameters('DomainJoinPassword')]"
+                            }
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
                             "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
                           ]
                         },
                         {
                           "type": "Microsoft.Network/networkInterfaces",
-                          "apiVersion": "2023-05-01",
+                          "apiVersion": "2023-09-01",
                           "name": "[[format('{0}-vNIC', parameters('VMName'))]",
                           "location": "[[parameters('Location')]",
                           "properties": {
@@ -996,7 +995,7 @@
                         },
                         {
                           "type": "Microsoft.Compute/virtualMachines",
-                          "apiVersion": "2023-07-01",
+                          "apiVersion": "2023-09-01",
                           "name": "[[parameters('VMName')]",
                           "location": "[[parameters('Location')]",
                           "zones": "[[variables('varAvailabilityZone')]",

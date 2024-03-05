@@ -43,7 +43,7 @@ var varVMNumber = int(
 
 var varAvailabilityZone = AvailabilityZones == [] ? [] : [ '${AvailabilityZones[varVMNumber % length(AvailabilityZones)]}' ]
 
-resource vNIC 'Microsoft.Network/networkInterfaces@2023-05-01' = {
+resource vNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
   name: '${VMName}-vNIC'
   location: Location
   properties: {
@@ -62,7 +62,7 @@ resource vNIC 'Microsoft.Network/networkInterfaces@2023-05-01' = {
   tags: Tags
 }
 
-resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
+resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: VMName
   location: Location
   zones: varAvailabilityZone
@@ -107,7 +107,7 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
 
   }
   // Guest Attestation (Integrity Monitoring) //
-  resource deployIntegrityMonitoring 'extensions@2023-07-01' = {
+  resource deployIntegrityMonitoring 'extensions@2023-09-01' = {
     name: 'deployIntegrityMonitoring'
     location: Location
     properties: {
@@ -132,7 +132,7 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
     }
   }
   // GPU Drivers //
-  resource deployGPUDriversNvidia 'extensions@2023-07-01' = if (varRequireNvidiaGPU) {
+  resource deployGPUDriversNvidia 'extensions@2023-09-01' = if (varRequireNvidiaGPU) {
     name: 'deployGPUDriversNvidia'
     location: Location
     properties: {
@@ -144,45 +144,8 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
     dependsOn: [ deployIntegrityMonitoring ]
   }
 
-  // Domain Join //
-  resource AADJoin 'extensions@2023-07-01' = if (DomainJoinObject.DomainType == 'EntraID') {
-    name: 'AADLoginForWindows'
-    location: Location
-    properties: {
-      publisher: 'Microsoft.Azure.ActiveDirectory'
-      type: 'AADLoginForWindows'
-      typeHandlerVersion: '2.0'
-      autoUpgradeMinorVersion: true
-      settings: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? { mdmId: '0000000a-0000-0000-c000-000000000000' } : null) : null
-    }
-    dependsOn: [ deployGPUDriversNvidia ]
-  }
-  resource DomainJoin 'extensions@2023-07-01' = if (DomainJoinObject.DomainType == 'ActiveDirectory') {
-    // Documentation is available here: https://docs.microsoft.com/en-us/azure/active-directory-domain-services/join-windows-vm-template#azure-resource-manager-template-overview
-    name: 'DomainJoin'
-    location: Location
-    properties: {
-      publisher: 'Microsoft.Compute'
-      type: 'JSonADDomainExtension'
-      typeHandlerVersion: '1.3'
-      autoUpgradeMinorVersion: true
-      settings: {
-        Name: DomainJoinObject.DomainName
-        OUPath: DomainJoinObject.OUPath
-        User: '${DomainJoinObject.DomainName}\\${DomainJoinObject.UserName}'
-        Restart: 'true'
-
-        //will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx'
-        Options: 3
-      }
-      protectedSettings: {
-        Password: DomainJoinPassword //TODO: Test domain join from keyvault option
-      }
-    }
-    dependsOn: [ deployGPUDriversNvidia ]
-  }
   // HostPool join //
-  resource AddWVDHost 'extensions@2023-03-01' = if (HostPoolName != '') {
+  resource AddWVDHost 'extensions@2023-09-01' = if (HostPoolName != '') {
     // Documentation is available here: https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/dsc-template
     // TODO: Update to the new format for DSC extension, see documentation above.
     name: 'JoinHostPool'
@@ -204,9 +167,44 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
         }
       }
     }
-    dependsOn: DomainJoinObject.DomainType == 'EntraID' ? [ AADJoin ] : [ DomainJoin ]
-
+    dependsOn: [ deployGPUDriversNvidia ]
   }
+  // Domain Join //
+  resource AADJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'EntraID') {
+    name: 'AADLoginForWindows'
+    location: Location
+    properties: {
+      publisher: 'Microsoft.Azure.ActiveDirectory'
+      type: 'AADLoginForWindows'
+      typeHandlerVersion: '2.0'
+      autoUpgradeMinorVersion: true
+      settings: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? { mdmId: '0000000a-0000-0000-c000-000000000000' } : null) : null
+    }
+    dependsOn: [ AddWVDHost ]
+  }
+  resource DomainJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'ActiveDirectory') {
+    // Documentation is available here: https://docs.microsoft.com/en-us/azure/active-directory-domain-services/join-windows-vm-template#azure-resource-manager-template-overview
+    name: 'DomainJoin'
+    location: Location
+    properties: {
+      publisher: 'Microsoft.Compute'
+      type: 'JSonADDomainExtension'
+      typeHandlerVersion: '1.3'
+      autoUpgradeMinorVersion: true
+      settings: {
+        Name: DomainJoinObject.DomainName
+        OUPath: DomainJoinObject.OUPath
+        User: '${DomainJoinObject.DomainName}\\${DomainJoinObject.UserName}'
+        Restart: 'true'
 
+        //will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx'
+        Options: 3
+      }
+      protectedSettings: {
+        Password: DomainJoinPassword //TODO: Test domain join from keyvault option
+      }
+    }
+    dependsOn: [ AddWVDHost ]
+  }
   tags: Tags
 }

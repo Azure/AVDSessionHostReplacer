@@ -145,7 +145,7 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
   }
 
   // Domain Join //
-  resource AADJoin 'extensions@2023-07-01' = if (DomainJoinObject.DomainType == 'AzureActiveDirectory') {
+  resource AADJoin 'extensions@2023-07-01' = if (DomainJoinObject.DomainType == 'EntraID') {
     name: 'AADLoginForWindows'
     location: Location
     properties: {
@@ -198,13 +198,13 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-07-01' = {
         properties: {
           hostPoolName: HostPoolName
           registrationInfoToken: HostPoolToken
-          aadJoin: DomainJoinObject.DomainType == 'AzureActiveDirectory' ? true : false
+          aadJoin: DomainJoinObject.DomainType == 'EntraID' ? true : false
           useAgentDownloadEndpoint: true
           mdmId: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? '0000000a-0000-0000-c000-000000000000' : '') : ''
         }
       }
     }
-    dependsOn: DomainJoinObject.DomainType == 'AzureActiveDirectory' ? [ AADJoin ] : [ DomainJoin ]
+    dependsOn: DomainJoinObject.DomainType == 'EntraID' ? [ AADJoin ] : [ DomainJoin ]
 
   }
 

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "9719717778156348821"
+      "templateHash": "5548649295897688159"
     }
   },
   "parameters": {
@@ -636,7 +636,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.25.53.49325",
-              "templateHash": "10237239326556153241"
+              "templateHash": "15537484189098848553"
             }
           },
           "parameters": {
@@ -656,7 +656,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.25.53.49325",
-                  "templateHash": "11287867097974988940"
+                  "templateHash": "2802635162645144830"
                 }
               },
               "parameters": {
@@ -786,7 +786,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.25.53.49325",
-                          "templateHash": "13299051856378803111"
+                          "templateHash": "5489753956665378564"
                         }
                       },
                       "parameters": {
@@ -901,7 +901,7 @@
                           ]
                         },
                         {
-                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'AzureActiveDirectory')]",
+                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'EntraID')]",
                           "type": "Microsoft.Compute/virtualMachines/extensions",
                           "apiVersion": "2023-07-01",
                           "name": "[[format('{0}/{1}', parameters('VMName'), 'AADLoginForWindows')]",
@@ -962,7 +962,7 @@
                               "properties": {
                                 "hostPoolName": "[[parameters('HostPoolName')]",
                                 "registrationInfoToken": "[[parameters('HostPoolToken')]",
-                                "aadJoin": "[[if(equals(parameters('DomainJoinObject').DomainType, 'AzureActiveDirectory'), true(), false())]",
+                                "aadJoin": "[[if(equals(parameters('DomainJoinObject').DomainType, 'EntraID'), true(), false())]",
                                 "useAgentDownloadEndpoint": true,
                                 "mdmId": "[[if(contains(parameters('DomainJoinObject'), 'IntuneJoin'), if(parameters('DomainJoinObject').IntuneJoin, '0000000a-0000-0000-c000-000000000000', ''), '')]"
                               }

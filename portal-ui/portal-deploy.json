@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "10369763570825669903"
+      "templateHash": "9719717778156348821"
     }
   },
   "parameters": {
@@ -636,7 +636,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.25.53.49325",
-              "templateHash": "16106885443552864447"
+              "templateHash": "10237239326556153241"
             }
           },
           "parameters": {
@@ -656,7 +656,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.25.53.49325",
-                  "templateHash": "11946856797471845609"
+                  "templateHash": "11287867097974988940"
                 }
               },
               "parameters": {
@@ -786,7 +786,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.25.53.49325",
-                          "templateHash": "5801241672683395031"
+                          "templateHash": "13299051856378803111"
                         }
                       },
                       "parameters": {
@@ -850,7 +850,7 @@
                       },
                       "variables": {
                         "varRequireNvidiaGPU": "[[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
-                        "varVMNumber": "[[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(length(parameters('VMName')), sub(lastIndexOf(parameters('VMName'), '-'), 1))))]",
+                        "varVMNumber": "[[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
                         "varAvailabilityZone": "[[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]"
                       },
                       "resources": [

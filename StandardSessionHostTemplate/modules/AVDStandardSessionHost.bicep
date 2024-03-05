@@ -34,7 +34,7 @@ param DomainJoinPassword string = ''
 //---- Variables ----//
 var varRequireNvidiaGPU = startsWith(VMSize, 'Standard_NC') || contains(VMSize, '_A10_v5')
 
-var varVMNumber = int(substring(VMName, (lastIndexOf(VMName, '-') + 1),(length(VMName) - (lastIndexOf(VMName, '-') - 1))))
+var varVMNumber = int(substring(VMName, (lastIndexOf(VMName, '-') + 1),(length(VMName) - lastIndexOf(VMName, '-') - 1)))
 
 var varAvailabilityZone = AvailabilityZones == [] ? [] : ['${AvailabilityZones[varVMNumber % length(AvailabilityZones)]}']
 

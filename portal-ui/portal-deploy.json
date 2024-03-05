@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "965061763803638809"
+      "templateHash": "10369763570825669903"
     }
   },
   "parameters": {
@@ -305,12 +305,11 @@
       "VMSize": "[parameters('SessionHostSize')]",
       "AcceleratedNetworking": "[parameters('AcceleratedNetworking')]",
       "DiskType": "[parameters('SessionHostDiskType')]",
-      "ImageType": "[parameters('MarketPlaceOrCustomImage')]",
       "ImageReference": "[variables('varImageReference')]",
       "SecurityProfile": "[variables('varSecurityProfile')]",
       "SubnetId": "[parameters('SubnetId')]",
       "DomainJoinObject": "[variables('varDomainJoinObject')]",
-      "ADJoinUserPassword": "[format('Placeholder for Keyvault: {0}', parameters('ADJoinUserPassword'))]",
+      "DomainJoinPassword": "[format('Placeholder for Keyvault: {0}', parameters('ADJoinUserPassword'))]",
       "AdminUsername": "[parameters('LocalAdminUsername')]",
       "tags": {}
     }

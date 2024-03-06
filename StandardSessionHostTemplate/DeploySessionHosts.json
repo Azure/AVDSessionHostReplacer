@@ -348,7 +348,7 @@
               "name": "[parameters('VMName')]",
               "location": "[parameters('Location')]",
               "zones": "[variables('varAvailabilityZone')]",
-              "identity": "[if(equals(parameters('DomainJoinObject').DomainType, 'EntraId'), createObject('type', 'SystemAssigned'), null())]",
+              "identity": "[if(equals(parameters('DomainJoinObject').DomainType, 'EntraID'), createObject('type', 'SystemAssigned'), null())]",
               "properties": {
                 "osProfile": {
                   "computerName": "[parameters('VMName')]",

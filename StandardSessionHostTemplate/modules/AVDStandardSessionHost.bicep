@@ -66,7 +66,7 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: VMName
   location: Location
   zones: varAvailabilityZone
-  identity: (DomainJoinObject.DomainType == 'EntraId') ? { type: 'SystemAssigned' } : any(null)
+  identity: (DomainJoinObject.DomainType == 'EntraID') ? { type: 'SystemAssigned' } : any(null)
   properties: {
     osProfile: {
       computerName: VMName

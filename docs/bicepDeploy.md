@@ -61,18 +61,15 @@ $paramsNewAzResourceGroupDeployment = @{
 New-AzResourceGroupDeployment @paramsNewAzResourceGroupDeployment -Verbose
 ```
 ### Assign permissions
-#### Key Vault (for Active Directory Joined)
+#### Active Directory Domain Joined
 If your session hosts are joining domain using a secret stored in a Key Vault, the FucntionApp requires the following permissions,
 - **Key Vault Secrets User**, this is required on the secret item.
 - **Key Vault resource manager template deployment operator**, this is required at the Key Vault level.
 > This role is not built-in so you will need to create a custom role following the instructions [here](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/key-vault-parameter?tabs=azure-cli#grant-deployment-access-to-the-secrets).
 
-#### Azure AD (for Azure AD Joined)
-If your session hosts are Azure AD Joined (not hybrid), the FunctionApp requires permissions against GraphAPI in order to delete the devices when deleting session hosts. Without this cleanup, creating a new session host with the same name will fail.
-- **Graph API: Device.Read.All**, this is required to query Azure AD for devices.
-- **Cloud Device Administrator Role**, this Azure AD is required to delete the devices from Azure AD.
-
-Assigning Graph API permissions to a system managed identity cannot be done from the portal. You may use the script below to assign the permissions,
+#### Entra ID Joined
+If your session hosts are Entra ID Joined (not hybrid), the FunctionApp requires permissions against GraphAPI in order to delete the devices when deleting session hosts. Without this cleanup, creating a new session host with the same name will fail.
+- **Graph API: Device.Read.All**, this is required to query Entra ID for devices. You can do this from the portal or use the below script,
 ```PowerShell
 $FunctionAppSP = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' # The ID of the system managed identity of the function app
 
@@ -94,6 +91,16 @@ $msGraphAppRoles | ForEach-Object {
     New-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $FunctionAppSP -BodyParameter $params -Verbose
 }
 ```
+- **Cloud Device Administrator Role**, this role is required to delete the devices from Entra ID. Assigning Graph API permissions to a system managed identity cannot be done from the portal. You may use the script below to assign the permissions,
+```PowerShell
+$FunctionAppSP = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' # The ID of the system managed identity of the function app
+
+Connect-MgGraph -Scopes Application.ReadWrite.All, Directory.ReadWrite.All, AppRoleAssignment.ReadWrite.All, RoleManagement.ReadWrite.Directory
+
+$directoryRole = Get-MgRoleManagementDirectoryRoleDefinition -Filter "DisplayName eq 'Cloud Device Administrator'"
+New-MgRoleManagementDirectoryRoleAssignment -RoleDefinitionId $directoryRole.Id -PrincipalId $FunctionAppSP  -DirectoryScopeId '/'
+```
+
 #### VM Image Definition
 If you are deploying VMs using an Image Gallery, the FunctionApp requires permission on the Image Definition.
 - **Reader**

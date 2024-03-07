@@ -607,7 +607,7 @@
                                     "options": {
                                         "icon": "Warning",
                                         "text": "When the VMs are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
-                                        "uri": "https://www.microsoft.com"
+                                        "uri": "https://github.com/Azure/AVDSessionHostReplacer/blob/main/docs/bicepDeploy.md#azure-ad-for-azure-ad-joined"
                                     }
                                 },
                                 {

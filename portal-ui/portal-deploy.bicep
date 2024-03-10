@@ -17,10 +17,22 @@ param SessionHostDiskType string
 param MarketPlaceOrCustomImage string
 param MarketPlaceImage string = ''
 param GalleryImageId string = ''
+
+@allowed([
+  'Standard'
+  'TrustedLaunch'
+  'ConfidentialVM'
+])
 param SecurityType string
 param SecureBootEnabled bool
 param TpmEnabled bool
 param SubnetId string
+
+@allowed([
+  'EntraID'
+  'ActiveDirectory'
+  'EntraDS'
+])
 param IdentityServiceProvider string
 param IntuneEnrollment bool
 param ADDomainName string = ''
@@ -38,6 +50,7 @@ param HostPoolResourceGroupName string = resourceGroup().name
 param HostPoolName string
 
 @description('Required: Yes | Prefix used for the name of the session hosts.')
+@maxLength(12)
 param SessionHostNamePrefix string
 
 @description('Required: Yes | Number of session hosts to maintain in the host pool.')

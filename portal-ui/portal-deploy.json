@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "17436382268809867662"
+      "templateHash": "16205299795077127434"
     }
   },
   "parameters": {
@@ -59,7 +59,12 @@
       "defaultValue": ""
     },
     "SecurityType": {
-      "type": "string"
+      "type": "string",
+      "allowedValues": [
+        "Standard",
+        "TrustedLaunch",
+        "ConfidentialVM"
+      ]
     },
     "SecureBootEnabled": {
       "type": "bool"
@@ -71,7 +76,12 @@
       "type": "string"
     },
     "IdentityServiceProvider": {
-      "type": "string"
+      "type": "string",
+      "allowedValues": [
+        "EntraID",
+        "ActiveDirectory",
+        "EntraDS"
+      ]
     },
     "IntuneEnrollment": {
       "type": "bool"
@@ -110,6 +120,7 @@
     },
     "SessionHostNamePrefix": {
       "type": "string",
+      "maxLength": 12,
       "metadata": {
         "description": "Required: Yes | Prefix used for the name of the session hosts."
       }

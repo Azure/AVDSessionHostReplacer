@@ -19,7 +19,6 @@ resource deployKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     tenantId: subscription().tenantId
     enabledForTemplateDeployment: true
     enableRbacAuthorization: true
-    accessPolicies: []
   }
   resource secretDomainJoinPassword 'secrets@2023-07-01' = {
     name: 'DomainJoinPassword'

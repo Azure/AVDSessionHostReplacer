@@ -13,9 +13,34 @@ param SessionHostsRegion string
 param AvailabilityZones array = []
 param SessionHostSize string
 param AcceleratedNetworking bool
-param SessionHostDiskType string
+
+@allowed([
+  'Premium_LRS'
+  'StandardSSD_LRS'
+])
+param SessionHostDiskType string = 'Premium_LRS'
+
+@allowed([
+  'Marketplace'
+  'CustomImage'
+])
 param MarketPlaceOrCustomImage string
-param MarketPlaceImage string = ''
+
+@allowed([ '2022-datacenter-smalldisk-g2'
+  'win10-21h2-avd'
+  '2022-datacenter-core-g2'
+  'win10-22h2-avd-m365-g2'
+  'win11-21h2-avd'
+  'win10-21h2-avd-m365'
+  'win11-22h2-avd-m365'
+  '2022-datacenter-core-smalldisk-g2'
+  'win11-21h2-avd-m365'
+  'win11-23h2-avd'
+  'win11-23h2-avd-m365'
+  'win11-22h2-avd'
+  '2022-datacenter-g2'
+  'win10-22h2-avd-g2' ])
+param MarketPlaceImage string = 'win11-23h2-avd-m365'
 param GalleryImageId string = ''
 
 @allowed([
@@ -193,16 +218,24 @@ var varSecurityProfile = SecurityType == 'Standard' ? null : {
   }
 }
 
-var varDomainJoinObject = IdentityServiceProvider != 'EntraID' ? {
+var varDomainJoinObject = IdentityServiceProvider == 'EntraID' ? {
+  DomainType: 'EntraID'
+  IntuneJoin: IntuneEnrollment
+} : {
   DomainType: 'ActiveDirectory'
   DomainName: ADDomainName
   DomainJoinUserName: ADDomainJoinUserName
   ADOUPath: ADOUPath
-} : {
-  DomainType: 'EntraID'
-  IntuneJoin: IntuneEnrollment
 }
 
+var varDomainJoinPasswordReference = IdentityServiceProvider == 'EntraID' ? null : {
+  reference: {
+    keyVault: {
+      id: deployKeyVault.outputs.keyVaultId
+    }
+    secretName: 'DomainJoinPassword'
+  }
+}
 var varSessionHostTemplateParameters = {
   Location: SessionHostsRegion
   AvailabilityZones: AvailabilityZones
@@ -213,7 +246,7 @@ var varSessionHostTemplateParameters = {
   SecurityProfile: varSecurityProfile
   SubnetId: SubnetId
   DomainJoinObject: varDomainJoinObject
-  DomainJoinPassword: 'Placeholder for Keyvault: ${ADJoinUserPassword}'
+  DomainJoinPassword: varDomainJoinPasswordReference
   AdminUsername: LocalAdminUsername
   tags: {}
 }
@@ -311,12 +344,15 @@ var varReplacementPlanSettings = [
   }
 ]
 
+var varUniqueString = uniqueString(resourceGroup().id, HostPoolName)
+var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
+
 //---- Resources ----//
 module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'
   params: {
     Location: Location
-    FunctionAppName: 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
+    FunctionAppName: varFunctionAppName
     EnableMonitoring: EnableMonitoring
     UseExistingLAW: UseExistingLAW
     LogAnalyticsWorkspaceId: LogAnalyticsWorkspaceId
@@ -324,6 +360,14 @@ module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   }
 }
 
+module deployKeyVault 'modules/deployKeyVault.bicep' = if (IdentityServiceProvider != 'EntraID') {
+  name: 'deployKeyVault'
+  params: {
+    Location: Location
+    KeyVaultName: 'kv-AVDSHR-${varUniqueString}'
+    DomainJoinPassword: ADJoinUserPassword
+  }
+}
 module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec.bicep' = {
   name: 'deployStandardSessionHostTemplate'
   params: {

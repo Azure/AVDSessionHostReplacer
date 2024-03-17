@@ -885,7 +885,7 @@
                 "SessionHostDiskType": "[steps('SessionHostsTemplate').SessionHostDiskType]",
                 "MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage]",
                 "MarketPlaceImage": "[steps('SessionHostsTemplate').dropDownMarketPlaceImage]",
-                "GalleryImageId": "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId]",
+                "GalleryImageId": "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId.id]",
                 "SecurityType": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType]",
                 "SecureBootEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecureBootEnabled]",
                 "TpmEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled]",

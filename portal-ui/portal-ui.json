@@ -87,6 +87,7 @@
                             "filter": true,
                             "multiselect": false,
                             "selectAll": false,
+                            "defaultValue": null,
                             "toolTip": "Select region to deploy session hosts.",
                             "constraints": {
                                 "required": true,

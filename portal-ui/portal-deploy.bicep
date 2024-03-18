@@ -22,7 +22,7 @@ param SessionHostDiskType string = 'Premium_LRS'
 
 @allowed([
   'Marketplace'
-  'CustomImage'
+  'Gallery'
 ])
 param MarketPlaceOrCustomImage string
 

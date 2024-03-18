@@ -347,7 +347,13 @@ var varReplacementPlanSettings = [
 var varUniqueString = uniqueString(resourceGroup().id, HostPoolName)
 var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
 
+
+
+// Outputs for verification
+
 //---- Resources ----//
+
+
 module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'
   params: {
@@ -385,7 +391,7 @@ module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = {
     Scope: subscription().id
   }
 }
-module RoleAssignments 'modules/RBACRoleAssignment.bicep' = {
+module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = {
   name: 'RBAC-TemplateSpecReader-${TimeStamp}'
   scope: subscription()
   params: {

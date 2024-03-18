@@ -492,6 +492,15 @@
                             "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Marketplace')]"
                         },
                         {
+                            "name": "GalleryImageInfoBox",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]",
+                            "options": {
+                                "icon": "Warning",
+                                "text": "The system identity of the Session Host Replacer function is assigned the 'Desktop Virtualization Virtual Machine Contributor' role against the subscription. If the Image Definition is in a different subscription, please make sure you manually assign the permission post deployment."
+                            }
+                        },
+                        {
                             "name": "resourceSelectorSessionHostGalleryImageId",
                             "type": "Microsoft.Solutions.ResourceSelector",
                             "label": "Select Gallery Image",

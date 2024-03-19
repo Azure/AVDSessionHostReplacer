@@ -6,7 +6,7 @@ name: Build deployAVDSessionHostReplacer bicep file into ARM
 on:
   push:
     paths:
-      - 'deploy\bicep\DeployAVDSessionHostReplacer.bicep'
+      - 'deploy/bicep/DeployAVDSessionHostReplacer.bicep'
   workflow_dispatch:
     inputs:
       messages:

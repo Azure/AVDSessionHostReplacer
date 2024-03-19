@@ -7,7 +7,12 @@ on:
   push:
     paths: 
       - 'deploy\bicep\DeployAVDSessionHostReplacer.bicep'
-      
+  workflow_dispatch:
+    inputs:
+      messages:
+       description: 'Why are you running manually?'
+       required: false
+       default: 'Manual Run'
 jobs:
   build-and-commit:
     runs-on: ubuntu-latest

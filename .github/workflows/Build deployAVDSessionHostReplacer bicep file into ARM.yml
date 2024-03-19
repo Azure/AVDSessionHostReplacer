@@ -5,7 +5,7 @@ name: Build deployAVDSessionHostReplacer bicep file into ARM
 # Controls when the workflow will run
 on:
   push:
-    paths: 
+    paths:
       - 'deploy\bicep\DeployAVDSessionHostReplacer.bicep'
   workflow_dispatch:
     inputs:
@@ -23,8 +23,6 @@ jobs:
       - name: Build Bicep File
         shell: pwsh
         run: |
-          get-Location
-          (get-childitem).FullName
           bicep build ./deploy/bicep/DeployAVDSessionHostReplacer.bicep --outfile ./deploy/arm/DeployAVDSessionHostReplacer.json
 
       - name: Commit Changes

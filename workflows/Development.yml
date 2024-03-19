@@ -19,6 +19,7 @@ jobs:
         shell: pwsh
         run: |
           $timeStamp = Get-Date -Format "o"
-          ./Build/Update-Repo.ps1 -TokenAccount WillyMoselhy -GitToken $env:GITHUBPAT -AccountName WillyMoselhy -RepositoryName AVDReplacementPlans -Message "Dev Build ($timeStamp) [no ci]"
+          ./Build/Update-Repo.ps1 -TokenAccount $env:TOKENACCOUNT -GitToken $env:TOKENPAT -AccountName WillyMoselhy -RepositoryName AVDReplacementPlans -Message "Dev Build ($timeStamp) [no ci]"
         env:
-          GITHUBPAT: ${{ secrets.GITHUBPAT }}
+          TOKENACCOUNT: ${{ secrets.TOKENACCOUNT }}
+          TOKENPAT: ${{ secrets.TOKENPAT }}

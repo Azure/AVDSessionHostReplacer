@@ -1,0 +1,29 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Build deployAVDSessionHostReplacer bicep file into ARM
+
+# Controls when the workflow will run
+on:
+  push:
+    paths: 
+      - 'deploy\bicep\DeployAVDSessionHostReplacer.bicep'
+      
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.2
+
+      - name: Build Bicep File
+        run: |
+          bicep build ./deploy/bicep/DeployAVDSessionHostReplacer.bicep --outfile ./deploy/arm/DeployAVDSessionHostReplacer.json
+
+      - name: Commit Changes
+        shell: pwsh
+        run: |
+          $timeStamp = Get-Date -Format "o"
+          ./Build/Update-Repo.ps1 -TokenAccount $env:TOKENACCOUNT -GitToken $env:TOKENPAT -AccountName Azure -RepositoryName AVDSessionHostReplacer -Message "Build deployAVDSessionHostReplacer.bicep file into ARM ($timeStamp) [no ci]"
+        env:
+          TOKENACCOUNT: ${{ secrets.TOKENACCOUNT }}
+          TOKENPAT: ${{ secrets.TOKENPAT }}

@@ -1,0 +1,934 @@
+{
+    "$schema": "<relative path to createFormUI.schema.json>",
+    "view": {
+        "kind": "Form",
+        "properties": {
+            "isWizard": false,
+            "title": "Azure Virtual Desktop - Session Host Replacer Deployment",
+            "steps": [
+                {
+                    "name": "basics",
+                    "label": "Deployment Basics",
+                    "elements": [
+                        {
+                            "name": "resourceScope",
+                            "type": "Microsoft.Common.ResourceScope",
+                            "location": {
+                                "resourceTypes": [
+                                    "Microsoft.DesktopVirtualization/HostPools"
+                                ]
+                            }
+                        },
+                        {
+                            "name": "MonitoringSection",
+                            "type": "Microsoft.Common.Section",
+                            "label": "Monitoring",
+                            "visible": true,
+                            "elements": [
+                                {
+                                    "name": "EnableMonitoring",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "label": "Enable Monitoring",
+                                    "toolTip": "[Recommended] If enabled, the session host replacer will use App Insights and Log Analytics to collect metrics and logs.",
+                                    "defaultValue": true,
+                                    "constraints": {
+                                        "required": false
+                                    }
+                                },
+                                {
+                                    "name": "UseExistingLAW",
+                                    "visible": "[steps('basics').MonitoringSection.EnableMonitoring]",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "label": "Select existing Log Analytics Workspace",
+                                    "toolTip": "If enabled, the session host replacer will use the selected Log Analytics Workspace. If disabled, the session host replacer will create a new Log Analytics Workspace.",
+                                    "defaultValue": false,
+                                    "constraints": {
+                                        "required": false
+                                    }
+                                },
+                                {
+                                    "name": "LAWSelector",
+                                    "type": "Microsoft.Solutions.ResourceSelector",
+                                    "visible": "[and(steps('basics').MonitoringSection.EnableMonitoring, steps('basics').MonitoringSection.UseExistingLAW)]",
+                                    "label": "Log Analytics Workspace",
+                                    "resourceType": "Microsoft.OperationalInsights/workspaces",
+                                    "constraints": {
+                                        "required": true
+                                    },
+                                    "options": {
+                                        "filter": {}
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "VersionInfo",
+                            "type": "Microsoft.Common.TextBlock",
+                            "visible": true,
+                            "options": {
+                                "text": "AVD session host replacer Portal UI Version: 240305-1819",
+                                "link": {
+                                    "label": "GitHub Repository",
+                                    "uri": "https://github.com/Azure/AVDSessionHostReplacer"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "SessionHostsTemplate",
+                    "label": "Session Hosts Template",
+                    "elements": [
+                        {
+                            "name": "SessionHostsRegion",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "Session Hosts Region",
+                            "visible": true,
+                            "filter": true,
+                            "multiselect": false,
+                            "selectAll": false,
+                            "defaultValue": null,
+                            "toolTip": "Select region to deploy session hosts.",
+                            "constraints": {
+                                "required": true,
+                                "allowedValues": [
+                                    {
+                                        "value": "eastus",
+                                        "label": "East US"
+                                    },
+                                    {
+                                        "value": "eastus2",
+                                        "label": "East US 2"
+                                    },
+                                    {
+                                        "value": "southcentralus",
+                                        "label": "South Central US"
+                                    },
+                                    {
+                                        "value": "westus2",
+                                        "label": "West US 2"
+                                    },
+                                    {
+                                        "value": "westus3",
+                                        "label": "West US 3"
+                                    },
+                                    {
+                                        "value": "australiaeast",
+                                        "label": "Australia East"
+                                    },
+                                    {
+                                        "value": "southeastasia",
+                                        "label": "Southeast Asia"
+                                    },
+                                    {
+                                        "value": "northeurope",
+                                        "label": "North Europe"
+                                    },
+                                    {
+                                        "value": "swedencentral",
+                                        "label": "Sweden Central"
+                                    },
+                                    {
+                                        "value": "uksouth",
+                                        "label": "UK South"
+                                    },
+                                    {
+                                        "value": "westeurope",
+                                        "label": "West Europe"
+                                    },
+                                    {
+                                        "value": "centralus",
+                                        "label": "Central US"
+                                    },
+                                    {
+                                        "value": "southafricanorth",
+                                        "label": "South Africa North"
+                                    },
+                                    {
+                                        "value": "centralindia",
+                                        "label": "Central India"
+                                    },
+                                    {
+                                        "value": "eastasia",
+                                        "label": "East Asia"
+                                    },
+                                    {
+                                        "value": "japaneast",
+                                        "label": "Japan East"
+                                    },
+                                    {
+                                        "value": "koreacentral",
+                                        "label": "Korea Central"
+                                    },
+                                    {
+                                        "value": "canadacentral",
+                                        "label": "Canada Central"
+                                    },
+                                    {
+                                        "value": "francecentral",
+                                        "label": "France Central"
+                                    },
+                                    {
+                                        "value": "germanywestcentral",
+                                        "label": "Germany West Central"
+                                    },
+                                    {
+                                        "value": "italynorth",
+                                        "label": "Italy North"
+                                    },
+                                    {
+                                        "value": "norwayeast",
+                                        "label": "Norway East"
+                                    },
+                                    {
+                                        "value": "polandcentral",
+                                        "label": "Poland Central"
+                                    },
+                                    {
+                                        "value": "switzerlandnorth",
+                                        "label": "Switzerland North"
+                                    },
+                                    {
+                                        "value": "uaenorth",
+                                        "label": "UAE North"
+                                    },
+                                    {
+                                        "value": "brazilsouth",
+                                        "label": "Brazil South"
+                                    },
+                                    {
+                                        "value": "centraluseuap",
+                                        "label": "Central US EUAP"
+                                    },
+                                    {
+                                        "value": "israelcentral",
+                                        "label": "Israel Central"
+                                    },
+                                    {
+                                        "value": "qatarcentral",
+                                        "label": "Qatar Central"
+                                    },
+                                    {
+                                        "value": "asia",
+                                        "label": "Asia"
+                                    },
+                                    {
+                                        "value": "asiapacific",
+                                        "label": "Asia Pacific"
+                                    },
+                                    {
+                                        "value": "australia",
+                                        "label": "Australia"
+                                    },
+                                    {
+                                        "value": "brazil",
+                                        "label": "Brazil"
+                                    },
+                                    {
+                                        "value": "canada",
+                                        "label": "Canada"
+                                    },
+                                    {
+                                        "value": "europe",
+                                        "label": "Europe"
+                                    },
+                                    {
+                                        "value": "france",
+                                        "label": "France"
+                                    },
+                                    {
+                                        "value": "germany",
+                                        "label": "Germany"
+                                    },
+                                    {
+                                        "value": "global",
+                                        "label": "Global"
+                                    },
+                                    {
+                                        "value": "india",
+                                        "label": "India"
+                                    },
+                                    {
+                                        "value": "japan",
+                                        "label": "Japan"
+                                    },
+                                    {
+                                        "value": "korea",
+                                        "label": "Korea"
+                                    },
+                                    {
+                                        "value": "norway",
+                                        "label": "Norway"
+                                    },
+                                    {
+                                        "value": "singapore",
+                                        "label": "Singapore"
+                                    },
+                                    {
+                                        "value": "southafrica",
+                                        "label": "South Africa"
+                                    },
+                                    {
+                                        "value": "sweden",
+                                        "label": "Sweden"
+                                    },
+                                    {
+                                        "value": "switzerland",
+                                        "label": "Switzerland"
+                                    },
+                                    {
+                                        "value": "unitedstates",
+                                        "label": "United States"
+                                    },
+                                    {
+                                        "value": "northcentralus",
+                                        "label": "North Central US"
+                                    },
+                                    {
+                                        "value": "westus",
+                                        "label": "West US"
+                                    },
+                                    {
+                                        "value": "japanwest",
+                                        "label": "Japan West"
+                                    },
+                                    {
+                                        "value": "eastus2euap",
+                                        "label": "East US 2 EUAP"
+                                    },
+                                    {
+                                        "value": "westcentralus",
+                                        "label": "West Central US"
+                                    },
+                                    {
+                                        "value": "southafricawest",
+                                        "label": "South Africa West"
+                                    },
+                                    {
+                                        "value": "australiacentral",
+                                        "label": "Australia Central"
+                                    },
+                                    {
+                                        "value": "australiacentral2",
+                                        "label": "Australia Central 2"
+                                    },
+                                    {
+                                        "value": "australiasoutheast",
+                                        "label": "Australia Southeast"
+                                    },
+                                    {
+                                        "value": "koreasouth",
+                                        "label": "Korea South"
+                                    },
+                                    {
+                                        "value": "southindia",
+                                        "label": "South India"
+                                    },
+                                    {
+                                        "value": "westindia",
+                                        "label": "West India"
+                                    },
+                                    {
+                                        "value": "canadaeast",
+                                        "label": "Canada East"
+                                    },
+                                    {
+                                        "value": "francesouth",
+                                        "label": "France South"
+                                    },
+                                    {
+                                        "value": "germanynorth",
+                                        "label": "Germany North"
+                                    },
+                                    {
+                                        "value": "norwaywest",
+                                        "label": "Norway West"
+                                    },
+                                    {
+                                        "value": "switzerlandwest",
+                                        "label": "Switzerland West"
+                                    },
+                                    {
+                                        "value": "ukwest",
+                                        "label": "UK West"
+                                    },
+                                    {
+                                        "value": "uaecentral",
+                                        "label": "UAE Central"
+                                    },
+                                    {
+                                        "value": "brazilsoutheast",
+                                        "label": "Brazil Southeast"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "AvailabilityZones",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "Availability Zones",
+                            "visible": true,
+                            "filter": false,
+                            "defaultValue": [],
+                            "multiselect": true,
+                            "selectAll": false,
+                            "toolTip": "Select Availability Zones for the session hosts. Make sure the selected size is available in the selected zones. Session hosts will be deployed across the zones.",
+                            "constraints": {
+                                "required": false,
+                                "allowedValues": [
+                                    {
+                                        "label": "Zone 1",
+                                        "value": "1"
+                                    },
+                                    {
+                                        "label": "Zone 2",
+                                        "value": "2"
+                                    },
+                                    {
+                                        "label": "Zone 3",
+                                        "value": "3"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "SessionHostSize",
+                            "type": "Microsoft.Compute.SizeSelector",
+                            "label": "VM Size",
+                            "toolTip": "",
+                            "recommendedSizes": [
+                                "Standard_D4ads_v5"
+                            ],
+                            "constraints": {
+                                "allowedSizes": [],
+                                "excludedSizes": [],
+                                "required": true
+                            },
+                            "options": {
+                                "hideDiskTypeFilter": true
+                            },
+                            "osPlatform": "Windows",
+                            "imageReference": {
+                                "publisher": "MicrosoftWindowsDesktop",
+                                "offer": "Windows-11",
+                                "sku": "win11-23h2-avd"
+                            }
+                        },
+                        {
+                            "name": "AcceleratedNetworking",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Enable accelerated networking",
+                            "defaultValue": true,
+                            "toolTip": "Enables low latency and high throughput on the network interface."
+                        },
+                        {
+                            "name": "SessionHostDiskType",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "OS Disk type",
+                            "filter": false,
+                            "defaultValue": "Premium",
+                            "toolTip": "Select session host disk type to host the OS.",
+                            "constraints": {
+                                "required": true,
+                                "allowedValues": [
+                                    {
+                                        "label": "Standard",
+                                        "value": "Standard_LRS"
+                                    },
+                                    {
+                                        "label": "Premium",
+                                        "value": "Premium_LRS"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "optionMarketPlaceOrCustomImage",
+                            "type": "Microsoft.Common.OptionsGroup",
+                            "label": "Image Source",
+                            "defaultValue": "Marketplace",
+                            "toolTip": "",
+                            "constraints": {
+                                "allowedValues": [
+                                    {
+                                        "label": "Marketplace",
+                                        "value": "Marketplace"
+                                    },
+                                    {
+                                        "label": "Gallery Image",
+                                        "value": "Gallery"
+                                    }
+                                ],
+                                "required": true
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "dropDownMarketPlaceImage",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "Select a Marketplace Image",
+                            "placeholder": "",
+                            "defaultValue": [
+                                "Windows 11 23H2 multi-session"
+                            ],
+                            "toolTip": "Marketplace images are updated on monthly basis. The Session Host Replacer will replace the session hosts when a new image is available.",
+                            "multiselect": false,
+                            "selectAll": false,
+                            "filter": true,
+                            "filterPlaceholder": "Filter items ...",
+                            "multiLine": true,
+                            "constraints": {
+                                "allowedValues": [
+                                    {
+                                        "label": "Windows 11 22H2 multi-session",
+                                        "value": "win11-22h2-avd"
+                                    },
+                                    {
+                                        "label": "Windows 11 23H2 multi-session",
+                                        "value": "win11-23h2-avd"
+                                    }
+                                ],
+                                "required": true
+                            },
+                            "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Marketplace')]"
+                        },
+                        {
+                            "name": "GalleryImageInfoBox",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]",
+                            "options": {
+                                "icon": "Warning",
+                                "text": "The system identity of the Session Host Replacer function is assigned the 'Desktop Virtualization Virtual Machine Contributor' role against the subscription. If the Image Definition is in a different subscription, please make sure you manually assign the permission post deployment."
+                            }
+                        },
+                        {
+                            "name": "resourceSelectorSessionHostGalleryImageId",
+                            "type": "Microsoft.Solutions.ResourceSelector",
+                            "label": "Select Gallery Image",
+                            "resourceType": "Microsoft.Compute/galleries/images",
+                            "constraints": {
+                                "required": true
+                            },
+                            "options": {
+                                "filter": {}
+                            },
+                            "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]"
+                        },
+                        {
+                            "name": "sessionHostsSecuritySection",
+                            "type": "Microsoft.Common.Section",
+                            "visible": true,
+                            "label": "Security profile",
+                            "elements": [
+                                {
+                                    "name": "SecurityType",
+                                    "type": "Microsoft.Common.DropDown",
+                                    "label": "Security type",
+                                    "filter": true,
+                                    "defaultValue": "Trusted Launch Virtual Machines",
+                                    "toolTip": "Choose a type of security that matches your needs: Standard includes basic protections at no additional cost. Trusted launch virtual machines provide additional security features on Gen2 virtual machines to protect against persistent and advanced attacks.",
+                                    "constraints": {
+                                        "required": true,
+                                        "allowedValues": [
+                                            {
+                                                "label": "Standard",
+                                                "value": "Standard"
+                                            },
+                                            {
+                                                "label": "Trusted Launch Virtual Machines",
+                                                "value": "TrustedLaunch"
+                                            },
+                                            {
+                                                "label": "Confidential Virtual Machines",
+                                                "value": "ConfidentialVM"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "SecureBootEnabled",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'ConfidentialVM'))]",
+                                    "label": "Enable secure boot",
+                                    "defaultValue": true,
+                                    "toolTip": "Secure boot helps protect your VMs against boot kits, rootkits, and kernel-level malware."
+                                },
+                                {
+                                    "name": "TpmEnabled",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'ConfidentialVM'))]",
+                                    "label": "Enable vTPM",
+                                    "defaultValue": true,
+                                    "toolTip": "Virtual Trusted Platform Module (vTPM) is TPM2.0 compliant and validates your VM boot integrity apart from securely storing keys and secrets."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "SubnetId",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Subnet ID",
+                            "visible": true,
+                            "placeholder": "Add resource id of subnet in the same region as the Session Hosts",
+                            "constraints": {
+                                "required": true,
+                                "validations": [
+                                    {
+                                        "regex": ".*/subnets/[A-Za-z0-9_\\.-]+$",
+                                        "message": "Invalid Subnet Resource ID. Make sure it ends with /subnets/SubnetName"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "DomainJoinSection",
+                            "type": "Microsoft.Common.Section",
+                            "visible": true,
+                            "label": "Domain Join",
+                            "elements": [
+                                {
+                                    "name": "IdentityServiceProvider",
+                                    "type": "Microsoft.Common.OptionsGroup",
+                                    "visible": true,
+                                    "label": "Identity service provider",
+                                    "defaultValue": "Microsoft Entra ID",
+                                    "toolTip": "Identity service provider (Active Directory or EntraDS) that already exist and will be used for Azure Virtual Desktop.",
+                                    "constraints": {
+                                        "required": true,
+                                        "allowedValues": [
+                                            {
+                                                "label": "Microsoft Entra ID",
+                                                "value": "EntraID"
+                                            },
+                                            {
+                                                "label": "Active Directory (AD DS)",
+                                                "value": "ActiveDirectory"
+                                            },
+                                            {
+                                                "label": "Microsoft Entra Domain Services",
+                                                "value": "EntraDS"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "EntraJoinedInfoBox",
+                                    "type": "Microsoft.Common.InfoBox",
+                                    "visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID')]",
+                                    "options": {
+                                        "icon": "Warning",
+                                        "text": "When the VMs are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
+                                        "uri": "https://github.com/Azure/AVDSessionHostReplacer/blob/main/docs/bicepDeploy.md#azure-ad-for-azure-ad-joined"
+                                    }
+                                },
+                                {
+                                    "name": "IntuneEnrollment",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID')]",
+                                    "label": "Intune enrollment",
+                                    "defaultValue": false,
+                                    "toolTip": "If Intune is configured in your Microsoft Entra ID tenant, you can choose to have the VM automatically enrolled during the deployment by selecting this box."
+                                },
+                                {
+                                    "name": "ADDomainName",
+                                    "type": "Microsoft.Common.TextBox",
+                                    "label": "AD Domain name",
+                                    "visible": "[or(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'ActiveDirectory'), equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraDS'))]",
+                                    "placeholder": "Example: contoso.com",
+                                    "constraints": {
+                                        "required": true
+                                    }
+                                },
+                                {
+                                    "name": "ADDomainJoinUserName",
+                                    "type": "Microsoft.Common.TextBox",
+                                    "label": "User principal name",
+                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
+                                    "toolTip": "Provide username with permissions to join session host to the domain.",
+                                    "placeholder": "Example: avdadmin@contoso.com",
+                                    "defaultValue": "",
+                                    "constraints": {
+                                        "required": true
+                                    }
+                                },
+                                {
+                                    "name": "ADJoinUserPassword",
+                                    "type": "Microsoft.Common.PasswordBox",
+                                    "label": {
+                                        "password": "Password"
+                                    },
+                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
+                                    "toolTip": "Provide password for domain join account. This will be stored in a new Azure Key Vault.",
+                                    "constraints": {
+                                        "required": true
+                                    },
+                                    "options": {
+                                        "hideConfirmation": true
+                                    }
+                                },
+                                {
+                                    "name": "ADOUPath",
+                                    "type": "Microsoft.Common.TextBox",
+                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
+                                    "label": "Custom OU path (Optional)",
+                                    "toolTip": "Provide OU where to locate session hosts, if not provided session hosts will be placed on the default (computers) OU.",
+                                    "placeholder": "Example: OU=session-hosts,OU=avd,DC=contoso,DC=com",
+                                    "constraints": {}
+                                }
+                            ]
+                        },
+                        {
+                            "name": "LocalAdminUsername",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Local Administrator Username",
+                            "toolTip": "Provide username for session host local admin account. Administrator can't be used as username, it is reserved by the system. The password is randomly generated at deployment time.",
+                            "placeholder": "Example: avdadmin",
+                            "defaultValue": "",
+                            "constraints": {
+                                "regex": "^(?!.*[aA]dministrator).*$",
+                                "validationMessage": "This username can't be used, it is a reserved word.",
+                                "required": true
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "RequiredParametersStep",
+                    "label": "Required Parameters",
+                    "elements": [
+                        {
+                            "name": "HostPoolSelector",
+                            "type": "Microsoft.Solutions.ResourceSelector",
+                            "label": "Select target Host Pool",
+                            "resourceType": "Microsoft.DesktopVirtualization/HostPools",
+                            "constraints": {
+                                "required": true
+                            },
+                            "options": {
+                                "filter": {
+                                    "subscription": "onBasics",
+                                    "location": "onBasics"
+                                }
+                            }
+                        },
+                        {
+                            "name": "sessionHostsCount",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Target Session Host Count",
+                            "toolTip": "The target number of session hosts in the host pool.",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^\\d+$",
+                                "validationMessage": "Must be an integer."
+                            }
+                        },
+                        {
+                            "name": "sessionHostNamePrefix",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Session Host Name Prefix",
+                            "toolTip": "The prefix for the session host names. The session host names will be in the format <prefix>-<number>.",
+                            "constraints": {
+                                "required": true,
+                                "validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "optionalParametersStep",
+                    "label": "Optional Parameters",
+                    "elements": [
+                        {
+                            "name": "_Tag_IncludeInAutomation",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Include in Automation Tag Name",
+                            "toolTip": "The name of the tag to use to determine if an existing session host should be included in the automation. After deployment, if the tag is present and set to 'true', the session host will be included. If the tag is not present or set to 'false', the session host will be excluded.",
+                            "defaultValue": "IncludeInAutoReplace",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_Tag_DeployTimestamp",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Deploy Timestamp Tag Name",
+                            "toolTip": "The name of the tag to use to determine when the session host was deployed. This is updated by the session host replacer function on new session hosts. After deployment, you can edit the value of this tag to force replace a VM.",
+                            "defaultValue": "AutoReplaceDeployTimestamp",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_Tag_PendingDrainTimestamp",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Pending Drain Timestamp Tag Name",
+                            "toolTip": "The name of the tag to use to determine when the session host was marked for drain. This is updated by the session host replacer function on hosts pending deletion.",
+                            "defaultValue": "AutoReplacePendingDrainTimestamp",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_Tag_ScalingPlanExclusionTag",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Scaling Plan Exclusion Tag Name",
+                            "toolTip": "The name of the tag session host replacer will set to exclude a session host from scaling plans actions.",
+                            "defaultValue": "ScalingPlanExclusion",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_TargetVMAgeDays",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Target VM Age (Days)",
+                            "toolTip": "The maximum age of a VM in days before it is replaced. This is compared to the value of the Deploy Timestamp Tag.",
+                            "defaultValue": 45,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_DrainGracePeriodHours",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Drain Grace Period (Hours)",
+                            "toolTip": "The number of hours to wait after marking a VM for drain before deleting it. This is to allow users to finish their sessions before the VM is deleted.",
+                            "defaultValue": 24,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_FixSessionHostTags",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Fix Existing Session Host Tags",
+                            "toolTip": "If enabled, the session host replacer will fix the tags on existing session hosts or if tags are mistakenly deleted. The tag values will NOT allow deletion of existing session hosts and must be changed post deployment. This is useful if you are deploying a new session host replacer to an existing host pool.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_SHRDeploymentPrefix",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Deployment Prefix",
+                            "toolTip": "The prefix of the deployment created in the session hosts resource group when replacement VMs are deploying. This is used to track running and failed deployments.",
+                            "defaultValue": "AVDSessionHostReplacer",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_AllowDownsizing",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Allow Downsizing",
+                            "toolTip": "If enabled, the session host replacer will delete older session hosts when the total number of good hosts is higher than target session host number.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_SessionHostInstanceNumberPadding",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Session Host VM Name Padding",
+                            "toolTip": "The number of digits to pad the session host instance number with. For example, if the value is 3, the session host names will be in the format <prefix>-001.",
+                            "defaultValue": 2,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_ReplaceSessionHostOnNewImageVersion",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Replace Session Hosts On New Image Version",
+                            "toolTip": "(Recommended) If enabled, the session host replacer will replace session hosts when a new image version is available. This works for both marketplace and custom images. If disabled, the session host replacer will only replace session hosts when the VM age is greater than the target VM age.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_ReplaceSessionHostOnNewImageVersionDelayDays",
+                            "type": "Microsoft.Common.TextBox",
+                            "visible": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
+                            "label": "Replace on New Image Version Delay (Days)",
+                            "toolTip": "The number of days to wait after a new image is available before replacing session hosts. This is to allow time for the image to be tested before replacing session hosts.",
+                            "defaultValue": "0",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_VMNamesTemplateParameterName",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "VM Names Template Parameter Name",
+                            "toolTip": "The name of the parameter in the template that specifies the VM Names array.",
+                            "defaultValue": "VMNames",
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "_SessionHostResourceGroupName",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Session Hosts Resource Group Name",
+                            "placeholder": "Same As Host Pool Resource Group",
+                            "toolTip": "Leave this empty to deploy to same resource group as the host pool.",
+                            "defaultValue": "",
+                            "constraints": {
+                                "required": false
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "outputs": {
+            "parameters": {
+                "EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
+                "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
+                "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
+                "SessionHostsRegion": "[steps('SessionHostsTemplate').SessionHostsRegion]",
+                "AvailabilityZones": "[steps('SessionHostsTemplate').AvailabilityZones]",
+                "SessionHostSize": "[steps('SessionHostsTemplate').SessionHostSize]",
+                "AcceleratedNetworking": "[steps('SessionHostsTemplate').AcceleratedNetworking]",
+                "SessionHostDiskType": "[steps('SessionHostsTemplate').SessionHostDiskType]",
+                "MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage]",
+                "MarketPlaceImage": "[steps('SessionHostsTemplate').dropDownMarketPlaceImage]",
+                "GalleryImageId": "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId.id]",
+                "SecurityType": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType]",
+                "SecureBootEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecureBootEnabled]",
+                "TpmEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled]",
+                "IdentityServiceProvider": "[steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider]",
+                "IntuneEnrollment": "[steps('SessionHostsTemplate').DomainJoinSection.IntuneEnrollment]",
+                "SubnetId": "[steps('SessionHostsTemplate').SubnetId]",
+                "ADDomainName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainName]",
+                "ADDomainJoinUserName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainJoinUserName]",
+                "ADJoinUserPassword": "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",
+                "ADOUPath": "[steps('SessionHostsTemplate').DomainJoinSection.ADOUPath]",
+                "LocalAdminUsername": "[steps('SessionHostsTemplate').LocalAdminUsername]",
+                "HostPoolResourceGroupName": "[steps('RequiredParametersStep').HostPoolSelector.resourceGroup]",
+                "HostPoolName": "[steps('RequiredParametersStep').HostPoolSelector.name]",
+                "SessionHostNamePrefix": "[steps('RequiredParametersStep').sessionHostNamePrefix]",
+                "TargetSessionHostCount": "[steps('RequiredParametersStep').sessionHostsCount]",
+                "TagIncludeInAutomation": "[steps('optionalParametersStep')._Tag_IncludeInAutomation]",
+                "TagDeployTimestamp": "[steps('optionalParametersStep')._Tag_DeployTimestamp]",
+                "TagPendingDrainTimestamp": "[steps('optionalParametersStep')._Tag_PendingDrainTimestamp]",
+                "TagScalingPlanExclusionTag": "[steps('optionalParametersStep')._Tag_ScalingPlanExclusionTag]",
+                "TargetVMAgeDays": "[steps('optionalParametersStep')._TargetVMAgeDays]",
+                "DrainGracePeriodHours": "[steps('optionalParametersStep')._DrainGracePeriodHours]",
+                "FixSessionHostTags": "[steps('optionalParametersStep')._FixSessionHostTags]",
+                "DeploymentPrefix": "[steps('optionalParametersStep')._SHRDeploymentPrefix]",
+                "AllowDownsizing": "[steps('optionalParametersStep')._AllowDownsizing]",
+                "SessionHostInstanceNumberPadding": "[steps('optionalParametersStep')._SessionHostInstanceNumberPadding]",
+                "ReplaceSessionHostOnNewImageVersion": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
+                "ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",
+                "VMNamesTemplateParameterName": "[steps('optionalParametersStep')._VMNamesTemplateParameterName]",
+                "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]"
+            },
+            "kind": "ResourceGroup",
+            "location": "[steps('basics').resourceScope.location.name]",
+            "resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]"
+        }
+    }
+}

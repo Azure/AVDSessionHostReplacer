@@ -23,7 +23,7 @@ jobs:
       - name: Build Bicep File
         shell: pwsh
         run: |
-          bicep build ./deploy/bicep/DeployAVDSessionHostReplacer.bicep --outfile ./deploy/arm/DeployAVDSessionHostReplacer.json
+          bicep build deploy/bicep/DeployAVDSessionHostReplacer.bicep --outfile deploy/arm/DeployAVDSessionHostReplacer.json
 
       - name: Commit Changes
         shell: pwsh

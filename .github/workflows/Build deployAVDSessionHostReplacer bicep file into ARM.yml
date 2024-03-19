@@ -23,6 +23,8 @@ jobs:
       - name: Build Bicep File
         shell: pwsh
         run: |
+          get-Location
+          get-childitem
           bicep build ./deploy/bicep/DeployAVDSessionHostReplacer.bicep --outfile ./deploy/arm/DeployAVDSessionHostReplacer.json
 
       - name: Commit Changes

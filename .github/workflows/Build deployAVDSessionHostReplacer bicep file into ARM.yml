@@ -25,11 +25,7 @@ jobs:
         run: |
           bicep build deploy/bicep/DeployAVDSessionHostReplacer.bicep --outfile deploy/arm/DeployAVDSessionHostReplacer.json
 
-      - name: Commit Changes
-        shell: pwsh
-        run: |
-          $timeStamp = Get-Date -Format "o"
-          ./Build/Update-Repo.ps1 -TokenAccount $env:TOKENACCOUNT -GitToken $env:TOKENPAT -AccountName Azure -RepositoryName AVDSessionHostReplacer -Message "Build deployAVDSessionHostReplacer.bicep file into ARM ($timeStamp) [no ci]"
-        env:
-          TOKENACCOUNT: ${{ secrets.TOKENACCOUNT }}
-          TOKENPAT: ${{ secrets.TOKENPAT }}
+      - name: publish
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Automated update for ARM templates

@@ -9,15 +9,15 @@ the AVD Session Host Replacer helps you manage the task of replacing old session
 
 # Getting started
 
-| Deployment Type        | Link                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| :----------------------| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Azure Portal UI        | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fmain%2Fportal-ui%2Fportal-deploy.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fmain%2Fportal-ui%2Fportal-ui.json) |
-| Command line (Bicep/ARM)	 | [![Powershell/Azure CLI](./docs/icons/powershell.png)](./docs/CodeDeploy.md)
+| Deployment Type           | Link                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Azure Portal UI           | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fmain%2Fdeploy%2Farm%2FDeployAVDSessionHostReplacer.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fmain%2Fdeploy%2Fportal-ui%2Fportal-ui.json) |
+| Command line (Bicep/ARM)  | [![Powershell/Azure CLI](./docs/icons/powershell.png)](./docs/CodeDeploy.md)
 
 ## How it works?
 
 There are two criteria for replacing a session host,
-1. **Image Version:** Is there a new image version available? If so, we create a new session host with the new image version. This can be from Market Place or Image Gallery Definition.
+1. **Image Version:** Is there a new image version available? If so, we create a new session host with the new image version. This can be from Marketplace or  Gallery Image Definition.
 2. **Session Host VM Age:** If the session host is older than a certain age, default is 45 days, we create a new session host and drain the old one.
 
 The core of an AVD Session Host Replacer is an Azure Function App built using PowerShell, the function is triggered every hour to check each session host against the above criteria.

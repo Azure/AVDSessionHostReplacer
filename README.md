@@ -9,17 +9,10 @@ the AVD Session Host Replacer helps you manage the task of replacing old session
 
 # Getting started
 
-You can deploy using one of the blow options. This will create,
-
-1. **Function App**
-2. **App Service Plan:** Consumption tier. Used to host the function.
-3. **Storage Account:** Utilized by the function App
-4. **Log Analytics Workspace:** Used to store Logs and AppService insights
-
 | Deployment Type        | Link                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | :----------------------| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Azure Portal UI        | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fmain%2Fportal-ui%2Fportal-deploy.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fmain%2Fportal-ui%2Fportal-ui.json) |
-| PowerShell (ARM/Bicep) | [![Powershell/Azure CLI](./docs/icons/powershell.png)](./docs/CodeDeploy.md)
+| Command line (Bicep/ARM)	 | [![Powershell/Azure CLI](./docs/icons/powershell.png)](./docs/CodeDeploy.md)
 
 ## How it works?
 
@@ -29,9 +22,7 @@ There are two criteria for replacing a session host,
 
 The core of an AVD Session Host Replacer is an Azure Function App built using PowerShell, the function is triggered every hour to check each session host against the above criteria.
 
-To deploy new session hosts, the function uses an ARM Template. A sample is available [here](SampleSessionHostTemplate).
-
-The template is ideally stored as a [Template Spec](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/template-specs). The Session Host Replacer will pass configured parameters to the template to create the new session host(s).
+To deploy new session hosts, the function uses an ARM Template that is stored as a Template Spec at deployment time.
 
 When deleting an old session host, the function will check if it has existing sessions and,
 
@@ -39,6 +30,9 @@ When deleting an old session host, the function will check if it has existing se
 2. Send a notification to all sessions.
 3. Add a tag to the session host with a timestamp
 4. Delete the session host once there are no sessions or the grace period has passed.
+    - Delete VM
+    - Remove from Host Pool
+    - (If Entra Joined) Delete device from Entra ID
 
 
 ## Contributing

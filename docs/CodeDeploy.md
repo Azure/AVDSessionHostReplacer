@@ -66,7 +66,7 @@ $TemplateParameters = @{
 $paramNewAzResourceGroupDeployment = @{
     Name = 'AVDSessionHostReplacer'
     ResourceGroupName = $ResourceGroupName
-    TemplateFile = '' #TODO add githubusercontent url to the json here.
+    TemplateFile = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/main/deploy/arm/DeployAVDSessionHostReplacer.json'
     # If you cloned the repo and want to deploy using the bicep file use this instead of the above line
     #TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer.bicep'
     TemplateParameterObject = $TemplateParameters

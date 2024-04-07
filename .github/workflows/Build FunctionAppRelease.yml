@@ -4,6 +4,12 @@ on:
       - Development
     paths:
       - 'FunctionApp/**'
+  workflow_dispatch:
+    inputs:
+      messages:
+       description: 'Why are you running manually?'
+       required: false
+       default: 'Manual Run'    
 jobs:
   Build-Nightly-Zip:
     runs-on: ubuntu-latest

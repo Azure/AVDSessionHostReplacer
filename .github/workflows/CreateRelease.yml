@@ -53,4 +53,4 @@ jobs:
           # Optionally specify the repo where the release should be generated. Defaults to current repo
           tag: ${{ steps.bump_version.outputs.new_tag }} # optional, default is
           # The Github token.
-          token: # optional, default is ${{ github.token }}
+          token: ${{ secrets.GITHUB_TOKEN }} # optional, default is ${{ github.token }}

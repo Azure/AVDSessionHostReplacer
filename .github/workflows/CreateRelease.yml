@@ -23,14 +23,25 @@ jobs:
         shell: pwsh
         run: |
           ./Build/Build-Zip-File.ps1 -Path ".\Nightly"
-
+      
+      - name: Bump version and push tag
+        id: bump_version
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch  # Default to patch if no keywords are found
+          WITH_V: true         # Prefix the tag with 'v'
+          PRE_RELEASE: true    # Enable pre-release
+          VERBOSE: true
+      
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.bump_version.outputs.new_tag }}
+          release_name: Release ${{ steps.bump_version.outputs.new_tag }}
           draft: false
           prerelease: true
+          

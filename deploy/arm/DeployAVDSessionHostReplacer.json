@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "8063927267183433633"
+      "templateHash": "5031791489587968257"
     }
   },
   "parameters": {
@@ -109,7 +109,8 @@
       ]
     },
     "IntuneEnrollment": {
-      "type": "bool"
+      "type": "bool",
+      "defaultValue": false
     },
     "ADDomainName": {
       "type": "string",

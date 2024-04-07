@@ -23,7 +23,7 @@ jobs:
         shell: pwsh
         run: |
           ./Build/Build-Zip-File.ps1 -Path ".\Nightly"
-      
+
       - name: Bump version and push tag
         id: bump_version
         uses: anothrNick/github-tag-action@1.36.0
@@ -33,15 +33,24 @@ jobs:
           WITH_V: true         # Prefix the tag with 'v'
           PRE_RELEASE: true    # Enable pre-release
           VERBOSE: true
-      
+
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # You may pin to the exact commit or the version.
+        # uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
+        uses: ncipollo/release-action@v1.14.0
         with:
-          tag_name: ${{ steps.bump_version.outputs.new_tag }}
-          release_name: Release ${{ steps.bump_version.outputs.new_tag }}
-          draft: false
+          # An optional flag which indicates if we should update a release if it already exists. Defaults to false.
+          allowUpdates: # optional, default is
+          # An optional flag which indicates if artifact read or upload errors should fail the build.
+          artifactErrorsFailBuild: # optional, default is
+          # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
+          artifacts: .\Nightly\FunctionApp.zip # optional
+          # The content type of the artifact. Defaults to raw
+          generateReleaseNotes: # optional, default is false
+          # Indicates if the release should be the "latest" release or not.
           prerelease: true
-          
+          replacesArtifacts: true # optional, default is true
+          # Optionally specify the repo where the release should be generated. Defaults to current repo
+          tag: ${{ steps.bump_version.outputs.new_tag }} # optional, default is
+          # The Github token.
+          token: # optional, default is ${{ github.token }}

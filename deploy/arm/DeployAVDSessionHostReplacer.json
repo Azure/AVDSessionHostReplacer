@@ -109,7 +109,8 @@
       ]
     },
     "IntuneEnrollment": {
-      "type": "bool"
+      "type": "bool",
+      "defaultValue": false
     },
     "ADDomainName": {
       "type": "string",

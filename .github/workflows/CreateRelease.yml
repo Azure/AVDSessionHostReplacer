@@ -1,7 +1,5 @@
 on:
   push:
-    branches:
-      - Development
     paths:
       - 'FunctionApp/**'
   workflow_dispatch:
@@ -9,11 +7,13 @@ on:
       messages:
        description: 'Why are you running manually?'
        required: false
-       default: 'Manual Run'      
+       default: 'Manual Run'
 jobs:
   Build-Nightly-Zip:
     runs-on: ubuntu-latest
     #if: github.sha == github.event.head_commit.id # Only run the job if the commit is the latest one
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.2

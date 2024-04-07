@@ -1,0 +1,36 @@
+on:
+  push:
+    branches:
+      - Development
+    paths:
+      - 'FunctionApp/**'
+  workflow_dispatch:
+    inputs:
+      messages:
+       description: 'Why are you running manually?'
+       required: false
+       default: 'Manual Run'      
+jobs:
+  Build-Nightly-Zip:
+    runs-on: ubuntu-latest
+    if: github.sha == github.event.head_commit.id # Only run the job if the commit is the latest one
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.2
+        with:
+          ref: ${{ github.head_ref}}
+      - name: Run-Build-Script
+        shell: pwsh
+        run: |
+          ./Build/Build-Zip-File.ps1 -Path ".\Nightly"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: true

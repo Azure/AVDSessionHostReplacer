@@ -40,13 +40,13 @@ jobs:
         uses: ncipollo/release-action@v1.14.0
         with:
           # An optional flag which indicates if we should update a release if it already exists. Defaults to false.
-          allowUpdates: # optional, default is
+          allowUpdates: true # optional, default is
           # An optional flag which indicates if artifact read or upload errors should fail the build.
-          artifactErrorsFailBuild: # optional, default is
+          artifactErrorsFailBuild: true # optional, default is
           # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
           artifacts: .\Nightly\FunctionApp.zip # optional
           # The content type of the artifact. Defaults to raw
-          generateReleaseNotes: # optional, default is false
+          generateReleaseNotes: true # optional, default is false
           # Indicates if the release should be the "latest" release or not.
           prerelease: true
           replacesArtifacts: true # optional, default is true

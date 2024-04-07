@@ -59,7 +59,7 @@ param SubnetId string
   'EntraDS'
 ])
 param IdentityServiceProvider string
-param IntuneEnrollment bool
+param IntuneEnrollment bool = false
 param ADDomainName string = ''
 param ADDomainJoinUserName string = ''
 @secure()

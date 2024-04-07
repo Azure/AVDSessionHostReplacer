@@ -28,10 +28,15 @@ catch{
     throw $_
 }
 
-# Authenticate with Azure PowerShell using MSI.
+# Authenticate with Azure PowerShell using MSI or user identity.
 if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
-    Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId)
+    if($env:_clientId){
+        Connect-AzAccount -Identity -SubscriptionId -AccountId $env:_clientId (Get-FunctionConfig _SubscriptionId)
+    }
+    else{
+        Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId)
+    }
 }
 else{
     Set-AzContext -SubscriptionId (Get-FunctionConfig _SubscriptionId)

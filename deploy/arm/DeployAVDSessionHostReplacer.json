@@ -1065,7 +1065,7 @@
                             "autoUpgradeMinorVersion": true,
                             "settings": {
                               "Name": "[[parameters('DomainJoinObject').DomainName]",
-                              "OUPath": "[[parameters('DomainJoinObject').OUPath]",
+                              "OUPath": "[[parameters('DomainJoinObject').ADOUPath]",
                               "User": "[[format('{0}\\{1}', parameters('DomainJoinObject').DomainName, parameters('DomainJoinObject').DomainJoinUserName)]",
                               "Restart": "true",
                               "Options": 3

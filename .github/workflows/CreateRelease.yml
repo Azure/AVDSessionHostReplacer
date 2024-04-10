@@ -54,3 +54,4 @@ jobs:
           tag: ${{ steps.bump_version.outputs.new_tag }} # optional, default is
           # The Github token.
           token: ${{ secrets.GITHUB_TOKEN }} # optional, default is ${{ github.token }}
+          body: ${{ github.ref }}

@@ -28,3 +28,8 @@ $folder = New-Item -Path $Path -ItemType Directory -Force
 $zipFilePath = $folder.FullName + "\FunctionApp.zip"
 if (Test-Path $zipFilePath) { Remove-Item $zipFilePath -Force }
 Compress-Archive -Path .\FunctionApp\* -DestinationPath $folder\FunctionApp.zip -Force -CompressionLevel Optimal
+
+
+# Create json files for deployment
+bicep.exe build .\StandardSessionHostTemplate\DeploySessionHosts.bicep --outfile .\StandardSessionHostTemplate\DeploySessionHosts.json
+bicep.exe build .\deploy\bicep\DeployAVDSessionHostReplacer.bicep --outfile .\deploy\arm\DeployAVDSessionHostReplacer.json

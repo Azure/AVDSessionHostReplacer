@@ -15,6 +15,13 @@ $TemplateParameters = @{
     SessionHostNamePrefix                        = 'avdshr' # Will be appended by '-XX'
     TargetSessionHostCount                       = 2 # How many session hosts to maintain in the Host Pool
 
+    # Identity
+    # Using a User Managed Identity is recommended. You can assign the same identity to different instances of session host replacer instances. The identity should have the proper permissions in Azure and Entra.
+    # The identity can be in a different Azure Subscription. If not used, a system assigned identity will be created and assigned permissions against the current subscription.
+    UseUserAssignedManagedIdentity               = $true
+    UserAssignedManagedIdentityResourceId        = '<Resource Id of the User Assigned Managed Identity>'
+    UserAssignedManagedIdentityClientId          = '<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx>' # The client (Application) ID of the user managed identity
+
     ## Session Host Template Parameters ##
     SessionHostsRegion                           = 'NorthEurope' # Does not have to be the same as Host Pool
     AvailabilityZones                            = @("1", "3") # Set to empty array if not using AZs
@@ -31,7 +38,7 @@ $TemplateParameters = @{
     SecureBootEnabled                            = $true
     TpmEnabled                                   = $true
 
-    SubnetId                                     = '/subscriptions/2a5d0771-685c-4101-a8bd-3b0ceb1691a3/resourceGroups/rg-avd-app1-dev-eun-network/providers/Microsoft.Network/virtualNetworks/vnet-app1-dev-eun-001/subnets/snet-avd-app1-dev-eun-001' # Resource Id, make sure it ends with /subnets/<subnetName>
+    SubnetId                                     = '<Resource Id, make sure it ends with /subnets/<subnetName>>'
 
     IdentityServiceProvider                      = 'EntraID' # EntraID / ActiveDirectory / EntraDS
     IntuneEnrollment                             = $false # This is only used when IdentityServiceProvider is EntraID
@@ -66,7 +73,8 @@ $TemplateParameters = @{
 $paramNewAzResourceGroupDeployment = @{
     Name = 'AVDSessionHostReplacer'
     ResourceGroupName = $ResourceGroupName
-    TemplateFile = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/main/deploy/arm/DeployAVDSessionHostReplacer.json'
+    TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/main/deploy/arm/DeployAVDSessionHostReplacer.json'
+
     # If you cloned the repo and want to deploy using the bicep file use this instead of the above line
     #TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer.bicep'
     TemplateParameterObject = $TemplateParameters
@@ -89,7 +97,7 @@ Without this cleanup, creating a new session host with the same name will fail.
 
 You use the script below to configure the permissions. Make sure to run them with a Global Admin account.
 ```PowerShell
-$FunctionAppSP = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' # The ID of the system managed identity of the function app
+$FunctionAppSP = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' # The ID of the system managed identity of the function app or the user assigned managed identity you created.
 
 # Connect to Graph with requires scopes.
 Connect-MgGraph -Scopes Application.ReadWrite.All, Directory.ReadWrite.All, AppRoleAssignment.ReadWrite.All,  RoleManagement.ReadWrite.Directory

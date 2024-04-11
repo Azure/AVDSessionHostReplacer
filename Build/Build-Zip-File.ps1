@@ -24,6 +24,10 @@ $filesToUpdate = @(
         Path = '.\deploy\bicep\modules\deployFunctionApp.bicep'
         BannerPattern = "(param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/)(.*)(/FunctionApp.zip')"
     }
+    @{
+        Path = '.\docs\CodeDeploy.md'
+        BannerPattern = "(TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/)(.+)(/deploy/arm/DeployAVDSessionHostReplacer.json')"
+    }
 )
 foreach($file in $filesToUpdate){
     $fileContent = Get-Content -Path $file.Path

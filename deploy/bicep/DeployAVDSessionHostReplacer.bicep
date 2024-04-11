@@ -81,6 +81,11 @@ param SessionHostNamePrefix string
 @description('Required: Yes | Number of session hosts to maintain in the host pool.')
 param TargetSessionHostCount int
 
+@description('Required: No | Resource Id of the User Assigned Managed Identity to use for the Function App. | Default: System Identity')
+param UseUserAssignedManagedIdentity bool = false
+param UserAssignedManagedIdentityResourceId string = ''
+param UserAssignedManagedIdentityClientId string = ''
+
 // Optional Parameters
 @description('Required: No | Tag name used to indicate that a session host should be included in the automatic replacement process. | Default: IncludeInAutoReplace.')
 param TagIncludeInAutomation string = 'IncludeInAutoReplace'
@@ -284,6 +289,10 @@ var varReplacementPlanSettings = [
     name: '_RemoveAzureADDevice'
     value: IdentityServiceProvider == 'EntraID'
   }
+  {
+    name: '_ClientId'
+    value: UserAssignedManagedIdentityClientId
+  }
 
   // Optional Parameters //
   {
@@ -347,6 +356,14 @@ var varReplacementPlanSettings = [
 var varUniqueString = uniqueString(resourceGroup().id, HostPoolName)
 var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
 
+var varFunctionAppIdentity = UseUserAssignedManagedIdentity ? {
+  type: 'UserAssigned'
+  userAssignedIdentities:{
+    '${UserAssignedManagedIdentityResourceId}': {}
+}
+} : {
+  type: 'SystemAssigned'
+}
 
 
 // Outputs for verification
@@ -363,6 +380,7 @@ module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
     UseExistingLAW: UseExistingLAW
     LogAnalyticsWorkspaceId: LogAnalyticsWorkspaceId
     ReplacementPlanSettings: varReplacementPlanSettings
+    FunctionAppIdentity: varFunctionAppIdentity
   }
 }
 
@@ -382,7 +400,8 @@ module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec.bic
   }
 }
 //---- Role Assignments ----//
-module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = {
+// These roles are only assigned if the FunctionApp is using a System Managed Identity (MSI). Please manually assign when using a User Assigned Managed Identity.
+module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
   name: 'RBAC-vdiVMContributor-${TimeStamp}'
   scope: subscription()
   params: {
@@ -391,7 +410,7 @@ module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = {
     Scope: subscription().id
   }
 }
-module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = {
+module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity){
   name: 'RBAC-TemplateSpecReader-${TimeStamp}'
   scope: subscription()
   params: {

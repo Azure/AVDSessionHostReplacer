@@ -20,6 +20,39 @@
                             }
                         },
                         {
+                            "name": "UseUserAssignedManagedIdentity",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Use User Assigned Managed Identity",
+                            "toolTip": "[Recommended] IF enabled, The Session Host Replacer will use the selected Identity to take actions. Otherwise System Identity (MSI) is used.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "UserAssignedManagedIdentitySelector",
+                            "type": "Microsoft.Solutions.ResourceSelector",
+                            "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
+                            "label": "Select User Assigned Managed Identity",
+                            "resourceType": "Microsoft.ManagedIdentity/userAssignedIdentities",
+                            "constraints": {
+                                "required": true
+                            },
+                            "options": {
+                                "filter": {}
+                            }
+                        },
+                        {
+                            "name": "UserAssignedManagedIdentityInfoBox",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
+                            "options": {
+                                "icon": "Info",
+                                "text": "When using a User Assigned Managed Identity, make sure the identity has the needed permissions in Azure and Entra. Follow the link for more info.",
+                                "uri": "https://www.microsoft.com"
+                            }
+                        },
+                        {
                             "name": "MonitoringSection",
                             "type": "Microsoft.Common.Section",
                             "label": "Monitoring",

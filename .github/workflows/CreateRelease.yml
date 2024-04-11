@@ -15,6 +15,12 @@ jobs:
     permissions:
       contents: write
     steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4.1.2
+        with:
+          ref: ${{ github.head_ref}}
+
       - name: Generate New Version and Tag (Dry_Run)
         id: bump_version_DryRun
         uses: anothrNick/github-tag-action@1.67.0
@@ -25,10 +31,6 @@ jobs:
           PRE_RELEASE: true    # Enable pre-release
           VERBOSE: true
           DRY_RUN: true
-      - name: Checkout code
-        uses: actions/checkout@v4.1.2
-        with:
-          ref: ${{ github.head_ref}}
 
       - name: Run-Build-Script
         shell: pwsh
@@ -40,7 +42,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
-          git commit -m "Automated commit by GitHub Actions for new build" || echo "No changes to commit"
+          git commit -m "Automated commit by GitHub Actions for new build [no ci]" || echo "No changes to commit"
           git push
 
       - name: Bump version and push tag

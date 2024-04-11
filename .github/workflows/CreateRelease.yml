@@ -28,7 +28,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch  # Default to patch if no keywords are found
           WITH_V: true         # Prefix the tag with 'v'
-          PRE_RELEASE: true    # Enable pre-release
+          PRERELEASE: true     # Enable pre-release
           VERBOSE: true
           DRY_RUN: true
 
@@ -52,7 +52,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch  # Default to patch if no keywords are found
           WITH_V: true         # Prefix the tag with 'v'
-          PRE_RELEASE: true    # Enable pre-release
+          PRERELEASE: true     # Enable pre-release
           VERBOSE: true
 
       - name: Run-Build-Script

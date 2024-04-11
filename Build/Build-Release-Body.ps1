@@ -17,7 +17,7 @@ $urlPortalUiUrl = "https://raw.githubusercontent.com/Azure/AVDSessionHostReplace
 
 $body = @"
 ReleaseBody<<EOF
-This release is based on $GitRef built on $timeStamp
+This release is built from $GitRef on $timeStamp
 ## Deploy This Release
 
 | Deployment Type           | Link                                                                                                                                                                                                                                                                                                                                                                                                                       |

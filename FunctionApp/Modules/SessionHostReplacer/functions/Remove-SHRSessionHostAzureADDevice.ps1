@@ -9,8 +9,6 @@ function Remove-SHRSessionHostAzureADDevice {
         [String] $VMName
     )
 
-    # Connect to Graph API
-    Connect-SHRGraphAPI
     # Get device object
     $device = Get-MgDevice -Filter "DisplayName eq '$VMName'"
     if($device){

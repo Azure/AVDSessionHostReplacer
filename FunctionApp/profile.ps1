@@ -29,16 +29,28 @@ catch{
 }
 
 # Authenticate with Azure PowerShell using MSI or user identity.
+
 if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
-    if($env:_clientId){
-        Connect-AzAccount -Identity -SubscriptionId -AccountId $env:_clientId (Get-FunctionConfig _SubscriptionId)
+    if([string]::IsNullOrEmpty($env:_ClientId)){
+        Write-PSFMessage -Level Host -Message "Authenticating with system assigned identity"
+        Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId)
+        if(Get-FunctionConfig _RemoveAzureADDevice){
+            Write-PSFMessage -Level Host -Message "Connecting to Graph API"
+            Connect-MGGraph -Identity
+        }
     }
     else{
-        Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId)
+        Write-PSFMessage -Level Host -Message "Authenticating with user assigned identity - {0}" -StringValues $env:_ClientId
+        Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId) -AccountId $env:_ClientId
+        if(Get-FunctionConfig _RemoveAzureADDevice){
+            Write-PSFMessage -Level Host -Message "Connecting to Graph API"
+            Connect-MGGraph -Identity -ClientId $env:_ClientId
+        }
     }
 }
 else{
+    # This is for testing locally
     Set-AzContext -SubscriptionId (Get-FunctionConfig _SubscriptionId)
 }
 $ErrorActionPreference = 'Stop'

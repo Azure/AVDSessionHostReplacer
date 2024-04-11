@@ -15,6 +15,16 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Generate New Version and Tag (Dry_Run)
+        id: bump_version_DryRun
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch  # Default to patch if no keywords are found
+          WITH_V: true         # Prefix the tag with 'v'
+          PRE_RELEASE: true    # Enable pre-release
+          VERBOSE: true
+          DRY_RUN: true
       - name: Checkout code
         uses: actions/checkout@v4.1.2
         with:
@@ -23,7 +33,7 @@ jobs:
       - name: Run-Build-Script
         shell: pwsh
         run: |
-          ./Build/Build-Zip-File.ps1 -Path ".\temp"
+          ./Build/Build-Zip-File.ps1 -Path ".\temp" -Tag "${{ steps.bump_version_DryRun.outputs.new_tag }}"
       # Commit changes made by the build script if any. This includes the newly created zip file or any other changes
       - name: Commit changes
         run: |
@@ -35,7 +45,7 @@ jobs:
 
       - name: Bump version and push tag
         id: bump_version
-        uses: anothrNick/github-tag-action@1.36.0
+        uses: anothrNick/github-tag-action@1.67.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch  # Default to patch if no keywords are found

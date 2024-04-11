@@ -3,27 +3,41 @@ param (
     [Parameter()]
     [string] $Path = '.\temp',
 
-    # Build Type, Release or Dev
-    [Parameter(Mandatory = $false)]
-    [ValidateSet('Release', 'Repo')]
-    [string] $ReleaseType = 'Repo'
+    [string] $Tag = 'v0.0.0'
 )
-switch ($ReleaseType) {
-    'Release' {
-        # Not implemented yet
+
+
+# Update the version banner.
+# The banner pattern is a regex pattern that matches the line containing the version banner. It has three matching groups, the second one is the one we replace.
+$filesToUpdate = @(
+    @{
+        Path = '.\FunctionApp\profile.ps1'
+        BannerPattern = @"
+(Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version \{0\}" -StringValues ')(.*)(')
+"@
     }
-    'Repo' {
-        # Update the version banner.
-        $timeStamp = Get-Date -Format 'yyyyMMdd-HHmmss' #This is the timestamp that will be used in the version banner
-        $profilePs1 = Get-Content -Path .\FunctionApp\profile.ps1 # This is the profile.ps1 file
-        $bannerLine = $profilePs1 | Where-Object { $_ -like '*Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}*' } # This is the line that contains the version banner
-        if(-not $bannerLine) { throw 'Failed to find version banner line in profile.ps1' } # Fail if the version banner line is not found
-        $index = $profilePs1.IndexOf($bannerLine) # This is the index of the version banner line
-        $bannerLine = $bannerLine -replace '-StringValues.*', "-StringValues '$timeStamp (Repo)'" # This is the new version banner line showing timestamp and build type
-        $profilePs1[$index] = $bannerLine # Replace the old version banner line with the new one
-        $profilePs1 | Set-Content -Path .\FunctionApp\profile.ps1 # Update profile.ps1 file
+    @{
+        Path = '.\deploy\portal-ui\portal-ui.json'
+        BannerPattern = '("text": "AVD session host replacer Portal UI Version: )(.*)()'
     }
+    @{
+        Path = '.\deploy\bicep\modules\deployFunctionApp.bicep'
+        BannerPattern = "(param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/)(.*)(/FunctionApp.zip')"
+    }
+)
+foreach($file in $filesToUpdate){
+    $fileContent = Get-Content -Path $file.Path
+    $bannerLine = $fileContent | Where-Object { $_ -match $file.BannerPattern } # This is the line that contains the version banner
+    if (-not $bannerLine) { throw "Failed to find version banner line in $($file.Path)" } # Fail if the version banner line is not found
+    $index = $fileContent.IndexOf($bannerLine) # This is the index of the version banner line
+    $bannerLine = $bannerLine -replace $file.BannerPattern,  ('$1{0}$3' -f $Tag) # This is the new version banner line showing timestamp and build type
+    $fileContent[$index] = $bannerLine # Replace the old version banner line with the new one
+    $fileContent | Set-Content -Path $file.Path # Update the file
+
+    Write-Host "Updated version in $($file.Path) to $bannerLine"
 }
+
+# Create the zip file
 $folder = New-Item -Path $Path -ItemType Directory -Force
 $zipFilePath = $folder.FullName + "\FunctionApp.zip"
 if (Test-Path $zipFilePath) { Remove-Item $zipFilePath -Force }

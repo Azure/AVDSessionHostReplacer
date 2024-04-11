@@ -47,7 +47,7 @@ jobs:
         id: ReleaseBody
         shell: pwsh
         run: |
-          ./Build/Build-Release-Body.ps1 -Tag "${{ steps.bump_version.outputs.new_tag }}"
+          ./Build/Build-Release-Body.ps1 -Tag "${{ steps.bump_version.outputs.new_tag }}" -GitRef "${{ github.head_ref }}"
 
       - name: Create Release
         # You may pin to the exact commit or the version.
@@ -61,7 +61,7 @@ jobs:
           # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
           artifacts: ./temp/FunctionApp.zip # optional
           # The content type of the artifact. Defaults to raw
-          generateReleaseNotes: true # optional, default is false
+          # generateReleaseNotes: true # optional, default is false
           # Indicates if the release should be the "latest" release or not.
           prerelease: true
           replacesArtifacts: true # optional, default is true

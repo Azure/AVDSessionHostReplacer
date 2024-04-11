@@ -19,10 +19,19 @@ jobs:
         uses: actions/checkout@v4.1.2
         with:
           ref: ${{ github.head_ref}}
+
       - name: Run-Build-Script
         shell: pwsh
         run: |
-          ./Build/Build-Zip-File.ps1 -Path ".\Nightly"
+          ./Build/Build-Zip-File.ps1 -Path ".\temp"
+      # Commit changes made by the build script if any. This includes the newly created zip file or any other changes
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Automated commit by GitHub Actions for new build" || echo "No changes to commit"
+          git push
 
       - name: Bump version and push tag
         id: bump_version
@@ -50,7 +59,7 @@ jobs:
           # An optional flag which indicates if artifact read or upload errors should fail the build.
           artifactErrorsFailBuild: true # optional, default is
           # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
-          artifacts: ./Nightly/FunctionApp.zip,./deploy/arm/DeployAVDSessionHostReplacer.json,./deploy/portal-ui/portal-ui.json # optional
+          artifacts: ./temp/FunctionApp.zip # optional
           # The content type of the artifact. Defaults to raw
           generateReleaseNotes: true # optional, default is false
           # Indicates if the release should be the "latest" release or not.

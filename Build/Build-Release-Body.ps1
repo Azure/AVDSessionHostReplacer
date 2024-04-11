@@ -7,12 +7,13 @@ param (
     $Tag
 )
 
-$urlDeployAVDSessionHostReplacer = "https://github.com/Azure/AVDSessionHostReplacer/releases/download/$Tag/DeployAVDSessionHostReplacer.json" -replace ":", "%3A"  -replace "/", "%2F"
-$urlPortalUiUrl = "https://github.com/Azure/AVDSessionHostReplacer/releases/download/$Tag/portal-ui.json"  -replace ":", "%3A"  -replace "/", "%2F"
+
+$urlDeployAVDSessionHostReplacer = "https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/$Tag/deploy/arm/DeployAVDSessionHostReplacer.json" -replace ":", "%3A"  -replace "/", "%2F"
+$urlPortalUiUrl = "https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/$Tag/deploy/portal-ui/portal-ui.json"  -replace ":", "%3A"  -replace "/", "%2F"
 
 $body = @"
 ReleaseBody<<EOF
-# Deploy This Release
+## Deploy This Release
 
 | Deployment Type           | Link                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [string] $Path = '.\Nightly',
+    [string] $Path = '.\temp',
 
     # Build Type, Release or Dev
     [Parameter(Mandatory = $false)]

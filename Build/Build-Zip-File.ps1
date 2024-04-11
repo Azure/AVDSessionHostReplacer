@@ -32,7 +32,7 @@ foreach($file in $filesToUpdate){
     $index = $fileContent.IndexOf($bannerLine) # This is the index of the version banner line
     $bannerLine = $bannerLine -replace $file.BannerPattern,  ('$1{0}$3' -f $Tag) # This is the new version banner line showing timestamp and build type
     $fileContent[$index] = $bannerLine # Replace the old version banner line with the new one
-    #$fileContent | Set-Content -Path $file.Path # Update the file
+    $fileContent | Set-Content -Path $file.Path # Update the file
 
     Write-Host "Updated version in $($file.Path) to: $bannerLine"
 }

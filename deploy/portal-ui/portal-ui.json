@@ -49,7 +49,7 @@
                             "options": {
                                 "icon": "Info",
                                 "text": "When using a User Assigned Managed Identity, make sure the identity has the needed permissions in Azure and Entra. Follow the link for more info.",
-                                "uri": "https://www.microsoft.com"
+                                "uri": "https://github.com/Azure/AVDReplacementPlans/blob/Dev-UserManagedIdentity/docs/Permissions.md"
                             }
                         },
                         {

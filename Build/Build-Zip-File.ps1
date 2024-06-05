@@ -21,6 +21,10 @@ $filesToUpdate = @(
         BannerPattern = '("text": "AVD session host replacer Portal UI Version: )(.*)(",)'
     }
     @{
+        Path = '.\deploy\portal-ui\portal-ui.json'
+        BannerPattern = '("uri": "https://github.com/Azure/AVDReplacementPlans/blob/)(.*)(/docs/Permissions.md")'
+    }
+    @{
         Path = '.\deploy\bicep\modules\deployFunctionApp.bicep'
         BannerPattern = "(param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/)(.*)(/FunctionApp.zip')"
     }

@@ -95,7 +95,7 @@ function Get-SHRHostPoolDecision {
     }
 
     [PSCustomObject]@{
-        PossibleDeploymentsCount = $possibleDeploymentsCount
+        PossibleDeploymentsCount = $sessionHostsToDeployCount
         AllowSessionHostDelete = $allowSessionHostDelete
         SessionHostsPendingDelete = $sessionHostsToReplace
         ExistingSessionHostVMNames = ([array]$SessionHosts.VMName + [array]$runningDeployments.SessionHostNames) | Select-Object -Unique

@@ -21,10 +21,6 @@ function Get-SHRHostPoolDecision {
         [Parameter()]
         [int] $TargetSessionHostCount = (Get-FunctionConfig _TargetSessionHostCount),
 
-        # Max number of session hosts to deploy at the same time
-        [Parameter()]
-        [int] $MaxSimultaneousDeployments = (Get-FunctionConfig _MaxSimultaneousDeployments),
-
         # Latest image version
         [Parameter()]
         [PSCustomObject] $LatestImageVersion,
@@ -77,12 +73,6 @@ function Get-SHRHostPoolDecision {
 
     if ($sessionHostsToDeployCount -gt 0) {
         Write-PSFMessage -Level Host -Message "We need to deploy {0} session hosts" -StringValues $sessionHostsToDeployCount
-        Write-PSFMessage -Level Host -Message "Maximum number of simultaneous deployment allowed is {0}" -StringValues $MaxSimultaneousDeployments
-        $possibleDeploymentsCount = [int]$MaxSimultaneousDeployments - $runningDeployments.SessionHostNames.Count
-        if ($possibleDeploymentsCount -gt $sessionHostsToDeployCount) {
-            $possibleDeploymentsCount = $sessionHostsToDeployCount
-        }
-        Write-PSFMessage -Level Host -Message "We can start deployment of {0} session hosts" -StringValues $possibleDeploymentsCount
     }
     elseif($sessionHostsToDeployCount -lt 0 -and $AllowDownsizing){
         Write-PSFMessage -Level Host -Message "We have too many session hosts. We need to decommission {0} session hosts" -StringValues $sessionHostsToDeployCount

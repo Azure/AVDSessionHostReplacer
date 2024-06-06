@@ -43,6 +43,14 @@
                             }
                         },
                         {
+                            "name": "UserAssignedManagedIdentityLookup",
+                            "type": "Microsoft.Solutions.ArmApiControl",
+                            "request": {
+                              "method": "GET",
+                              "path": "[concat(steps('basics').UserAssignedManagedIdentitySelector.id,'?api-version=2023-01-31']"
+                            }
+                          },
+                        {
                             "name": "UserAssignedManagedIdentityInfoBox",
                             "type": "Microsoft.Common.InfoBox",
                             "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
@@ -958,7 +966,9 @@
                 "ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",
                 "VMNamesTemplateParameterName": "[steps('optionalParametersStep')._VMNamesTemplateParameterName]",
                 "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]",
-                "UserAssignedManagedIdentityClientId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentitySelector.id, '')]"
+                "UseUserAssignedManagedIdentity": "[if(steps('basics').UseUserAssignedManagedIdentity, true, false)]",
+                "UserAssignedManagedIdentityResourceId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentitySelector.id, '')]",
+                "UserAssigneManagedIdentityClientId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentityLookup.value, '')]"
             },
             "kind": "ResourceGroup",
             "location": "[steps('basics').resourceScope.location.name]",

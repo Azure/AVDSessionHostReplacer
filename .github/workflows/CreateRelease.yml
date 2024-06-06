@@ -2,6 +2,7 @@ on:
   push:
     paths:
       - 'FunctionApp/**'
+      - 'deploy/**'
   workflow_dispatch:
     inputs:
       messages:

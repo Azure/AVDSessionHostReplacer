@@ -92,10 +92,12 @@
       ]
     },
     "SecureBootEnabled": {
-      "type": "bool"
+      "type": "bool",
+      "defaultValue":"false"
     },
     "TpmEnabled": {
-      "type": "bool"
+      "type": "bool",
+      "defaultValue":"false"
     },
     "SubnetId": {
       "type": "string"

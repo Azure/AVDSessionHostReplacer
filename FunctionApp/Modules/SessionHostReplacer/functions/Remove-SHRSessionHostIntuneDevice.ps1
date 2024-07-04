@@ -1,4 +1,4 @@
-function Remove-SHRSessionHostAzureADDevice {
+function Remove-SHRSessionHostIntuneDevice {
     <#
     .SYNOPSIS
         This is used to delete the VM object from Intune

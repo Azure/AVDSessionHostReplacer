@@ -93,6 +93,8 @@ function Remove-SHRSessionHost {
             if ($RemoveAzureDevice) {
                 Write-PSFMessage -Level Host -Message 'Deleting device from Azure AD'
                 Remove-SHRSessionHostAzureADDevice -VMName $sessionHost.VMName
+                Write-PSFMessage -Level Host -Message 'Deleting device from Intune'
+                Remove-SHRSessionHostIntuneDevice -VMName $sessionHost.VMName
             }
 
             Write-PSFMessage -Level Host -Message 'Removing Session Host from Host Pool {0}' -StringValues $HostPoolName

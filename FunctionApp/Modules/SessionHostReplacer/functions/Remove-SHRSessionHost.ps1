@@ -91,10 +91,12 @@ function Remove-SHRSessionHost {
             Write-PSFMessage -Level Host -Message 'Deleting session host {0}...' -StringValues $sessionHost.Name
 
             if ($RemoveAzureDevice) {
-                Write-PSFMessage -Level Host -Message 'Deleting device from Azure AD'
+                Write-PSFMessage -Level Host -Message 'Deleting device from Azure AD and Intune'
                 Remove-SHRSessionHostAzureADDevice -VMName $sessionHost.VMName
-                Write-PSFMessage -Level Host -Message 'Deleting device from Intune'
-                Remove-SHRSessionHostIntuneDevice -VMName $sessionHost.VMName
+                #Write-PSFMessage -Level Host -Message 'Deleting device from Intune'
+                #Remove-SHRSessionHostIntuneDevice -VMName $sessionHost.VMName 
+                # TODO: Dedicated function. Removed due to Connect-SHRGraphAPI testing issues. 
+                # Integrated into Remove-SHRSessionHostAzureADDevice.ps1 for now.
             }
 
             Write-PSFMessage -Level Host -Message 'Removing Session Host from Host Pool {0}' -StringValues $HostPoolName

@@ -98,7 +98,8 @@ Connect-MgGraph -Scopes Application.ReadWrite.All, Directory.ReadWrite.All, AppR
 $graphAppId = "00000003-0000-0000-c000-000000000000"
 $graphSP = Get-MgServicePrincipal -Search "AppId:$graphAppId" -ConsistencyLevel eventual
 $msGraphPermissions = @(
-    'Device.Read.All' #Used to read user and group permissions
+    'Device.Read.All', #Used to read user and group permissions
+    'DeviceManagementManagedDevices.ReadWrite.All' #Used to remove Devices from Intune
 )
 $msGraphAppRoles = $graphSP.AppRoles | Where-Object { $_.Value -in $msGraphPermissions }
 

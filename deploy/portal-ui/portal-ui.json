@@ -66,7 +66,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240707-1421z",
+                                "text": "AVD session host replacer Portal UI Version: 240707-1444z",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/Azure/AVDSessionHostReplacer"
@@ -897,8 +897,8 @@
                 "MarketPlaceImage": "[steps('SessionHostsTemplate').dropDownMarketPlaceImage]",
                 "GalleryImageId": "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId.id]",
                 "SecurityType": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType]",
-                "SecureBootEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecureBootEnabled]",
-                "TpmEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled]",
+                "SecureBootEnabled": "[if(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'Standard'), false(), steps('SessionHostsTemplate').sessionHostsSecuritySection.SecureBootEnabled)]",
+                "TpmEnabled": "[if(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'Standard'), false(), steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled)]",
                 "IdentityServiceProvider": "[steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider]",
                 "IntuneEnrollment": "[steps('SessionHostsTemplate').DomainJoinSection.IntuneEnrollment]",
                 "SubnetId": "[steps('SessionHostsTemplate').SubnetId]",

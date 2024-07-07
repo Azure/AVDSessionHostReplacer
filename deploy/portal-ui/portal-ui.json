@@ -711,6 +711,17 @@
                             }
                         },
                         {
+                            "name": "MaxSimultaneousDeployments",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Max number of simultaneous session host deployments",
+                            "toolTip": "Max number of simultaneous session host deployments.",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^\\d+$",
+                                "validationMessage": "Must be an integer."
+                            }
+                        },
+                        {
                             "name": "sessionHostsCount",
                             "type": "Microsoft.Common.TextBox",
                             "label": "Target Session Host Count",
@@ -911,6 +922,7 @@
                 "HostPoolName": "[steps('RequiredParametersStep').HostPoolSelector.name]",
                 "SessionHostNamePrefix": "[steps('RequiredParametersStep').sessionHostNamePrefix]",
                 "TargetSessionHostCount": "[steps('RequiredParametersStep').sessionHostsCount]",
+                "MaxSimultaneousDeployments": "[steps('RequiredParametersStep').MaxSimultaneousDeployments]",
                 "TagIncludeInAutomation": "[steps('optionalParametersStep')._Tag_IncludeInAutomation]",
                 "TagDeployTimestamp": "[steps('optionalParametersStep')._Tag_DeployTimestamp]",
                 "TagPendingDrainTimestamp": "[steps('optionalParametersStep')._Tag_PendingDrainTimestamp]",

@@ -159,6 +159,12 @@
         "description": "Required: Yes | Number of session hosts to maintain in the host pool."
       }
     },
+    "MaxSimultaneousDeployments": {
+      "type": "int",
+      "metadata": {
+        "description": "Required: Yes | Number of max simultaneous deployments."
+      }
+    },
     "TagIncludeInAutomation": {
       "type": "string",
       "defaultValue": "IncludeInAutoReplace",
@@ -376,6 +382,10 @@
               {
                 "name": "_HostPoolName",
                 "value": "[parameters('HostPoolName')]"
+              },
+              {
+                "name": "_MaxSimultaneousDeployments",
+                "value": "[parameters('MaxSimultaneousDeployments')]"
               },
               {
                 "name": "_TargetSessionHostCount",

@@ -92,12 +92,10 @@
       ]
     },
     "SecureBootEnabled": {
-      "type": "bool",
-      "defaultValue":"false"
+      "type": "bool"
     },
     "TpmEnabled": {
-      "type": "bool",
-      "defaultValue":"false"
+      "type": "bool"
     },
     "SubnetId": {
       "type": "string"
@@ -1112,7 +1110,6 @@
                           "tags": "[[parameters('Tags')]"
                         },
                         {
-                          "condition": "[[not(equals(parameters('SecurityType'), 'Standard'))]",
                           "type": "Microsoft.Compute/virtualMachines",
                           "apiVersion": "2023-09-01",
                           "name": "[[parameters('VMName')]",
@@ -1161,52 +1158,7 @@
                           "dependsOn": [
                             "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]"
                           ]
-                        },
-                        {
-                          "condition": "[[equals(parameters('SecurityType'), 'Standard')]",
-                          "type": "Microsoft.Compute/virtualMachines",
-                          "apiVersion": "2023-09-01",
-                          "name": "[[parameters('VMName')]",
-                          "location": "[[parameters('Location')]",
-                          "zones": "[[variables('varAvailabilityZone')]",
-                          "identity": "[[if(equals(parameters('DomainJoinObject').DomainType, 'EntraID'), createObject('type', 'SystemAssigned'), null())]",
-                          "properties": {
-                            "osProfile": {
-                                "computerName": "[[parameters('VMName')]",
-                                "adminUsername": "[[parameters('AdminUsername')]",
-                                "adminPassword": "[[parameters('AdminPassword')]"
-                                },
-                            "hardwareProfile": {
-                                                "vmSize": "[[parameters('VMSize')]"
-                                              },
-                                              "storageProfile": {
-                                                "osDisk": {
-                                                  "name": "[[format('{0}-OSDisk', parameters('VMName'))]",
-                                                  "createOption": "FromImage",
-                                                  "deleteOption": "Delete",
-                                                  "managedDisk": {
-                                                    "storageAccountType": "[[parameters('DiskType')]"
-                                                  }
-                                                },
-                                                "ImageReference": "[[parameters('ImageReference')]"
-                                              },
-                                              "networkProfile": {
-                                                "networkInterfaces": [
-                                                  {
-                                                    "id": "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]",
-                                                    "properties": {
-                                                      "deleteOption": "Delete"
-                                                    }
-                                                  }
-                                                ]
-                                              },
-                                              "licenseType": "Windows_Client"
-                                            },
-                                            "tags": "[[parameters('Tags')]",
-                                            "dependsOn": [
-                                              "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]"
-                                            ]
-                                          }
+                        }
                       ]
                     }
                   }

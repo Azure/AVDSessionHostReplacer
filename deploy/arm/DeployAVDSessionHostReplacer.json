@@ -814,6 +814,9 @@
                 "SecurityProfile": {
                   "type": "object"
                 },
+                "SecurityType": {
+                  "type": "string"
+                },
                 "HostPoolName": {
                   "type": "string"
                 },
@@ -865,6 +868,9 @@
                       },
                       "SecurityProfile": {
                         "value": "[[parameters('SecurityProfile')]"
+                      },
+                      "SecurityType": {
+                        "value": "[[parameters('SecurityType')]"
                       },
                       "SubnetID": {
                         "value": "[[parameters('SubnetID')]"
@@ -947,6 +953,9 @@
                         },
                         "SecurityProfile": {
                           "type": "object"
+                        },
+                        "SecurityType": {
+                          "type": "string"
                         },
                         "HostPoolName": {
                           "type": "string"
@@ -1112,7 +1121,7 @@
                           "tags": "[[parameters('Tags')]"
                         },
                         {
-                          "condition": "[[not(equals(parameters('SecurityProfile'), {'SecurityType':'Standard'}))]",
+                          "condition": "[not(equals(parameters('SecurityType'), 'Standard'))]",
                           "type": "Microsoft.Compute/virtualMachines",
                           "apiVersion": "2023-09-01",
                           "name": "[[parameters('VMName')]",
@@ -1163,7 +1172,7 @@
                           ]
                         },
                         {
-                          "condition": "[[equals(parameters('SecurityProfile'), {'SecurityType':'Standard'})]",
+                          "condition": "[equals(parameters('SecurityType'), 'Standard')]",
                           "type": "Microsoft.Compute/virtualMachines",
                           "apiVersion": "2023-09-01",
                           "name": "[[parameters('VMName')]",

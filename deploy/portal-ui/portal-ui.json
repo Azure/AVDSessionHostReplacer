@@ -486,6 +486,10 @@
                                     {
                                         "label": "Windows 11 23H2 multi-session",
                                         "value": "win11-23h2-avd"
+                                    },
+                                    {
+                                        "label": "Windows 10 21H2 multi-session with M365",
+                                        "value": "win10-21h2-avd-m365"
                                     }
                                 ],
                                 "required": true

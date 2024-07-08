@@ -342,7 +342,7 @@
       }
     },
     "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'Marketplace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
-    "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), createObject('SecurityType', parameters('SecurityType')), createObject('SecurityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled'))))]",
+    "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('SecurityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled'))))]",
     "varDomainJoinObject": "[if(equals(parameters('IdentityServiceProvider'), 'EntraID'), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('IntuneEnrollment')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')))]",
     "varUniqueString": "[uniqueString(resourceGroup().id, parameters('HostPoolName'))]",
     "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', uniqueString(resourceGroup().id, parameters('HostPoolName')))]"
@@ -401,7 +401,7 @@
               },
               {
                 "name": "_SessionHostParameters",
-                "value": "[string(createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SecurityType', parameters('SecurityType'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'tags', createObject()))]"
+                "value": "[string(createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'tags', createObject()))]"
               },
               {
                 "name": "_SubscriptionId",
@@ -812,10 +812,8 @@
                   "type": "object"
                 },
                 "SecurityProfile": {
-                  "type": "object"
-                },
-                "SecurityType": {
-                  "type": "string"
+                  "type": "object",
+                  "defaultvalue": {}
                 },
                 "HostPoolName": {
                   "type": "string"
@@ -868,9 +866,6 @@
                       },
                       "SecurityProfile": {
                         "value": "[[parameters('SecurityProfile')]"
-                      },
-                      "SecurityType": {
-                        "value": "[[parameters('SecurityType')]"
                       },
                       "SubnetID": {
                         "value": "[[parameters('SubnetID')]"
@@ -953,9 +948,6 @@
                         },
                         "SecurityProfile": {
                           "type": "object"
-                        },
-                        "SecurityType": {
-                          "type": "string"
                         },
                         "HostPoolName": {
                           "type": "string"
@@ -1121,7 +1113,6 @@
                           "tags": "[[parameters('Tags')]"
                         },
                         {
-                          "condition": "[not(equals(parameters('SecurityType'), 'Standard'))]",
                           "type": "Microsoft.Compute/virtualMachines",
                           "apiVersion": "2023-09-01",
                           "name": "[[parameters('VMName')]",
@@ -1170,52 +1161,8 @@
                           "dependsOn": [
                             "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]"
                           ]
-                        },
-                        {
-                          "condition": "[equals(parameters('SecurityType'), 'Standard')]",
-                          "type": "Microsoft.Compute/virtualMachines",
-                          "apiVersion": "2023-09-01",
-                          "name": "[[parameters('VMName')]",
-                          "location": "[[parameters('Location')]",
-                          "zones": "[[variables('varAvailabilityZone')]",
-                          "identity": "[[if(equals(parameters('DomainJoinObject').DomainType, 'EntraID'), createObject('type', 'SystemAssigned'), null())]",
-                          "properties": {
-                            "osProfile": {
-                                "computerName": "[[parameters('VMName')]",
-                                "adminUsername": "[[parameters('AdminUsername')]",
-                                "adminPassword": "[[parameters('AdminPassword')]"
-                                },
-                            "hardwareProfile": {
-                                                "vmSize": "[[parameters('VMSize')]"
-                                              },
-                                              "storageProfile": {
-                                                "osDisk": {
-                                                  "name": "[[format('{0}-OSDisk', parameters('VMName'))]",
-                                                  "createOption": "FromImage",
-                                                  "deleteOption": "Delete",
-                                                  "managedDisk": {
-                                                    "storageAccountType": "[[parameters('DiskType')]"
-                                                  }
-                                                },
-                                                "ImageReference": "[[parameters('ImageReference')]"
-                                              },
-                                              "networkProfile": {
-                                                "networkInterfaces": [
-                                                  {
-                                                    "id": "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]",
-                                                    "properties": {
-                                                      "deleteOption": "Delete"
-                                                    }
-                                                  }
-                                                ]
-                                              },
-                                              "licenseType": "Windows_Client"
-                                            },
-                                            "tags": "[[parameters('Tags')]",
-                                            "dependsOn": [
-                                              "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]"
-                                            ]
-                                          }
+                        }
+
                       ]
                     }
                   }

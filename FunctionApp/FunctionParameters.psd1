@@ -7,7 +7,6 @@
     _DrainGracePeriodHours                        = @{Required = $false ; Type = 'int   '  ; Default = 24                                 ; Description = '' }
     _FixSessionHostTags                           = @{Required = $false ; Type = 'bool  '  ; Default = $true                              ; Description = '' }
     _SHRDeploymentPrefix                          = @{Required = $false ; Type = 'string'  ; Default = 'AVDSessionHostReplacer'           ; Description = '' }
-    _MaxSimultaneousDeployments                   = @{Required = $false ; Type = 'int   '  ; Default = 100                                ; Description = 'Deprecated.This allows multiple deployments running simultaneously. Might change later to control maximum number of VMNames to deploy. Or control it using batches in template, or both!.' }
     _AllowDownsizing                              = @{Required = $false ; Type = 'bool  '  ; Default = $true                              ; Description = '' }
     _SessionHostInstanceNumberPadding             = @{Required = $false ; Type = 'int   '  ; Default = 2                                  ; Description = '' }
     _ReplaceSessionHostOnNewImageVersion          = @{Required = $false ; Type = 'bool  '  ; Default = $true                              ; Description = '' }

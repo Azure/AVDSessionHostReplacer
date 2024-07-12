@@ -43,13 +43,20 @@
                             }
                         },
                         {
-                            "name": "UserAssignedManagedIdentityLookup",
-                            "type": "Microsoft.Solutions.ArmApiControl",
-                            "request": {
-                              "method": "GET",
-                              "path": "[concat(replace(steps('basics').UserAssignedManagedIdentitySelector.id, '/subscriptions/', ''),'?api-version=2023-01-31']"
-                            }
-                          },
+                            "name": "UserAssignedManagedIdentityClientId",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "User Assigned Managed Identity Client ID",
+                            "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
+                            "constraints": {
+                                "required": true
+                            },
+                            "validations":[
+                                {
+                                    "regex": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                                    "message": "Client Id must be a valid GUID"
+                                }
+                            ]
+                        },
                         {
                             "name": "UserAssignedManagedIdentityInfoBox",
                             "type": "Microsoft.Common.InfoBox",
@@ -968,7 +975,7 @@
                 "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]",
                 "UseUserAssignedManagedIdentity": "[if(steps('basics').UseUserAssignedManagedIdentity, true, false)]",
                 "UserAssignedManagedIdentityResourceId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentitySelector.id, '')]",
-                "UserAssigneManagedIdentityClientId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentityLookup.value, '')]"
+                "UserAssignedManagedIdentityClientId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentityClientId, '')]"
             },
             "kind": "ResourceGroup",
             "location": "[steps('basics').resourceScope.location.name]",

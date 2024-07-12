@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "3340955790368041989"
+      "templateHash": "18416257953965077458"
     }
   },
   "parameters": {
@@ -488,7 +488,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "10772947120936474730"
+              "templateHash": "4674412288593593168"
             }
           },
           "parameters": {
@@ -522,7 +522,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.6-beta.21/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.6-beta.22/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

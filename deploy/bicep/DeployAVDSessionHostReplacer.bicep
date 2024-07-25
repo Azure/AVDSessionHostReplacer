@@ -84,7 +84,6 @@ param TargetSessionHostCount int
 @description('Required: No | Resource Id of the User Assigned Managed Identity to use for the Function App. | Default: System Identity')
 param UseUserAssignedManagedIdentity bool = false
 param UserAssignedManagedIdentityResourceId string = ''
-param UserAssignedManagedIdentityClientId string = ''
 
 // Optional Parameters
 @description('Required: No | Tag name used to indicate that a session host should be included in the automatic replacement process. | Default: IncludeInAutoReplace.')
@@ -290,8 +289,8 @@ var varReplacementPlanSettings = [
     value: IdentityServiceProvider == 'EntraID'
   }
   {
-    name: '_ClientId'
-    value: UserAssignedManagedIdentityClientId
+    name: '_ClientResourceId'
+    value: UserAssignedManagedIdentityResourceId
   }
 
   // Optional Parameters //

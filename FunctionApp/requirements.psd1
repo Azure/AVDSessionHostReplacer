@@ -8,6 +8,7 @@
     'Az.Resources'                                 = '6.*'
     'Az.DesktopVirtualization'                     = '4.*'
     'Az.Compute'                                   = '7.*'
+    'EntraAuth'                                    = '1.*'
     'PSFramework'                                  = '1.*'
     'Microsoft.Graph.Identity.DirectoryManagement' = '2.*'
 }

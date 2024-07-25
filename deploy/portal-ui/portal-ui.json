@@ -43,21 +43,6 @@
                             }
                         },
                         {
-                            "name": "UserAssignedManagedIdentityClientId",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "User Assigned Managed Identity Client ID",
-                            "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
-                            "constraints": {
-                                "required": true
-                            },
-                            "validations":[
-                                {
-                                    "regex": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                                    "message": "Client Id must be a valid GUID"
-                                }
-                            ]
-                        },
-                        {
                             "name": "UserAssignedManagedIdentityInfoBox",
                             "type": "Microsoft.Common.InfoBox",
                             "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
@@ -974,8 +959,7 @@
                 "VMNamesTemplateParameterName": "[steps('optionalParametersStep')._VMNamesTemplateParameterName]",
                 "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]",
                 "UseUserAssignedManagedIdentity": "[if(steps('basics').UseUserAssignedManagedIdentity, true, false)]",
-                "UserAssignedManagedIdentityResourceId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentitySelector.id, '')]",
-                "UserAssignedManagedIdentityClientId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentityClientId, '')]"
+                "UserAssignedManagedIdentityResourceId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentitySelector.id, '')]"
             },
             "kind": "ResourceGroup",
             "location": "[steps('basics').resourceScope.location.name]",

@@ -34,23 +34,29 @@ if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
     if([string]::IsNullOrEmpty($env:_ClientId)){
         Write-PSFMessage -Level Host -Message "Authenticating with system assigned identity"
-        Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId)
+        Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId) -ErrorAction Stop
         if(Get-FunctionConfig _RemoveAzureADDevice){
             Write-PSFMessage -Level Host -Message "Connecting to Graph API"
             Connect-MGGraph -Identity
         }
     }
     else{
-        Write-PSFMessage -Level Host -Message "Authenticating with user assigned identity - {0}" -StringValues $env:_ClientId
-        Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId) -AccountId $env:_ClientId
+        Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Resource ID: $env:_ClientResourceId"
+
+        $entraAzureConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Azure
+        Connect-AzAccount -AccessToken $entraAzureConnection.AccessToken  -ErrorAction Stop
+
+
         if(Get-FunctionConfig _RemoveAzureADDevice){
-            Write-PSFMessage -Level Host -Message "Connecting to Graph API"
-            Connect-MGGraph -Identity -ClientId $env:_ClientId
+            Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Resource ID: $env:_ClientResourceId"
+            $entraGraphConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Graph
+            Connect-MGGraph -AccessToken (ConvertTo-SecureString $entraGraphConnection.AccessToken -AsPlainText -Force)  -ErrorAction Stop
         }
     }
 }
 else{
     # This is for testing locally
+    Write-PSFMessage "MSI_Secret environment variable not found. This should only happen when testing locally. Otherwise confirm that a System or User Managed Identity is defined."
     Set-AzContext -SubscriptionId (Get-FunctionConfig _SubscriptionId)
 }
 $ErrorActionPreference = 'Stop'

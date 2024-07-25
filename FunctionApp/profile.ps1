@@ -32,7 +32,7 @@ catch{
 
 if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
-    if([string]::IsNullOrEmpty($env:_ClientId)){
+    if([string]::IsNullOrEmpty($env:_ClientResourceId)){
         Write-PSFMessage -Level Host -Message "Authenticating with system assigned identity"
         Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId) -ErrorAction Stop
         if(Get-FunctionConfig _RemoveAzureADDevice){

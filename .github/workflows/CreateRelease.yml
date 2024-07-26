@@ -22,6 +22,17 @@ jobs:
         with:
           ref: ${{ github.head_ref}}
 
+      - name: Set PRERELEASE based on branch name
+        id: set_prerelease
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "PRERELEASE=false" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == refs/heads/Dev* ]]; then
+            echo "PRERELEASE=true" >> $GITHUB_ENV
+          else
+            echo "PRERELEASE=true" >> $GITHUB_ENV
+          fi
+
       - name: Generate New Version and Tag (Dry_Run)
         id: bump_version_DryRun
         uses: anothrNick/github-tag-action@1.67.0
@@ -29,7 +40,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch  # Default to patch if no keywords are found
           WITH_V: true         # Prefix the tag with 'v'
-          PRERELEASE: true     # Enable pre-release
+          PRERELEASE: ${{ env.PRERELEASE }} # Set PRERELEASE based on the branch name
           VERBOSE: true
           DRY_RUN: true
 
@@ -53,7 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch  # Default to patch if no keywords are found
           WITH_V: true         # Prefix the tag with 'v'
-          PRERELEASE: true     # Enable pre-release
+          PRERELEASE: ${{ env.PRERELEASE }} # Set PRERELEASE based on the branch name
           VERBOSE: true
 
       - name: Run-Build-Script

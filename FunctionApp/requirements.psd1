@@ -6,8 +6,9 @@
     # To use the Az module in your function app, please uncomment the line below.
     'AzureFunctionConfiguration'                   = "1.*"
     'Az.Resources'                                 = '6.*'
-    'Az.DesktopVirtualization'                     = '3.*'
-    'Az.Compute'                                   = '5.*'
+    'Az.DesktopVirtualization'                     = '4.*'
+    'Az.Compute'                                   = '7.*'
+    'EntraAuth'                                    = '1.*'
     'PSFramework'                                  = '1.*'
-    'Microsoft.Graph.Identity.DirectoryManagement' = '1.*'
+    'Microsoft.Graph.Identity.DirectoryManagement' = '2.*'
 }

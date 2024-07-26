@@ -16,7 +16,7 @@ Set-PSFConfig -FullName PSFramework.Message.style.NoColor -Value $true #This is 
 
 ## Version Banner ## Updated by Build\Build-Zip-File.ps1
 
-Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}" -StringValues '0.2.1'
+Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}" -StringValues 'v0.2.6-beta.29'
 
 
 # Import Function Parameters
@@ -28,12 +28,35 @@ catch{
     throw $_
 }
 
-# Authenticate with Azure PowerShell using MSI.
+# Authenticate with Azure PowerShell using MSI or user identity.
+
 if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
-    Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId)
+    if([string]::IsNullOrEmpty($env:_ClientResourceId)){
+        Write-PSFMessage -Level Host -Message "Authenticating with system assigned identity"
+        Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId) -ErrorAction Stop
+        if(Get-FunctionConfig _RemoveAzureADDevice){
+            Write-PSFMessage -Level Host -Message "Connecting to Graph API"
+            Connect-MGGraph -Identity
+        }
+    }
+    else{
+        Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Resource ID: $env:_ClientResourceId"
+
+        $entraAzureConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Azure -PassThru
+        Connect-AzAccount -AccessToken $entraAzureConnection.AccessToken  -ErrorAction Stop -AccountId $env:_ClientResourceId -Subscription (Get-FunctionConfig _SubscriptionId)
+
+
+        if(Get-FunctionConfig _RemoveAzureADDevice){
+            Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID. Connecting to Graph API using User Managed Identity with Resource ID: $env:_ClientResourceId"
+            $entraGraphConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Graph -PassThru
+            Connect-MGGraph -AccessToken (ConvertTo-SecureString $entraGraphConnection.AccessToken -AsPlainText -Force)  -ErrorAction Stop
+        }
+    }
 }
 else{
+    # This is for testing locally
+    Write-PSFMessage "MSI_Secret environment variable not found. This should only happen when testing locally. Otherwise confirm that a System or User Managed Identity is defined."
     Set-AzContext -SubscriptionId (Get-FunctionConfig _SubscriptionId)
 }
 $ErrorActionPreference = 'Stop'

@@ -2,6 +2,7 @@ on:
   push:
     paths:
       - 'FunctionApp/**'
+      - 'deploy/**'
   workflow_dispatch:
     inputs:
       messages:
@@ -15,24 +16,62 @@ jobs:
     permissions:
       contents: write
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4.1.2
         with:
           ref: ${{ github.head_ref}}
-      - name: Run-Build-Script
-        shell: pwsh
-        run: |
-          ./Build/Build-Zip-File.ps1 -Path ".\Nightly"
 
-      - name: Bump version and push tag
-        id: bump_version
-        uses: anothrNick/github-tag-action@1.36.0
+      - name: Set PRERELEASE based on branch name
+        id: set_prerelease
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "PRERELEASE=false" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == refs/heads/Dev* ]]; then
+            echo "PRERELEASE=true" >> $GITHUB_ENV
+          else
+            echo "PRERELEASE=true" >> $GITHUB_ENV
+          fi
+
+      - name: Generate New Version and Tag (Dry_Run)
+        id: bump_version_DryRun
+        uses: anothrNick/github-tag-action@1.67.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch  # Default to patch if no keywords are found
           WITH_V: true         # Prefix the tag with 'v'
-          PRE_RELEASE: true    # Enable pre-release
+          PRERELEASE: ${{ env.PRERELEASE }} # Set PRERELEASE based on the branch name
           VERBOSE: true
+          DRY_RUN: true
+
+      - name: Run-Build-Script
+        shell: pwsh
+        run: |
+          ./Build/Build-Zip-File.ps1 -Path ".\temp" -Tag "${{ steps.bump_version_DryRun.outputs.new_tag }}"
+      # Commit changes made by the build script if any. This includes the newly created zip file or any other changes
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Automated commit by GitHub Actions for new build [no ci]" || echo "No changes to commit"
+          git push
+
+      - name: Bump version and push tag
+        id: bump_version
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch  # Default to patch if no keywords are found
+          WITH_V: true         # Prefix the tag with 'v'
+          PRERELEASE: ${{ env.PRERELEASE }} # Set PRERELEASE based on the branch name
+          VERBOSE: true
+
+      - name: Run-Build-Script
+        id: ReleaseBody
+        shell: pwsh
+        run: |
+          ./Build/Build-Release-Body.ps1 -Tag "${{ steps.bump_version.outputs.new_tag }}" -GitRef "${{ github.ref_name }}"
 
       - name: Create Release
         # You may pin to the exact commit or the version.
@@ -44,9 +83,9 @@ jobs:
           # An optional flag which indicates if artifact read or upload errors should fail the build.
           artifactErrorsFailBuild: true # optional, default is
           # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
-          artifacts: ./Nightly/FunctionApp.zip # optional
+          artifacts: ./temp/FunctionApp.zip # optional
           # The content type of the artifact. Defaults to raw
-          generateReleaseNotes: true # optional, default is false
+          # generateReleaseNotes: true # optional, default is false
           # Indicates if the release should be the "latest" release or not.
           prerelease: true
           replacesArtifacts: true # optional, default is true
@@ -54,3 +93,4 @@ jobs:
           tag: ${{ steps.bump_version.outputs.new_tag }} # optional, default is
           # The Github token.
           token: ${{ secrets.GITHUB_TOKEN }} # optional, default is ${{ github.token }}
+          body: ${{ steps.ReleaseBody.outputs.ReleaseBody }}

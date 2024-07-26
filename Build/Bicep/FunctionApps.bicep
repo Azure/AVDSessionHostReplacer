@@ -64,9 +64,6 @@ param SHRDeploymentPrefix string = 'AVDSessionHostReplacer'
 @description('Required: Yes | Number of session hosts to maintain in the host pool.')
 param TargetSessionHostCount int
 
-@description('Required: No | Maximum number of session hosts to deploy at the same time. | Default: 20')
-param MaxSimultaneousDeployments int = 20
-
 @description('Required: Yes | Prefix used for the name of the session hosts.')
 param SessionHostNamePrefix string
 
@@ -179,10 +176,6 @@ var varFunctionAppSettings = [
   {
     name: '_TargetSessionHostCount'
     value: TargetSessionHostCount
-  }
-  {
-    name: '_MaxSimultaneousDeployments'
-    value: MaxSimultaneousDeployments
   }
   {
     name: '_Tag_IncludeInAutomation'

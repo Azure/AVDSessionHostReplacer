@@ -7,7 +7,6 @@
     _DrainGracePeriodHours                        = @{Required = $false ; Type = 'int   '  ; Default = 24                                 ; Description = '' }
     _FixSessionHostTags                           = @{Required = $false ; Type = 'bool  '  ; Default = $true                              ; Description = '' }
     _SHRDeploymentPrefix                          = @{Required = $false ; Type = 'string'  ; Default = 'AVDSessionHostReplacer'           ; Description = '' }
-    _MaxSimultaneousDeployments                   = @{Required = $false ; Type = 'int   '  ; Default = 100                                ; Description = 'Deprecated.This allows multiple deployments running simultaneously. Might change later to control maximum number of VMNames to deploy. Or control it using batches in template, or both!.' }
     _AllowDownsizing                              = @{Required = $false ; Type = 'bool  '  ; Default = $true                              ; Description = '' }
     _SessionHostInstanceNumberPadding             = @{Required = $false ; Type = 'int   '  ; Default = 2                                  ; Description = '' }
     _ReplaceSessionHostOnNewImageVersion          = @{Required = $false ; Type = 'bool  '  ; Default = $true                              ; Description = '' }
@@ -22,4 +21,5 @@
     _SessionHostParameters                        = @{Required = $true  ; Type = 'hashtable'                                              ; Description = '' }
     _SubscriptionId                               = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }
     _RemoveAzureADDevice                          = @{Required = $true  ; Type = 'bool'                                                   ; Description = 'When deleting a session host, will also delete the Azure AD Device record. This is required for Azure AD Joined Session Hosts' }
+    _ClientResourceId                             = @{Required = $false ; Type = 'string' ; Default = ''                                  ; Description = 'When using a User Managed Identity, the Client Resource Id is used to take all actions.' }
 }

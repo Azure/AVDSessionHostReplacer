@@ -20,6 +20,39 @@
                             }
                         },
                         {
+                            "name": "UseUserAssignedManagedIdentity",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Use User Assigned Managed Identity",
+                            "toolTip": "[Recommended] IF enabled, The Session Host Replacer will use the selected Identity to take actions. Otherwise System Identity (MSI) is used.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "UserAssignedManagedIdentitySelector",
+                            "type": "Microsoft.Solutions.ResourceSelector",
+                            "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
+                            "label": "Select User Assigned Managed Identity",
+                            "resourceType": "Microsoft.ManagedIdentity/userAssignedIdentities",
+                            "constraints": {
+                                "required": true
+                            },
+                            "options": {
+                                "filter": {}
+                            }
+                        },
+                        {
+                            "name": "UserAssignedManagedIdentityInfoBox",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
+                            "options": {
+                                "icon": "Info",
+                                "text": "When using a User Assigned Managed Identity, make sure the identity has the needed permissions in Azure and Entra. Follow the link for more info.",
+                                "uri": "https://github.com/Azure/AVDReplacementPlans/blob/v0.2.6-beta.29/docs/Permissions.md"
+                            }
+                        },
+                        {
                             "name": "MonitoringSection",
                             "type": "Microsoft.Common.Section",
                             "label": "Monitoring",
@@ -66,7 +99,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: 240305-1819",
+                                "text": "AVD session host replacer Portal UI Version: v0.2.6-beta.29",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/Azure/AVDSessionHostReplacer"
@@ -924,7 +957,9 @@
                 "ReplaceSessionHostOnNewImageVersion": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
                 "ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",
                 "VMNamesTemplateParameterName": "[steps('optionalParametersStep')._VMNamesTemplateParameterName]",
-                "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]"
+                "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]",
+                "UseUserAssignedManagedIdentity": "[if(steps('basics').UseUserAssignedManagedIdentity, true, false)]",
+                "UserAssignedManagedIdentityResourceId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentitySelector.id, '')]"
             },
             "kind": "ResourceGroup",
             "location": "[steps('basics').resourceScope.location.name]",

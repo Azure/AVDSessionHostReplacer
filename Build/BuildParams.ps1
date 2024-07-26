@@ -22,7 +22,6 @@ $param = @{
         FixSessionHostTags               = $true
         SHRDeploymentPrefix              = "AVDSessionHostReplacer"
         TargetSessionHostCount           = 3
-        MaxSimultaneousDeployments       = 2
         SessionHostNamePrefix            = "AVD-WE-D01" #Azure Virtual Desktop - West Europe - FullDesktop Host Pool 01
         SessionHostTemplate              = "URI or Template Spec Resource Id HERE"
         ADOrganizationalUnitPath         = "PATH HERE"

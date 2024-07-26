@@ -1,5 +1,6 @@
 // This is a sample bicep file //
 
+
 param Location string = resourceGroup().location
 param AvailabilityZones array = []
 param VMNames array

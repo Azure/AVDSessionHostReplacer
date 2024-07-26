@@ -21,7 +21,7 @@ param LogAnalyticsWorkspaceId string = 'none'
 param FunctionAppName string
 
 @description('Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code.')
-param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.1/FunctionApp.zip'
+param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.6-beta.29/FunctionApp.zip'
 
 @description('Required: No | App Service Plan Name | Default: Y1 for consumption based plan')
 param AppPlanName string = 'Y1'
@@ -65,6 +65,10 @@ param AppPlanTier string = 'Dynamic'
   }
 ]''')
 param ReplacementPlanSettings array
+
+param FunctionAppIdentity object = {
+  type: 'SystemAssigned'
+}
 
 //-------//
 
@@ -163,9 +167,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: FunctionAppName
   location: Location
   kind: 'functionApp'
-  identity: {
-    type: 'SystemAssigned'
-  }
+  identity: FunctionAppIdentity
   properties: {
     httpsOnly: true
     serverFarmId: appServicePlan.id
@@ -187,43 +189,6 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     }
   }
 }
-//------//
-
-/*
-resource deployTemplateSpec 'Microsoft.Resources/templateSpecs@2022-02-01' = {
-  name: 'spec-avd-session-hosts'
-  location: Location
-  properties: {
-    description: 'This is the template used by AVD Replacement Plan to deploy session hosts.'
-    displayName: 'AVD Session Host Template'
-  }
-  resource deployTemplateSpecVersion 'versions@2022-02-01' = {
-    name: 'deployTemplateSpecVersion'
-    location: Location
-    properties: {
-      mainTemplate: any('')//loadJsonContent('../../../arm/avdSessionHosts.json')
-    }
-  }
-}
-*/
-/*
-module RBACFunctionAppDesktopVirtualizationVirtualMachineContributor './.bicep/roleAssignment.bicep' = {
-  name: 'RBACFunctionAppDesktopVirtualizationVirtualMachineContributor'
-  params: {
-    PrinicpalId: functionApp.identity.principalId
-    RoleDefinitionId: 'b24988ac-6180-42a0-ab88-20f7382dd24c' // Contributor
-    Scope: resourceGroup().id
-  }
-}
-module RBACFunctionApphasReaderOnTemplateSpec './.bicep/roleAssignment.bicep' = if (startsWith(SessionHostTemplate, '/subscriptions/')) {
-  name: 'RBACFunctionApphasReaderOnTemplateSpec'
-  params: {
-    PrinicpalId: functionApp.identity.principalId
-    RoleDefinitionId: 'acdd72a7-3385-48ef-bd42-f606fba81ae7' // Reader
-    Scope: SessionHostTemplate
-  }
-}
-*/
 
 //----- Outputs ------//
-output functionAppPrincipalId string = functionApp.identity.principalId
+output functionAppPrincipalId string = FunctionAppIdentity.type == 'SystemAssigned'? functionApp.identity.principalId : ''

@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.26.54.24096",
-      "templateHash": "8063927267183433633"
+      "version": "0.29.45.22436",
+      "templateHash": "13376648797916183257"
     }
   },
   "parameters": {
@@ -156,6 +156,17 @@
       "metadata": {
         "description": "Required: Yes | Number of session hosts to maintain in the host pool."
       }
+    },
+    "UseUserAssignedManagedIdentity": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required: No | Resource Id of the User Assigned Managed Identity to use for the Function App. | Default: System Identity"
+      }
+    },
+    "UserAssignedManagedIdentityResourceId": {
+      "type": "string",
+      "defaultValue": ""
     },
     "TagIncludeInAutomation": {
       "type": "string",
@@ -337,7 +348,8 @@
     "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('securityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled'))))]",
     "varDomainJoinObject": "[if(equals(parameters('IdentityServiceProvider'), 'EntraID'), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('IntuneEnrollment')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')))]",
     "varUniqueString": "[uniqueString(resourceGroup().id, parameters('HostPoolName'))]",
-    "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', uniqueString(resourceGroup().id, parameters('HostPoolName')))]"
+    "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', uniqueString(resourceGroup().id, parameters('HostPoolName')))]",
+    "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
   },
   "resources": [
     {
@@ -400,6 +412,10 @@
                 "value": "[equals(parameters('IdentityServiceProvider'), 'EntraID')]"
               },
               {
+                "name": "_ClientResourceId",
+                "value": "[parameters('UserAssignedManagedIdentityResourceId')]"
+              },
+              {
                 "name": "_Tag_IncludeInAutomation",
                 "value": "[parameters('TagIncludeInAutomation')]"
               },
@@ -456,6 +472,9 @@
                 "value": "[parameters('SessionHostResourceGroupName')]"
               }
             ]
+          },
+          "FunctionAppIdentity": {
+            "value": "[variables('varFunctionAppIdentity')]"
           }
         },
         "template": {
@@ -464,8 +483,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "10461568145730079396"
+              "version": "0.29.45.22436",
+              "templateHash": "15522466312394365162"
             }
           },
           "parameters": {
@@ -499,7 +518,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.1/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.6-beta.29/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }
@@ -522,6 +541,12 @@
               "type": "array",
               "metadata": {
                 "description": "Required: Yes | The following settings are mandatory. Rest are optional.\n[\n  {\n    name: '_HostPoolResourceGroupName'\n    value: 'string'\n  }\n  {\n    name: '_HostPoolName'\n    value: 'string'\n  }\n  {\n    name: '_RemoveAzureADDevice'\n    value: 'bool'\n  }\n  {\n    name: '_SessionHostTemplate'\n    value: 'string'\n  }\n  {\n    name: '_SessionHostParameters'\n    value: 'hashtable'\n  }\n  {\n    name: '_SubscriptionId'\n    value: 'string'\n  }\n  {\n    name: '_TargetSessionHostCount'\n    value: 'int'\n  }\n  {\n    name: '_SessionHostNamePrefix'\n    value: 'string'\n  }\n]"
+              }
+            },
+            "FunctionAppIdentity": {
+              "type": "object",
+              "defaultValue": {
+                "type": "SystemAssigned"
               }
             }
           },
@@ -599,9 +624,7 @@
               "name": "[parameters('FunctionAppName')]",
               "location": "[parameters('Location')]",
               "kind": "functionApp",
-              "identity": {
-                "type": "SystemAssigned"
-              },
+              "identity": "[parameters('FunctionAppIdentity')]",
               "properties": {
                 "httpsOnly": true,
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('varAppServicePlanName'))]",
@@ -628,7 +651,7 @@
           "outputs": {
             "functionAppPrincipalId": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2023-01-01', 'full').identity.principalId]"
+              "value": "[if(equals(parameters('FunctionAppIdentity').type, 'SystemAssigned'), reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2023-01-01', 'full').identity.principalId, '')]"
             }
           }
         }
@@ -665,8 +688,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "9609859793350366993"
+              "version": "0.29.45.22436",
+              "templateHash": "5445249370521833019"
             }
           },
           "parameters": {
@@ -741,8 +764,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "6068287418555259828"
+              "version": "0.29.45.22436",
+              "templateHash": "16930491596178402473"
             }
           },
           "parameters": {
@@ -761,8 +784,8 @@
               "metadata": {
                 "_generator": {
                   "name": "bicep",
-                  "version": "0.25.53.49325",
-                  "templateHash": "8286586008382207877"
+                  "version": "0.29.45.22436",
+                  "templateHash": "15758060740360418364"
                 }
               },
               "parameters": {
@@ -891,8 +914,8 @@
                       "metadata": {
                         "_generator": {
                           "name": "bicep",
-                          "version": "0.25.53.49325",
-                          "templateHash": "6908079971974050968"
+                          "version": "0.29.45.22436",
+                          "templateHash": "7197712868022024044"
                         }
                       },
                       "parameters": {
@@ -1190,6 +1213,7 @@
       }
     },
     {
+      "condition": "[not(parameters('UseUserAssignedManagedIdentity'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('RBAC-vdiVMContributor-{0}', parameters('TimeStamp'))]",
@@ -1217,8 +1241,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "5762611483574939749"
+              "version": "0.29.45.22436",
+              "templateHash": "15455176785742187947"
             }
           },
           "parameters": {
@@ -1250,6 +1274,7 @@
       ]
     },
     {
+      "condition": "[not(parameters('UseUserAssignedManagedIdentity'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('RBAC-TemplateSpecReader-{0}', parameters('TimeStamp'))]",
@@ -1277,8 +1302,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "5762611483574939749"
+              "version": "0.29.45.22436",
+              "templateHash": "15455176785742187947"
             }
           },
           "parameters": {

@@ -1,5 +1,6 @@
 # Code Deployment
 ## AVD Session Host Replacer with all parameters
+This code deploys the AVD Session Host Replacer with all the available parameters. Remember to assign the [needed permissions](Permissions.md).
 ### PowerShell
 ```PowerShell
 $ResourceGroupName = '<Target Resource Group Name>' # Same as the Host Pool RG
@@ -14,6 +15,13 @@ $TemplateParameters = @{
     HostPoolResourceGroupName                    = $ResourceGroupName
     SessionHostNamePrefix                        = 'avdshr' # Will be appended by '-XX'
     TargetSessionHostCount                       = 2 # How many session hosts to maintain in the Host Pool
+
+    # Identity
+    # Using a User Managed Identity is recommended. You can assign the same identity to different instances of session host replacer instances. The identity should have the proper permissions in Azure and Entra.
+    # The identity can be in a different Azure Subscription. If not used, a system assigned identity will be created and assigned permissions against the current subscription.
+    UseUserAssignedManagedIdentity               = $true
+    UserAssignedManagedIdentityResourceId        = '<Resource Id of the User Assigned Managed Identity>'
+    UserAssignedManagedIdentityClientId          = '<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx>' # The client (Application) ID of the user managed identity
 
     ## Session Host Template Parameters ##
     SessionHostsRegion                           = 'NorthEurope' # Does not have to be the same as Host Pool
@@ -31,7 +39,7 @@ $TemplateParameters = @{
     SecureBootEnabled                            = $true
     TpmEnabled                                   = $true
 
-    SubnetId                                     = '/subscriptions/2a5d0771-685c-4101-a8bd-3b0ceb1691a3/resourceGroups/rg-avd-app1-dev-eun-network/providers/Microsoft.Network/virtualNetworks/vnet-app1-dev-eun-001/subnets/snet-avd-app1-dev-eun-001' # Resource Id, make sure it ends with /subnets/<subnetName>
+    SubnetId                                     = '<Resource Id, make sure it ends with /subnets/<subnetName>>'
 
     IdentityServiceProvider                      = 'EntraID' # EntraID / ActiveDirectory / EntraDS
     IntuneEnrollment                             = $false # This is only used when IdentityServiceProvider is EntraID
@@ -66,52 +74,12 @@ $TemplateParameters = @{
 $paramNewAzResourceGroupDeployment = @{
     Name = 'AVDSessionHostReplacer'
     ResourceGroupName = $ResourceGroupName
-    TemplateFile = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/main/deploy/arm/DeployAVDSessionHostReplacer.json'
+    TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.2.6-beta.29/deploy/arm/DeployAVDSessionHostReplacer.json'
+
     # If you cloned the repo and want to deploy using the bicep file use this instead of the above line
     #TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer.bicep'
     TemplateParameterObject = $TemplateParameters
 }
 New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
 
-```
-### Assign permissions
-#### Active Directory Domain Joined
-If your session hosts are joining domain using a secret stored in a Key Vault, the FucntionApp requires the following permissions,
-- **Key Vault Secrets User**, this is required on the secret item.
-- **Key Vault resource manager template deployment operator**, this is required at the Key Vault level.
-> This role is not built-in so you will need to create a custom role following the instructions [here](https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/key-vault-parameter?tabs=azure-cli#grant-deployment-access-to-the-secrets).
-
-#### Entra Joined
-If your session hosts are Entra Joined (not hybrid), the FunctionApp requires permissions in Entra ID in order to delete the devices when deleting session hosts.
-Without this cleanup, creating a new session host with the same name will fail.
-- **Graph API: Device.Read.All**, this is required to query Entra ID for devices.
-- **Cloud Device Administrator Role**, this role is required to delete the devices from Entra ID. Assigning Graph API permissions to a system managed identity cannot be done from the portal.
-
-You use the script below to configure the permissions. Make sure to run them with a Global Admin account.
-```PowerShell
-$FunctionAppSP = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' # The ID of the system managed identity of the function app
-
-# Connect to Graph with requires scopes.
-Connect-MgGraph -Scopes Application.ReadWrite.All, Directory.ReadWrite.All, AppRoleAssignment.ReadWrite.All,  RoleManagement.ReadWrite.Directory
-
-#region: Assign Device.Read.All
-$graphAppId = "00000003-0000-0000-c000-000000000000"
-$graphSP = Get-MgServicePrincipal -Search "AppId:$graphAppId" -ConsistencyLevel eventual
-$msGraphPermissions = @(
-    'Device.Read.All' #Used to read user and group permissions
-)
-$msGraphAppRoles = $graphSP.AppRoles | Where-Object { $_.Value -in $msGraphPermissions }
-
-$msGraphAppRoles | ForEach-Object {
-    $params = @{
-        PrincipalId = $FunctionAppSP
-        ResourceId  = $graphSP.Id
-        AppRoleId   = $_.Id
-    }
-    New-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $FunctionAppSP -BodyParameter $params -Verbose
-}
-
-# Assign Cloud Device Administrator
-$directoryRole = Get-MgRoleManagementDirectoryRoleDefinition -Filter "DisplayName eq 'Cloud Device Administrator'"
-New-MgRoleManagementDirectoryRoleAssignment -RoleDefinitionId $directoryRole.Id -PrincipalId $FunctionAppSP  -DirectoryScopeId '/'
 ```

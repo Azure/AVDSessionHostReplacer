@@ -5,8 +5,15 @@ However, we recommend using a User Assigned Managed Identity specially if you ha
 
 Below we list the required permissions for the Session Host Replacer to work correctly,
 ## Azure Resource Permissions
-Assign the Desktop Virtualization Virtual Machine Contributor role to the resource group or subscription where the host pool is located, this is assigned automatically for System Managed Identity.
-If you are using a User Assigned Managed Identity, you will need to assign this role manually. Additionally, if you are using a custom image from a compute gallery in a different subscription, make sure to assign the same permission against it.
+The Session Host Replacer requires permissions to query the host pool and replace the session hosts. It also needs to read teh TemplateSpec storing the Session Hosts' ARM template.
+When using a System Managed Identity, the deployment will assign the required permissions automatically in Azure as detailed below,
+- **Destkop Virtualization Virtual Machine Contributor**
+    - This role is required to query the host pool and replace the session hosts. Assign it to the user managed identity at the subscription level for easier management.
+    - If using an Azure Computer Gallery in a different subscription make sure the role is assigned to the gallery as well.
+    - When using System Managed Identity, the role is automatically assigned at the subscription level. Make sure to assign it to the gallery if using a custom image.
+- **Template Spec Reader**
+    - This role is required to access the TemplateSpec at deployment time. The session host replacer will create one for each Host Pool you configure. Assign it to the User Managed Identity at the subscription level for easier management.
+    - When using System Managed Identity, the role is automatically assigned at the TemplateSpec scope.
 
 ## Key Vault Permissions
 The Key Vault is used to store domain join password. Make sure the identity has `Key Vault Secret User` and `Key Vault resource manager template deployment operator`, this is required at the Key Vault level.

@@ -87,7 +87,7 @@ jobs:
           # The content type of the artifact. Defaults to raw
           # generateReleaseNotes: true # optional, default is false
           # Indicates if the release should be the "latest" release or not.
-          prerelease: true
+          prerelease: ${{ env.PRERELEASE }} # Set PRERELEASE based on the branch name
           replacesArtifacts: true # optional, default is true
           # Optionally specify the repo where the release should be generated. Defaults to current repo
           tag: ${{ steps.bump_version.outputs.new_tag }} # optional, default is

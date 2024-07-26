@@ -44,7 +44,7 @@ if ($env:MSI_SECRET) {
         Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Resource ID: $env:_ClientResourceId"
 
         $entraAzureConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Azure -PassThru
-        Connect-AzAccount -AccessToken $entraAzureConnection.AccessToken  -ErrorAction Stop -AccountId $env:_ClientResourceId
+        Connect-AzAccount -AccessToken $entraAzureConnection.AccessToken  -ErrorAction Stop -AccountId $env:_ClientResourceId -Subscription (Get-FunctionConfig _SubscriptionId)
 
 
         if(Get-FunctionConfig _RemoveAzureADDevice){

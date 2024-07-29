@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.45.22436",
-      "templateHash": "8763771753878913130"
+      "templateHash": "13177512627922187186"
     }
   },
   "parameters": {
@@ -408,8 +408,12 @@
                 "value": "[subscription().subscriptionId]"
               },
               {
-                "name": "_RemoveAzureADDevice",
+                "name": "_RemoveEntraDevice",
                 "value": "[equals(parameters('IdentityServiceProvider'), 'EntraID')]"
+              },
+              {
+                "name": "_RemoveIntuneDevice",
+                "value": "[parameters('IntuneEnrollment')]"
               },
               {
                 "name": "_ClientResourceId",
@@ -484,7 +488,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.45.22436",
-              "templateHash": "15051213884939347178"
+              "templateHash": "8630689221074059201"
             }
           },
           "parameters": {
@@ -540,7 +544,7 @@
             "ReplacementPlanSettings": {
               "type": "array",
               "metadata": {
-                "description": "Required: Yes | The following settings are mandatory. Rest are optional.\n[\n  {\n    name: '_HostPoolResourceGroupName'\n    value: 'string'\n  }\n  {\n    name: '_HostPoolName'\n    value: 'string'\n  }\n  {\n    name: '_RemoveAzureADDevice'\n    value: 'bool'\n  }\n  {\n    name: '_SessionHostTemplate'\n    value: 'string'\n  }\n  {\n    name: '_SessionHostParameters'\n    value: 'hashtable'\n  }\n  {\n    name: '_SubscriptionId'\n    value: 'string'\n  }\n  {\n    name: '_TargetSessionHostCount'\n    value: 'int'\n  }\n  {\n    name: '_SessionHostNamePrefix'\n    value: 'string'\n  }\n]"
+                "description": "Required: Yes | The following settings are mandatory. Rest are optional.\n[\n  {\n    name: '_HostPoolResourceGroupName'\n    value: 'string'\n  }\n  {\n    name: '_HostPoolName'\n    value: 'string'\n  }\n  {\n    name: '_RemoveEntraDevice'\n    value: 'bool'\n  }\n  {\n    name: '_SessionHostTemplate'\n    value: 'string'\n  }\n  {\n    name: '_SessionHostParameters'\n    value: 'hashtable'\n  }\n  {\n    name: '_SubscriptionId'\n    value: 'string'\n  }\n  {\n    name: '_TargetSessionHostCount'\n    value: 'int'\n  }\n  {\n    name: '_SessionHostNamePrefix'\n    value: 'string'\n  }\n]"
               }
             },
             "FunctionAppIdentity": {

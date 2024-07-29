@@ -650,7 +650,7 @@
                                     "options": {
                                         "icon": "Warning",
                                         "text": "When the VMs are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
-                                        "uri": "https://github.com/Azure/AVDSessionHostReplacer/blob/main/docs/bicepDeploy.md#azure-ad-for-azure-ad-joined"
+                                        "uri": "https://github.com/Azure/AVDSessionHostReplacer/blob/main/docs/Permissions.md"
                                     }
                                 },
                                 {
@@ -659,7 +659,7 @@
                                     "visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID')]",
                                     "label": "Intune enrollment",
                                     "defaultValue": false,
-                                    "toolTip": "If Intune is configured in your Microsoft Entra ID tenant, you can choose to have the VM automatically enrolled during the deployment by selecting this box."
+                                    "toolTip": "If Intune is configured in your Microsoft Entra ID tenant, you can choose to have the VM automatically enrolled during the deployment by selecting this box. Session Host Replacer will delete the device from Intune during replacement."
                                 },
                                 {
                                     "name": "ADDomainName",

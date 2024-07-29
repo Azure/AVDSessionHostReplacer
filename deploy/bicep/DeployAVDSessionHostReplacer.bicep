@@ -285,8 +285,12 @@ var varReplacementPlanSettings = [
     value: subscription().subscriptionId
   }
   {
-    name: '_RemoveAzureADDevice'
+    name: '_RemoveEntraDevice'
     value: IdentityServiceProvider == 'EntraID'
+  }
+  {
+    name: '_RemoveIntuneDevice'
+    value: IntuneEnrollment
   }
   {
     name: '_ClientResourceId'

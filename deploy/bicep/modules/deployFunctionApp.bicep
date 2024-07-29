@@ -40,7 +40,7 @@ param AppPlanTier string = 'Dynamic'
     value: 'string'
   }
   {
-    name: '_RemoveAzureADDevice'
+    name: '_RemoveEntraDevice'
     value: 'bool'
   }
   {

@@ -20,7 +20,12 @@ function Remove-SHRSessionHost {
         [string] $TagScalingPlanExclusionTag = (Get-FunctionConfig _Tag_ScalingPlanExclusionTag),
 
         [Parameter()]
-        [bool] $RemoveAzureDevice
+        [bool] $RemoveEntraDevice,
+
+        [Parameter()]
+        [bool] $RemoveIntuneDevice
+
+
     )
 
     foreach ($sessionHost in $SessionHostsPendingDelete) {
@@ -90,9 +95,13 @@ function Remove-SHRSessionHost {
         if ($deleteSessionHost) {
             Write-PSFMessage -Level Host -Message 'Deleting session host {0}...' -StringValues $sessionHost.Name
 
-            if ($RemoveAzureDevice) {
-                Write-PSFMessage -Level Host -Message 'Deleting device from Azure AD'
-                Remove-SHRSessionHostAzureADDevice -VMName $sessionHost.VMName
+            if ($RemoveEntraDevice) {
+                Write-PSFMessage -Level Host -Message 'Deleting device from Entra ID'
+                Remove-SHRSessionHostEntraDevice -VMName $sessionHost.VMName
+            }
+            if ($RemoveIntuneDevice) {
+                Write-PSFMessage -Level Host -Message 'Deleting device from Intune'
+                Remove-SHRSessionHostIntuneDevice -VMName $sessionHost.VMName
             }
 
             Write-PSFMessage -Level Host -Message 'Removing Session Host from Host Pool {0}' -StringValues $HostPoolName

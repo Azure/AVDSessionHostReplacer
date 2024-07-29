@@ -1,7 +1,7 @@
-function Remove-SHRSessionHostAzureADDevice {
+function Remove-SHRSessionHostEntraDevice {
     <#
     .SYNOPSIS
-        This is used to delete the VM object from Azure AD
+        This is used to delete the VM object from Entra ID
     #>
     [CmdletBinding()]
     param (

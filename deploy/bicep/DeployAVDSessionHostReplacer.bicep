@@ -18,6 +18,8 @@ param functionAppName string
 param functionAppNetworkInterfaceName string
 param functionAppPrivateDnsZoneResourceId string
 param functionAppPrivateEndpointName string
+param functionAppScmPrivateDnsZoneResourceId string
+param functionAppZipUrl string
 param galleryImageId string = ''
 param hostPoolResourceId string
 param identityServiceProvider string
@@ -113,7 +115,7 @@ var sessionHostTemplateParameters = {
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: userAssignedIdentityName
   location: location
-  tags: contains(tags, 'Microsoft.ManagedIdentity/userAssignedIdentities') ? tags['Microsoft.ManagedIdentity/userAssignedIdentities'] : {}
+  tags: tags[?'Microsoft.ManagedIdentity/userAssignedIdentities'] ?? {}
 }
 
 module keyVault 'modules/keyVault.bicep' = if (identityServiceProvider != 'EntraID') {
@@ -172,6 +174,8 @@ module functionApp 'modules/functionApp.bicep' = {
     functionAppNetworkInterfaceName: functionAppNetworkInterfaceName
     functionAppPrivateDnsZoneResourceId: functionAppPrivateDnsZoneResourceId
     functionAppPrivateEndpointName: functionAppPrivateEndpointName
+    functionAppScmPrivateDnsZoneResourceId: functionAppScmPrivateDnsZoneResourceId
+    functionAppZipUrl: functionAppZipUrl
     location: location
     replacementPlanSettings: [
       // Required Parameters //
@@ -273,6 +277,7 @@ module functionApp 'modules/functionApp.bicep' = {
     storageAccountName: storageAccountName
     subnetResourceId: subnetResourceId
     tags: tags
+    timestamp: timeStamp
   }
 }
 

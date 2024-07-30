@@ -5,18 +5,21 @@ param functionAppName string
 param functionAppNetworkInterfaceName string
 param functionAppPrivateDnsZoneResourceId string
 param functionAppPrivateEndpointName string
+param functionAppScmPrivateDnsZoneResourceId string
+param functionAppZipUrl string
 param location string = resourceGroup().location
 param replacementPlanSettings array
 param storageAccountName string
 param subnetResourceId string
 param tags object
+param timestamp string
 
 var cloudSuffix = replace(replace(environment().resourceManager, 'https://management.', ''), '/', '')
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: appServicePlanName
   location: location
-  tags: contains(tags, 'Microsoft.Web/serverfarms') ? tags['Microsoft.Web/serverfarms'] : {}
+  tags: tags[?'Microsoft.Web/serverfarms'] ?? {}
   sku: {
     tier: 'ElasticPremium'
     name: 'EP1'
@@ -41,7 +44,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: functionAppName
   location: location
-  tags: contains(tags, 'Microsoft.Web/sites') ? tags['Microsoft.Web/sites'] : {}
+  tags: tags[?'Microsoft.Web/sites'] ?? {}
   kind: 'functionapp'
   identity: {
     type: 'SystemAssigned'
@@ -83,22 +86,15 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
             value: toLower(functionAppName)
           }
           {
-            name: 'EnvironmentName'
+            name: '_EnvironmentName'
             value: environment().name
           }
           {
-            name: 'ResourceManagerUrl'
-            // This workaround is needed because the environment().resourceManager value is missing the trailing slash for some Azure environments
-            value: endsWith(environment().resourceManager, '/')
-              ? environment().resourceManager
-              : '${environment().resourceManager}/'
-          }
-          {
-            name: 'SubscriptionId'
+            name: '_SubscriptionId'
             value: subscription().subscriptionId
           }
           {
-            name: 'TenantId'
+            name: '_TenantId'
             value: subscription().tenantId
           }
         ],
@@ -126,6 +122,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-04-01' = {
   name: functionAppPrivateEndpointName
   location: location
+  tags: tags[?'Microsoft.Network/privateEndpoints'] ?? {}
   properties: {
     customNetworkInterfaceName: functionAppNetworkInterfaceName
     privateLinkServiceConnections: [
@@ -157,5 +154,28 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
         }
       }
     ]
+  }
+}
+
+resource deployFromZip 'Microsoft.Web/sites/extensions@2023-01-01' = {
+  parent: functionApp
+  name: 'MSDeploy'
+  properties: {
+    packageUri: functionAppZipUrl
+  }
+  dependsOn: [
+    privateDnsZoneGroup
+    privateEndpoint
+  ]
+}
+
+// This module is used to deploy the A record for the SCM site which does not use a dedicated private endpoint
+module scmARecord 'aRecord.bicep' = {
+  name: 'deploy-a-record-${timestamp}'
+  scope: resourceGroup(split(functionAppScmPrivateDnsZoneResourceId, '/')[2], split(functionAppScmPrivateDnsZoneResourceId, '/')[4])
+  params: {
+    functionAppName: functionAppName
+    ipv4Address: privateEndpoint.properties.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress
+    privateDnsZoneName: split(functionAppScmPrivateDnsZoneResourceId, '/')[8]
   }
 }

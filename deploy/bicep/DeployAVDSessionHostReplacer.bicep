@@ -1,420 +1,305 @@
-//------ Parameters ------//
-@description('Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group.')
-param Location string = resourceGroup().location
-
-//Monitoring
-param EnableMonitoring bool = true
-param UseExistingLAW bool = false
-@description('Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights.')
-param LogAnalyticsWorkspaceId string = 'none'
-
-// Session Host Template
-param SessionHostsRegion string
-param AvailabilityZones array = []
-param SessionHostSize string
-param AcceleratedNetworking bool
-
-@allowed([
-  'Premium_LRS'
-  'StandardSSD_LRS'
-])
-param SessionHostDiskType string = 'Premium_LRS'
-
-@allowed([
-  'Marketplace'
-  'Gallery'
-])
-param MarketPlaceOrCustomImage string
-
-@allowed([ '2022-datacenter-smalldisk-g2'
-  'win10-21h2-avd'
-  '2022-datacenter-core-g2'
-  'win10-22h2-avd-m365-g2'
-  'win11-21h2-avd'
-  'win10-21h2-avd-m365'
-  'win11-22h2-avd-m365'
-  '2022-datacenter-core-smalldisk-g2'
-  'win11-21h2-avd-m365'
-  'win11-23h2-avd'
-  'win11-23h2-avd-m365'
-  'win11-22h2-avd'
-  '2022-datacenter-g2'
-  'win10-22h2-avd-g2' ])
-param MarketPlaceImage string = 'win11-23h2-avd-m365'
-param GalleryImageId string = ''
-
-@allowed([
-  'Standard'
-  'TrustedLaunch'
-  'ConfidentialVM'
-])
-param SecurityType string
-param SecureBootEnabled bool
-param TpmEnabled bool
-param SubnetId string
-
-@allowed([
-  'EntraID'
-  'ActiveDirectory'
-  'EntraDS'
-])
-param IdentityServiceProvider string
-param IntuneEnrollment bool = false
-param ADDomainName string = ''
-param ADDomainJoinUserName string = ''
+param acceleratedNetworking bool
+param allowDownsizing bool = true
+param applicationInsightsName string
+param appServicePlanName string
+param availabilityZones array = []
+param azureBlobsPrivateDnsZoneResourceId string
+param azureFilesPrivateDnsZoneResourceId string
+param azureQueuesPrivateDnsZoneResourceId string
+param azureTablesPrivateDnsZoneResourceId string
+param delegatedSubnetResourceId string
 @secure()
-param ADJoinUserPassword string = ''
-param ADOUPath string = ''
-param LocalAdminUsername string
+param domainJoinPassword string = ''
+param domainJoinUserName string = ''
+param domainName string = ''
+param drainGracePeriodHours int = 24
+param fixSessionHostTags bool = true
+param functionAppName string
+param functionAppNetworkInterfaceName string
+param functionAppPrivateDnsZoneResourceId string
+param functionAppPrivateEndpointName string
+param galleryImageId string = ''
+param hostPoolResourceId string
+param identityServiceProvider string
+param intuneEnrollment bool = false
+param keyVaultName string
+param organizationUnitPath string = ''
+param keyVaultNetworkInterfaceName string
+param keyVaultPrivateDnsZoneResourceId string
+param keyVaultPrivateEndpointName string
+param localAdminUsername string
+param location string = resourceGroup().location
+param logAnalyticsWorkspaceResourceId string = ''
+param marketPlaceImageOffer string
+param marketPlaceImagePublisher string
+param marketPlaceImageSku string
+param privateLinkScopeResourceId string
+param replaceSessionHostOnNewImageVersion bool = true
+param replaceSessionHostOnNewImageVersionDelayDays int = 0
+param securityType string
+param sessionHostDiskType string = 'Premium_LRS'
+param sessionHostInstanceNumberPadding int = 2
+param sessionHostNamePrefix string
+param sessionHostResourceGroupName string = ''
+param sessionHostSize string
+param sessionHostsRegion string
+param shrDeploymentPrefix string = 'AVDSessionHostReplacer'
+param storageAccountDiagnosticSettingName string
+param storageAccountName string
+param storageAccountNetworkInterfaceName string
+param storageAccountPrivateEndpointName string
+param subnetResourceId string
+param tagDeployTimestamp string = 'AutoReplaceDeployTimestamp'
+param tagIncludeInAutomation string = 'IncludeInAutoReplace'
+param tagPendingDrainTimestamp string = 'AutoReplacePendingDrainTimestamp'
+param tags object = {}
+param tagScalingPlanExclusionTag string = 'ScalingPlanExclusion'
+param targetSessionHostCount int
+param targetVMAgeDays int = 45
+param templateSpecName string
+param timeStamp string = utcNow() // Used for unique deployment names. Do Not supply a value for this parameter.
+param userAssignedIdentityName string
+param vmNamesTemplateParameterName string = 'VMNames'
 
-//Required Parameters
-@description('Required: No | Name of the resource group containing the Azure Virtual Desktop Host Pool. | Default: The resource group of the Function App.')
-param HostPoolResourceGroupName string = resourceGroup().name
-
-@description('Required: Yes | Name of the Azure Virtual Desktop Host Pool.')
-param HostPoolName string
-
-@description('Required: Yes | Prefix used for the name of the session hosts.')
-@maxLength(12)
-param SessionHostNamePrefix string
-
-@description('Required: Yes | Number of session hosts to maintain in the host pool.')
-param TargetSessionHostCount int
-
-@description('Required: No | Resource Id of the User Assigned Managed Identity to use for the Function App. | Default: System Identity')
-param UseUserAssignedManagedIdentity bool = false
-param UserAssignedManagedIdentityResourceId string = ''
-
-// Optional Parameters
-@description('Required: No | Tag name used to indicate that a session host should be included in the automatic replacement process. | Default: IncludeInAutoReplace.')
-param TagIncludeInAutomation string = 'IncludeInAutoReplace'
-
-@description('Required: No | Tag name used to indicate the timestamp of the last deployment of a session host. | Default: AutoReplaceDeployTimestamp.')
-param TagDeployTimestamp string = 'AutoReplaceDeployTimestamp'
-
-@description('Required: No | Tag name used to indicate drain timestamp of session host pending deletion. | Default: AutoReplacePendingDrainTimestamp.')
-param TagPendingDrainTimestamp string = 'AutoReplacePendingDrainTimestamp'
-
-@description('Required: No | Tag name used to exclude session host from Scaling Plan activities. | Default: ScalingPlanExclusion')
-param TagScalingPlanExclusionTag string = 'ScalingPlanExclusion'
-
-@description('Required: No | Target age of session hosts in days. | Default:  45 days.')
-param TargetVMAgeDays int = 45
-
-@description('Required: No | Grace period in hours for session hosts to drain before deletion. | Default: 24 hours.')
-param DrainGracePeriodHours int = 24
-
-@description('Required: No | If true, will apply tags for Include In Auto Replace and Deployment Timestamp to existing session hosts. This will not enable automatic deletion of existing session hosts. | Default: True.')
-param FixSessionHostTags bool = true
-
-@description('Required: No | Prefix used for the deployment name of the session hosts. | Default: AVDSessionHostReplacer')
-param SHRDeploymentPrefix string = 'AVDSessionHostReplacer'
-
-@description('Required: No | Allow deleting session hosts if count exceeds target. | Default: true')
-param AllowDownsizing bool = true
-
-@description('Required: No | Number of digits to use for the instance number of the session hosts (eg. AVDVM-01). | Default: 2')
-param SessionHostInstanceNumberPadding int = 2
-
-@description('Required: No | If true, will replace session hosts when a new image version is detected. | Default: true')
-param ReplaceSessionHostOnNewImageVersion bool = true
-
-@description('Required: No | Delay in days before replacing session hosts when a new image version is detected. | Default: 0 (no delay).')
-param ReplaceSessionHostOnNewImageVersionDelayDays int = 0
-
-@description('Required: No | The name of the parameter in the template that specifies the VM Names array.')
-param VMNamesTemplateParameterName string = 'VMNames'
-
-@description('Required: No | Leave this empty to deploy to same resource group as the host pool.')
-param SessionHostResourceGroupName string = ''
-
-param TimeStamp string = utcNow() // Used for unique deployment names. Do Not supply a value for this parameter.
-
-/////////////////
-
-//---- Variables ----//
-var varMarketPlaceImages = {
-  '2022-datacenter-smalldisk-g2': {
-    publisher: 'MicrosoftWindowsServer'
-    offer: 'WindowsServer'
-    sku: '2022-datacenter-smalldisk-g2'
-  }
-  'win10-21h2-avd': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'windows-10'
-    sku: 'win10-21h2-avd'
-  }
-  '2022-datacenter-core-g2': {
-    publisher: 'MicrosoftWindowsServer'
-    offer: 'WindowsServer'
-    sku: '2022-datacenter-core-g2'
-  }
-  'win10-22h2-avd-m365-g2': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win10-22h2-avd-m365-g2'
-  }
-  'win11-21h2-avd': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'Windows-11'
-    sku: 'win11-21h2-avd'
-  }
-  'win10-21h2-avd-m365': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win10-21h2-avd-m365'
-  }
-  'win11-22h2-avd-m365': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win11-22h2-avd-m365'
-  }
-  '2022-datacenter-core-smalldisk-g2': {
-    publisher: 'MicrosoftWindowsServer'
-    offer: 'WindowsServer'
-    sku: '2022-datacenter-core-smalldisk-g2'
-  }
-  'win11-21h2-avd-m365': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win11-21h2-avd-m365'
-  }
-  'win11-23h2-avd': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'Windows-11'
-    sku: 'win11-23h2-avd'
-  }
-  'win11-23h2-avd-m365': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win11-23h2-avd-m365'
-  }
-  'win11-22h2-avd': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'Windows-11'
-    sku: 'win11-22h2-avd'
-  }
-  '2022-datacenter-g2': {
-    publisher: 'MicrosoftWindowsServer'
-    offer: 'WindowsServer'
-    sku: '2022-datacenter-g2'
-  }
-  'win10-22h2-avd-g2': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'windows-10'
-    sku: 'win10-22h2-avd-g2'
-  }
-}
-var varImageReference = MarketPlaceOrCustomImage == 'Marketplace' ? {
-  publisher: varMarketPlaceImages[MarketPlaceImage].publisher
-  offer: varMarketPlaceImages[MarketPlaceImage].offer
-  sku: varMarketPlaceImages[MarketPlaceImage].sku
+var imageReference = empty(galleryImageId) ? {
+  publisher: marketPlaceImagePublisher
+  offer: marketPlaceImageOffer
+  sku: marketPlaceImageSku
   version: 'latest'
 } : {
-  Id: GalleryImageId
+  Id: galleryImageId
 }
 
-var varSecurityProfile = SecurityType == 'Standard' ? null : {
-  securityType: SecurityType
-  uefiSettings: {
-    secureBootEnabled: SecureBootEnabled
-    vTpmEnabled: TpmEnabled
-  }
-}
-
-var varDomainJoinObject = IdentityServiceProvider == 'EntraID' ? {
+var domainJoinObject = identityServiceProvider == 'EntraID' ? {
   DomainType: 'EntraID'
-  IntuneJoin: IntuneEnrollment
+  IntuneJoin: intuneEnrollment
 } : {
   DomainType: 'ActiveDirectory'
-  DomainName: ADDomainName
-  DomainJoinUserName: ADDomainJoinUserName
-  ADOUPath: ADOUPath
+  DomainName: domainName
+  DomainJoinUserName: domainJoinUserName
+  ADOUPath: organizationUnitPath
 }
 
-var varDomainJoinPasswordReference = IdentityServiceProvider == 'EntraID' ? null : {
+var domainJoinPasswordReference = identityServiceProvider == 'EntraID' ? null : {
   reference: {
     keyVault: {
-      id: deployKeyVault.outputs.keyVaultId
+      id: keyVault.outputs.resourceId
     }
     secretName: 'DomainJoinPassword'
   }
 }
-var varSessionHostTemplateParameters = {
-  Location: SessionHostsRegion
-  AvailabilityZones: AvailabilityZones
-  VMSize: SessionHostSize
-  AcceleratedNetworking: AcceleratedNetworking
-  DiskType: SessionHostDiskType
-  ImageReference: varImageReference
-  SecurityProfile: varSecurityProfile
-  SubnetId: SubnetId
-  DomainJoinObject: varDomainJoinObject
-  DomainJoinPassword: varDomainJoinPasswordReference
-  AdminUsername: LocalAdminUsername
-  tags: {}
-}
-var varReplacementPlanSettings = [
-  // Required Parameters //
-  {
-    name: '_HostPoolResourceGroupName'
-    value: HostPoolResourceGroupName
-  }
-  {
-    name: '_HostPoolName'
-    value: HostPoolName
-  }
-  {
-    name: '_TargetSessionHostCount'
-    value: TargetSessionHostCount
-  }
-  {
-    name: '_SessionHostNamePrefix'
-    value: SessionHostNamePrefix
-  }
-  {
-    name: '_SessionHostTemplate'
-    value: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
-  }
-  {
-    name: '_SessionHostParameters'
-    value: string(varSessionHostTemplateParameters)
-  }
-  {
-    name: '_SubscriptionId'
-    value: subscription().subscriptionId
-  }
-  {
-    name: '_RemoveAzureADDevice'
-    value: IdentityServiceProvider == 'EntraID'
-  }
-  {
-    name: '_ClientResourceId'
-    value: UserAssignedManagedIdentityResourceId
-  }
 
-  // Optional Parameters //
-  {
-    name: '_Tag_IncludeInAutomation'
-    value: TagIncludeInAutomation
+var sessionHostTemplateParameters = {
+  location: sessionHostsRegion
+  availabilityZones: availabilityZones
+  vmSize: sessionHostSize
+  acceleratedNetworking: acceleratedNetworking
+  diskType: sessionHostDiskType
+  imageReference: imageReference
+  securityProfile: {
+    securityType: securityType
+    uefiSettings: {
+      secureBootEnabled: true
+      vTpmEnabled: true
+    }
   }
-  {
-    name: '_Tag_DeployTimestamp'
-    value: TagDeployTimestamp
-  }
-  {
-    name: '_Tag_PendingDrainTimestamp'
-    value: TagPendingDrainTimestamp
-  }
-  {
-    name: '_Tag_ScalingPlanExclusionTag'
-    value: TagScalingPlanExclusionTag
-  }
-  {
-    name: '_TargetVMAgeDays'
-    value: TargetVMAgeDays
-  }
-  {
-    name: '_DrainGracePeriodHours'
-    value: DrainGracePeriodHours
-  }
-  {
-    name: '_FixSessionHostTags'
-    value: FixSessionHostTags
-  }
-  {
-    name: '_SHRDeploymentPrefix'
-    value: SHRDeploymentPrefix
-  }
-  {
-    name: '_AllowDownsizing'
-    value: AllowDownsizing
-  }
-  {
-    name: '_SessionHostInstanceNumberPadding'
-    value: SessionHostInstanceNumberPadding
-  }
-  {
-    name: '_ReplaceSessionHostOnNewImageVersion'
-    value: ReplaceSessionHostOnNewImageVersion
-  }
-  {
-    name: '_ReplaceSessionHostOnNewImageVersionDelayDays'
-    value: ReplaceSessionHostOnNewImageVersionDelayDays
-  }
-  {
-    name: '_VMNamesTemplateParameterName'
-    value: VMNamesTemplateParameterName
-  }
-  {
-    name: '_SessionHostResourceGroupName'
-    value: SessionHostResourceGroupName
-  }
-]
-
-var varUniqueString = uniqueString(resourceGroup().id, HostPoolName)
-var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
-
-var varFunctionAppIdentity = UseUserAssignedManagedIdentity ? {
-  type: 'UserAssigned'
-  userAssignedIdentities:{
-    '${UserAssignedManagedIdentityResourceId}': {}
-}
-} : {
-  type: 'SystemAssigned'
+  subnetResourceId: subnetResourceId
+  DomainJoinObject: domainJoinObject
+  DomainJoinPassword: domainJoinPasswordReference
+  AdminUsername: localAdminUsername
+  tags: tags
 }
 
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: userAssignedIdentityName
+  location: location
+  tags: contains(tags, 'Microsoft.ManagedIdentity/userAssignedIdentities') ? tags['Microsoft.ManagedIdentity/userAssignedIdentities'] : {}
+}
 
-// Outputs for verification
-
-//---- Resources ----//
-
-
-module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
-  name: 'deployFunctionApp'
+module keyVault 'modules/keyVault.bicep' = if (identityServiceProvider != 'EntraID') {
+  name: 'deploy-key-vault-${timeStamp}'
   params: {
-    Location: Location
-    FunctionAppName: varFunctionAppName
-    EnableMonitoring: EnableMonitoring
-    UseExistingLAW: UseExistingLAW
-    LogAnalyticsWorkspaceId: LogAnalyticsWorkspaceId
-    ReplacementPlanSettings: varReplacementPlanSettings
-    FunctionAppIdentity: varFunctionAppIdentity
+    domainJoinPassword: domainJoinPassword
+    keyVaultName: keyVaultName
+    keyVaultNetworkInterfaceName: keyVaultNetworkInterfaceName
+    keyVaultPrivateDnsZoneResourceId: keyVaultPrivateDnsZoneResourceId
+    keyVaultPrivateEndpointName: keyVaultPrivateEndpointName
+    subnetResourceId: subnetResourceId
+    tags: tags
   }
 }
 
-module deployKeyVault 'modules/deployKeyVault.bicep' = if (IdentityServiceProvider != 'EntraID') {
-  name: 'deployKeyVault'
+module storageAccount 'modules/storageAccount.bicep' = {
+  name: 'deploy-storage-account-${timeStamp}'
   params: {
-    Location: Location
-    KeyVaultName: 'kv-AVDSHR-${varUniqueString}'
-    DomainJoinPassword: ADJoinUserPassword
+    azureBlobsPrivateDnsZoneResourceId: azureBlobsPrivateDnsZoneResourceId
+    azureFilesPrivateDnsZoneResourceId: azureFilesPrivateDnsZoneResourceId
+    azureQueuesPrivateDnsZoneResourceId: azureQueuesPrivateDnsZoneResourceId
+    azureTablesPrivateDnsZoneResourceId: azureTablesPrivateDnsZoneResourceId
+    functionAppName: functionAppName
+    keyName: keyVault.outputs.keyName
+    keyVaultUri: keyVault.outputs.uri
+    location: location
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    storageAccountDiagnosticSettingName: storageAccountDiagnosticSettingName
+    storageAccountName: storageAccountName
+    storageAccountNetworkInterfaceName: storageAccountNetworkInterfaceName
+    storageAccountPrivateEndpointName: storageAccountPrivateEndpointName
+    subnetResourceId: subnetResourceId
+    tags: tags
+    userAssignedIdentityResourceId: userAssignedIdentity.id
   }
 }
-module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec.bicep' = {
-  name: 'deployStandardSessionHostTemplate'
+
+module applicationInsights 'modules/applicationInsights.bicep' = {
+  name: 'deploy-application-insights-${timeStamp}'
   params: {
-    Location: Location
-    Name: '${HostPoolName}-Spec'
+    applicationInsightsName: applicationInsightsName
+    location: location
+    privateLinkScopeResourceId: privateLinkScopeResourceId
+    tags: tags
+    timestamp: timeStamp
   }
 }
-//---- Role Assignments ----//
-// These roles are only assigned if the FunctionApp is using a System Managed Identity (MSI). Please manually assign when using a User Assigned Managed Identity.
-module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
-  name: 'RBAC-vdiVMContributor-${TimeStamp}'
+
+module functionApp 'modules/functionApp.bicep' = {
+  name: 'deploy-function-app-${timeStamp}'
+  params: {
+    applicationInsightsName: applicationInsightsName
+    appServicePlanName: appServicePlanName
+    delegatedSubnetResourceId: delegatedSubnetResourceId
+    functionAppName: functionAppName
+    functionAppNetworkInterfaceName: functionAppNetworkInterfaceName
+    functionAppPrivateDnsZoneResourceId: functionAppPrivateDnsZoneResourceId
+    functionAppPrivateEndpointName: functionAppPrivateEndpointName
+    location: location
+    replacementPlanSettings: [
+      // Required Parameters //
+      {
+        name: '_HostPoolResourceGroupName'
+        value: split(hostPoolResourceId, '/')[4]
+      }
+      {
+        name: '_HostPoolName'
+        value: split(hostPoolResourceId, '/')[8]
+      }
+      {
+        name: '_TargetSessionHostCount'
+        value: targetSessionHostCount
+      }
+      {
+        name: '_SessionHostNamePrefix'
+        value: sessionHostNamePrefix
+      }
+      {
+        name: '_SessionHostTemplate'
+        value: templateSpec.outputs.resourceId
+      }
+      {
+        name: '_SessionHostParameters'
+        value: string(sessionHostTemplateParameters)
+      }
+      {
+        name: '_SubscriptionId'
+        value: subscription().subscriptionId
+      }
+      {
+        name: '_RemoveAzureADDevice'
+        value: identityServiceProvider == 'EntraID'
+      }
+      {
+        name: '_ClientResourceId'
+        value: userAssignedIdentity.id
+      }
+    
+      // Optional Parameters //
+      {
+        name: '_Tag_IncludeInAutomation'
+        value: tagIncludeInAutomation
+      }
+      {
+        name: '_Tag_DeployTimestamp'
+        value: tagDeployTimestamp
+      }
+      {
+        name: '_Tag_PendingDrainTimestamp'
+        value: tagPendingDrainTimestamp
+      }
+      {
+        name: '_Tag_ScalingPlanExclusionTag'
+        value: tagScalingPlanExclusionTag
+      }
+      {
+        name: '_TargetVMAgeDays'
+        value: targetVMAgeDays
+      }
+      {
+        name: '_DrainGracePeriodHours'
+        value: drainGracePeriodHours
+      }
+      {
+        name: '_FixSessionHostTags'
+        value: fixSessionHostTags
+      }
+      {
+        name: '_SHRDeploymentPrefix'
+        value: shrDeploymentPrefix
+      }
+      {
+        name: '_AllowDownsizing'
+        value: allowDownsizing
+      }
+      {
+        name: '_SessionHostInstanceNumberPadding'
+        value: sessionHostInstanceNumberPadding
+      }
+      {
+        name: '_ReplaceSessionHostOnNewImageVersion'
+        value: replaceSessionHostOnNewImageVersion
+      }
+      {
+        name: '_ReplaceSessionHostOnNewImageVersionDelayDays'
+        value: replaceSessionHostOnNewImageVersionDelayDays
+      }
+      {
+        name: '_VMNamesTemplateParameterName'
+        value: vmNamesTemplateParameterName
+      }
+      {
+        name: '_SessionHostResourceGroupName'
+        value: sessionHostResourceGroupName
+      }
+    ]
+    storageAccountName: storageAccountName
+    subnetResourceId: subnetResourceId
+    tags: tags
+  }
+}
+
+module templateSpec 'modules/templateSpec.bicep' = {
+  name: 'deploy-template-spec-${timeStamp}'
+  params: {
+    location: location
+    name: templateSpecName
+  }
+}
+
+module roleAssignment_HostPool 'modules/roleAssignment.bicep' = {
+  name: 'assign-rbac-host-pool-${timeStamp}'
   scope: subscription()
   params: {
-    PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
-    RoleDefinitionId: 'a959dbd1-f747-45e3-8ba6-dd80f235f97c' // Desktop Virtualization Virtual Machine Contributor
-    Scope: subscription().id
+    prinicpalId: userAssignedIdentity.properties.principalId
+    roleDefinitionId: 'a959dbd1-f747-45e3-8ba6-dd80f235f97c' // Desktop Virtualization Virtual Machine Contributor
+    scope: subscription().id
   }
 }
-module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity){
-  name: 'RBAC-TemplateSpecReader-${TimeStamp}'
+
+module roleAssignment_TemplateSpec 'modules/roleAssignment.bicep' = {
+  name: 'assign-rbac-template-spec-${timeStamp}'
   scope: subscription()
   params: {
-    PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
-    RoleDefinitionId: '392ae280-861d-42bd-9ea5-08ee6d83b80e' // Template Spec Reader
-    Scope: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
+    prinicpalId: userAssignedIdentity.properties.principalId
+    roleDefinitionId: '392ae280-861d-42bd-9ea5-08ee6d83b80e' // Template Spec Reader
+    scope: templateSpec.outputs.resourceId
   }
 }

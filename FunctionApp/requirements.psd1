@@ -11,4 +11,5 @@
     'EntraAuth'                                    = '1.*'
     'PSFramework'                                  = '1.*'
     'Microsoft.Graph.Identity.DirectoryManagement' = '2.*'
+    'Microsoft.Graph.DeviceManagement'             = '2.*'
 }

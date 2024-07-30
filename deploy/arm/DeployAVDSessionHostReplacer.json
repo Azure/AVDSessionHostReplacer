@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "16270594338810585591"
+      "templateHash": "9686442561563028619"
     }
   },
   "parameters": {
@@ -71,6 +71,12 @@
       "type": "string"
     },
     "functionAppPrivateEndpointName": {
+      "type": "string"
+    },
+    "functionAppScmPrivateDnsZoneResourceId": {
+      "type": "string"
+    },
+    "functionAppZipUrl": {
       "type": "string"
     },
     "galleryImageId": {
@@ -229,7 +235,7 @@
       "apiVersion": "2023-01-31",
       "name": "[parameters('userAssignedIdentityName')]",
       "location": "[parameters('location')]",
-      "tags": "[if(contains(parameters('tags'), 'Microsoft.ManagedIdentity/userAssignedIdentities'), parameters('tags')['Microsoft.ManagedIdentity/userAssignedIdentities'], createObject())]"
+      "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.ManagedIdentity/userAssignedIdentities'), createObject())]"
     },
     {
       "condition": "[not(equals(parameters('identityServiceProvider'), 'EntraID'))]",
@@ -271,7 +277,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "15088480330190824016"
+              "templateHash": "3746217074302163452"
             }
           },
           "parameters": {
@@ -311,7 +317,7 @@
               "apiVersion": "2022-07-01",
               "name": "[parameters('keyVaultName')]",
               "location": "[parameters('location')]",
-              "tags": "[if(contains(parameters('tags'), 'Microsoft.KeyVault/vaults'), parameters('tags')['Microsoft.KeyVault/vaults'], createObject())]",
+              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.KeyVault/vaults'), createObject())]",
               "properties": {
                 "enabledForDeployment": false,
                 "enabledForDiskEncryption": false,
@@ -339,7 +345,7 @@
               "apiVersion": "2023-04-01",
               "name": "[parameters('keyVaultPrivateEndpointName')]",
               "location": "[parameters('location')]",
-              "tags": "[if(contains(parameters('tags'), 'Microsoft.Network/privateEndpoints'), parameters('tags')['Microsoft.Network/privateEndpoints'], createObject())]",
+              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.Network/privateEndpoints'), createObject())]",
               "properties": {
                 "customNetworkInterfaceName": "[parameters('keyVaultNetworkInterfaceName')]",
                 "privateLinkServiceConnections": [
@@ -513,7 +519,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "13991356661166191108"
+              "templateHash": "14364740693705528382"
             }
           },
           "parameters": {
@@ -699,7 +705,7 @@
               "apiVersion": "2023-04-01",
               "name": "[format('{0}-{1}', parameters('storageAccountPrivateEndpointName'), variables('storageSubResources')[copyIndex()])]",
               "location": "[parameters('location')]",
-              "tags": "[if(contains(parameters('tags'), 'Microsoft.Network/privateEndpoints'), parameters('tags')['Microsoft.Network/privateEndpoints'], createObject())]",
+              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.Network/privateEndpoints'), createObject())]",
               "properties": {
                 "customNetworkInterfaceName": "[format('{0}-{1}', parameters('storageAccountNetworkInterfaceName'), variables('storageSubResources')[copyIndex()])]",
                 "privateLinkServiceConnections": [
@@ -810,7 +816,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "10004591363284451245"
+              "templateHash": "2363594677507686202"
             }
           },
           "parameters": {
@@ -836,7 +842,7 @@
               "apiVersion": "2020-02-02",
               "name": "[parameters('applicationInsightsName')]",
               "location": "[parameters('location')]",
-              "tags": "[if(contains(parameters('tags'), 'Microsoft.Insights/components'), parameters('tags')['Microsoft.Insights/components'], createObject())]",
+              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.Insights/components'), createObject())]",
               "properties": {
                 "Application_Type": "web"
               },
@@ -935,6 +941,12 @@
           },
           "functionAppPrivateEndpointName": {
             "value": "[parameters('functionAppPrivateEndpointName')]"
+          },
+          "functionAppScmPrivateDnsZoneResourceId": {
+            "value": "[parameters('functionAppScmPrivateDnsZoneResourceId')]"
+          },
+          "functionAppZipUrl": {
+            "value": "[parameters('functionAppZipUrl')]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -1043,6 +1055,9 @@
           },
           "tags": {
             "value": "[parameters('tags')]"
+          },
+          "timestamp": {
+            "value": "[parameters('timeStamp')]"
           }
         },
         "template": {
@@ -1052,7 +1067,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "12614722600519321979"
+              "templateHash": "10937559249869541212"
             }
           },
           "parameters": {
@@ -1077,6 +1092,12 @@
             "functionAppPrivateEndpointName": {
               "type": "string"
             },
+            "functionAppScmPrivateDnsZoneResourceId": {
+              "type": "string"
+            },
+            "functionAppZipUrl": {
+              "type": "string"
+            },
             "location": {
               "type": "string",
               "defaultValue": "[resourceGroup().location]"
@@ -1092,6 +1113,9 @@
             },
             "tags": {
               "type": "object"
+            },
+            "timestamp": {
+              "type": "string"
             }
           },
           "variables": {
@@ -1103,7 +1127,7 @@
               "apiVersion": "2023-01-01",
               "name": "[parameters('appServicePlanName')]",
               "location": "[parameters('location')]",
-              "tags": "[if(contains(parameters('tags'), 'Microsoft.Web/serverfarms'), parameters('tags')['Microsoft.Web/serverfarms'], createObject())]",
+              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.Web/serverfarms'), createObject())]",
               "sku": {
                 "tier": "ElasticPremium",
                 "name": "EP1"
@@ -1121,7 +1145,7 @@
               "apiVersion": "2023-01-01",
               "name": "[parameters('functionAppName')]",
               "location": "[parameters('location')]",
-              "tags": "[if(contains(parameters('tags'), 'Microsoft.Web/sites'), parameters('tags')['Microsoft.Web/sites'], createObject())]",
+              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.Web/sites'), createObject())]",
               "kind": "functionapp",
               "identity": {
                 "type": "SystemAssigned"
@@ -1132,7 +1156,7 @@
                 "publicNetworkAccess": "Disabled",
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "siteConfig": {
-                  "appSettings": "[union(createArray(createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix={2}', parameters('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value, environment().suffixes.storage)), createObject('name', 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix={2}', parameters('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value, environment().suffixes.storage)), createObject('name', 'WEBSITE_CONTENTOVERVNET', 'value', 1), createObject('name', 'WEBSITE_CONTENTSHARE', 'value', toLower(parameters('functionAppName'))), createObject('name', 'EnvironmentName', 'value', environment().name), createObject('name', 'ResourceManagerUrl', 'value', if(endsWith(environment().resourceManager, '/'), environment().resourceManager, format('{0}/', environment().resourceManager))), createObject('name', 'SubscriptionId', 'value', subscription().subscriptionId), createObject('name', 'TenantId', 'value', subscription().tenantId)), parameters('replacementPlanSettings'))]",
+                  "appSettings": "[union(createArray(createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix={2}', parameters('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value, environment().suffixes.storage)), createObject('name', 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix={2}', parameters('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value, environment().suffixes.storage)), createObject('name', 'WEBSITE_CONTENTOVERVNET', 'value', 1), createObject('name', 'WEBSITE_CONTENTSHARE', 'value', toLower(parameters('functionAppName'))), createObject('name', '_EnvironmentName', 'value', environment().name), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId)), parameters('replacementPlanSettings'))]",
                   "cors": {
                     "allowedOrigins": [
                       "[format('{0}', environment().portal)]",
@@ -1159,6 +1183,7 @@
               "apiVersion": "2023-04-01",
               "name": "[parameters('functionAppPrivateEndpointName')]",
               "location": "[parameters('location')]",
+              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.Network/privateEndpoints'), createObject())]",
               "properties": {
                 "customNetworkInterfaceName": "[parameters('functionAppNetworkInterfaceName')]",
                 "privateLinkServiceConnections": [
@@ -1197,6 +1222,83 @@
               "dependsOn": [
                 "[resourceId('Microsoft.Network/privateEndpoints', parameters('functionAppPrivateEndpointName'))]"
               ]
+            },
+            {
+              "type": "Microsoft.Web/sites/extensions",
+              "apiVersion": "2023-01-01",
+              "name": "[format('{0}/{1}', parameters('functionAppName'), 'MSDeploy')]",
+              "properties": {
+                "packageUri": "[parameters('functionAppZipUrl')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]",
+                "[resourceId('Microsoft.Network/privateEndpoints/privateDnsZoneGroups', parameters('functionAppPrivateEndpointName'), 'default')]",
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('functionAppPrivateEndpointName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('deploy-a-record-{0}', parameters('timestamp'))]",
+              "subscriptionId": "[split(parameters('functionAppScmPrivateDnsZoneResourceId'), '/')[2]]",
+              "resourceGroup": "[split(parameters('functionAppScmPrivateDnsZoneResourceId'), '/')[4]]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "functionAppName": {
+                    "value": "[parameters('functionAppName')]"
+                  },
+                  "ipv4Address": {
+                    "value": "[reference(resourceId('Microsoft.Network/privateEndpoints', parameters('functionAppPrivateEndpointName')), '2023-04-01').networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress]"
+                  },
+                  "privateDnsZoneName": {
+                    "value": "[split(parameters('functionAppScmPrivateDnsZoneResourceId'), '/')[8]]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.29.47.4906",
+                      "templateHash": "7030409442479244335"
+                    }
+                  },
+                  "parameters": {
+                    "functionAppName": {
+                      "type": "string"
+                    },
+                    "ipv4Address": {
+                      "type": "string"
+                    },
+                    "privateDnsZoneName": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/privateDnsZones/A",
+                      "apiVersion": "2020-06-01",
+                      "name": "[format('{0}/{1}', parameters('privateDnsZoneName'), parameters('functionAppName'))]",
+                      "properties": {
+                        "aRecords": [
+                          {
+                            "ipv4Address": "[parameters('ipv4Address')]"
+                          }
+                        ],
+                        "ttl": 3600
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('functionAppPrivateEndpointName'))]"
+              ]
             }
           ]
         }
@@ -1222,6 +1324,9 @@
           },
           "name": {
             "value": "[parameters('templateSpecName')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
           }
         },
         "template": {
@@ -1231,7 +1336,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "11179779577307341242"
+              "templateHash": "1933397706178193521"
             }
           },
           "parameters": {
@@ -1241,6 +1346,9 @@
             },
             "name": {
               "type": "string"
+            },
+            "tags": {
+              "type": "object"
             }
           },
           "variables": {
@@ -1663,6 +1771,7 @@
               "apiVersion": "2022-02-01",
               "name": "[parameters('name')]",
               "location": "[parameters('location')]",
+              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.Resources/templateSpecs'), createObject())]",
               "properties": {
                 "description": "Template Spec for deploying VMs through the AVD Replacement Plan",
                 "displayName": "AVD Replacement Plan Session Host Template"
@@ -1707,7 +1816,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "852792330190262115"
+              "templateHash": "9812956379931741090"
             }
           },
           "parameters": {
@@ -1728,7 +1837,8 @@
               "name": "[guid(parameters('prinicpalId'), parameters('roleDefinitionId'), parameters('scope'))]",
               "properties": {
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('roleDefinitionId'))]",
-                "principalId": "[parameters('prinicpalId')]"
+                "principalId": "[parameters('prinicpalId')]",
+                "principalType": "ServicePrincipal"
               }
             }
           ]
@@ -1767,7 +1877,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "852792330190262115"
+              "templateHash": "9812956379931741090"
             }
           },
           "parameters": {
@@ -1788,7 +1898,8 @@
               "name": "[guid(parameters('prinicpalId'), parameters('roleDefinitionId'), parameters('scope'))]",
               "properties": {
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('roleDefinitionId'))]",
-                "principalId": "[parameters('prinicpalId')]"
+                "principalId": "[parameters('prinicpalId')]",
+                "principalType": "ServicePrincipal"
               }
             }
           ]

@@ -16,7 +16,7 @@ param DiskType string
 param Tags object = {}
 
 param ImageReference object
-param SecurityProfile object
+param SecurityProfile object = {}
 
 //HostPool join
 param HostPoolName string

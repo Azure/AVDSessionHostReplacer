@@ -49,9 +49,9 @@ param GalleryImageId string = ''
   'TrustedLaunch'
   'ConfidentialVM'
 ])
-param SecurityType string
-param SecureBootEnabled bool
-param TpmEnabled bool
+param SecurityType string = 'TrustedLaunch'
+param SecureBootEnabled bool = true
+param TpmEnabled bool = true
 param SubnetId string
 
 @allowed([

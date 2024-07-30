@@ -99,7 +99,7 @@
                                     "options": {
                                         "icon": "Info",
                                         "text": "When using a User Assigned Managed Identity, make sure the identity has the needed permissions in Azure and Entra. Follow the link for more info.",
-                                        "uri": "https://github.com/Azure/AVDReplacementPlans/blob/v0.2.8-beta.5/docs/Permissions.md"
+                                        "uri": "https://github.com/Azure/AVDReplacementPlans/blob/v0.2.8-beta.6/docs/Permissions.md"
                                     }
                                 }
                             ]
@@ -152,7 +152,7 @@
                             "type": "Microsoft.Common.TextBlock",
                             "visible": true,
                             "options": {
-                                "text": "AVD session host replacer Portal UI Version: v0.2.8-beta.5",
+                                "text": "AVD session host replacer Portal UI Version: v0.2.8-beta.6",
                                 "link": {
                                     "label": "GitHub Repository",
                                     "uri": "https://github.com/Azure/AVDSessionHostReplacer"

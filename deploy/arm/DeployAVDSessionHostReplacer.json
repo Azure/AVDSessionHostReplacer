@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.45.22436",
-      "templateHash": "79349903947073607"
+      "templateHash": "11962093493397552523"
     }
   },
   "parameters": {
@@ -48,8 +48,9 @@
       "type": "string",
       "defaultValue": "Premium_LRS",
       "allowedValues": [
-        "Premium_LRS",
-        "StandardSSD_LRS"
+        "Standard_LRS",
+        "StandardSSD_LRS",
+        "Premium_LRS"
       ]
     },
     "MarketPlaceOrCustomImage": {
@@ -488,7 +489,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.45.22436",
-              "templateHash": "6476496551747842720"
+              "templateHash": "2474268611865631946"
             }
           },
           "parameters": {
@@ -522,7 +523,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.8-beta.5/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.8-beta.6/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

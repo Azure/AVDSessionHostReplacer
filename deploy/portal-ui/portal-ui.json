@@ -55,7 +55,7 @@
                                     "name": "sessionHostNamePrefix",
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "Session Host Name Prefix",
-                                    "toolTip": "The prefix for the session host names. The session host names will be in the format <prefix>-<number>. Make sure this produces a unique value across all device names in your tenant / Active Directory. Try selecting a prefix that helps you identify the host pool such as AVDHP01",
+                                    "toolTip": "The prefix for the session host names. The session host names will be in the format (prefix)-(number). Make sure this produces a unique value across all device names in your environment. Try selecting a prefix that helps you identify the host pool such as AVDHP01 for example so the session hosts will be named AVDHP01-01, AVDHP01-02 and so on.",
                                     "constraints": {
                                         "required": true,
                                         "validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
@@ -173,7 +173,7 @@
                             "filter": true,
                             "multiselect": false,
                             "selectAll": false,
-                            "defaultValue": null,
+                            "defaultValue": "South Central US",
                             "toolTip": "Select region to deploy session hosts.",
                             "constraints": {
                                 "required": true,

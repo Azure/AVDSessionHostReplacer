@@ -4,404 +4,966 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.29.45.22436",
-      "templateHash": "8763771753878913130"
+      "version": "0.29.47.4906",
+      "templateHash": "16270594338810585591"
     }
   },
   "parameters": {
-    "Location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group."
-      }
+    "acceleratedNetworking": {
+      "type": "bool"
     },
-    "EnableMonitoring": {
+    "allowDownsizing": {
       "type": "bool",
       "defaultValue": true
     },
-    "UseExistingLAW": {
-      "type": "bool",
-      "defaultValue": false
-    },
-    "LogAnalyticsWorkspaceId": {
-      "type": "string",
-      "defaultValue": "none",
-      "metadata": {
-        "description": "Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights."
-      }
-    },
-    "SessionHostsRegion": {
+    "applicationInsightsName": {
       "type": "string"
     },
-    "AvailabilityZones": {
+    "appServicePlanName": {
+      "type": "string"
+    },
+    "availabilityZones": {
       "type": "array",
       "defaultValue": []
     },
-    "SessionHostSize": {
+    "azureBlobsPrivateDnsZoneResourceId": {
       "type": "string"
     },
-    "AcceleratedNetworking": {
-      "type": "bool"
-    },
-    "SessionHostDiskType": {
-      "type": "string",
-      "defaultValue": "Premium_LRS",
-      "allowedValues": [
-        "Premium_LRS",
-        "StandardSSD_LRS"
-      ]
-    },
-    "MarketPlaceOrCustomImage": {
-      "type": "string",
-      "allowedValues": [
-        "Marketplace",
-        "Gallery"
-      ]
-    },
-    "MarketPlaceImage": {
-      "type": "string",
-      "defaultValue": "win11-23h2-avd-m365",
-      "allowedValues": [
-        "2022-datacenter-smalldisk-g2",
-        "win10-21h2-avd",
-        "2022-datacenter-core-g2",
-        "win10-22h2-avd-m365-g2",
-        "win11-21h2-avd",
-        "win10-21h2-avd-m365",
-        "win11-22h2-avd-m365",
-        "2022-datacenter-core-smalldisk-g2",
-        "win11-21h2-avd-m365",
-        "win11-23h2-avd",
-        "win11-23h2-avd-m365",
-        "win11-22h2-avd",
-        "2022-datacenter-g2",
-        "win10-22h2-avd-g2"
-      ]
-    },
-    "GalleryImageId": {
-      "type": "string",
-      "defaultValue": ""
-    },
-    "SecurityType": {
-      "type": "string",
-      "allowedValues": [
-        "Standard",
-        "TrustedLaunch",
-        "ConfidentialVM"
-      ]
-    },
-    "SecureBootEnabled": {
-      "type": "bool"
-    },
-    "TpmEnabled": {
-      "type": "bool"
-    },
-    "SubnetId": {
+    "azureFilesPrivateDnsZoneResourceId": {
       "type": "string"
     },
-    "IdentityServiceProvider": {
-      "type": "string",
-      "allowedValues": [
-        "EntraID",
-        "ActiveDirectory",
-        "EntraDS"
-      ]
+    "azureQueuesPrivateDnsZoneResourceId": {
+      "type": "string"
     },
-    "IntuneEnrollment": {
-      "type": "bool",
-      "defaultValue": false
+    "azureTablesPrivateDnsZoneResourceId": {
+      "type": "string"
     },
-    "ADDomainName": {
-      "type": "string",
-      "defaultValue": ""
+    "delegatedSubnetResourceId": {
+      "type": "string"
     },
-    "ADDomainJoinUserName": {
-      "type": "string",
-      "defaultValue": ""
-    },
-    "ADJoinUserPassword": {
+    "domainJoinPassword": {
       "type": "securestring",
       "defaultValue": ""
     },
-    "ADOUPath": {
+    "domainJoinUserName": {
       "type": "string",
       "defaultValue": ""
     },
-    "LocalAdminUsername": {
+    "domainName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "drainGracePeriodHours": {
+      "type": "int",
+      "defaultValue": 24
+    },
+    "fixSessionHostTags": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "functionAppName": {
       "type": "string"
     },
-    "HostPoolResourceGroupName": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().name]",
-      "metadata": {
-        "description": "Required: No | Name of the resource group containing the Azure Virtual Desktop Host Pool. | Default: The resource group of the Function App."
-      }
+    "functionAppNetworkInterfaceName": {
+      "type": "string"
     },
-    "HostPoolName": {
-      "type": "string",
-      "metadata": {
-        "description": "Required: Yes | Name of the Azure Virtual Desktop Host Pool."
-      }
+    "functionAppPrivateDnsZoneResourceId": {
+      "type": "string"
     },
-    "SessionHostNamePrefix": {
-      "type": "string",
-      "maxLength": 12,
-      "metadata": {
-        "description": "Required: Yes | Prefix used for the name of the session hosts."
-      }
+    "functionAppPrivateEndpointName": {
+      "type": "string"
     },
-    "TargetSessionHostCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Required: Yes | Number of session hosts to maintain in the host pool."
-      }
-    },
-    "UseUserAssignedManagedIdentity": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Required: No | Resource Id of the User Assigned Managed Identity to use for the Function App. | Default: System Identity"
-      }
-    },
-    "UserAssignedManagedIdentityResourceId": {
+    "galleryImageId": {
       "type": "string",
       "defaultValue": ""
     },
-    "TagIncludeInAutomation": {
-      "type": "string",
-      "defaultValue": "IncludeInAutoReplace",
-      "metadata": {
-        "description": "Required: No | Tag name used to indicate that a session host should be included in the automatic replacement process. | Default: IncludeInAutoReplace."
-      }
+    "hostPoolResourceId": {
+      "type": "string"
     },
-    "TagDeployTimestamp": {
-      "type": "string",
-      "defaultValue": "AutoReplaceDeployTimestamp",
-      "metadata": {
-        "description": "Required: No | Tag name used to indicate the timestamp of the last deployment of a session host. | Default: AutoReplaceDeployTimestamp."
-      }
+    "identityServiceProvider": {
+      "type": "string"
     },
-    "TagPendingDrainTimestamp": {
-      "type": "string",
-      "defaultValue": "AutoReplacePendingDrainTimestamp",
-      "metadata": {
-        "description": "Required: No | Tag name used to indicate drain timestamp of session host pending deletion. | Default: AutoReplacePendingDrainTimestamp."
-      }
-    },
-    "TagScalingPlanExclusionTag": {
-      "type": "string",
-      "defaultValue": "ScalingPlanExclusion",
-      "metadata": {
-        "description": "Required: No | Tag name used to exclude session host from Scaling Plan activities. | Default: ScalingPlanExclusion"
-      }
-    },
-    "TargetVMAgeDays": {
-      "type": "int",
-      "defaultValue": 45,
-      "metadata": {
-        "description": "Required: No | Target age of session hosts in days. | Default:  45 days."
-      }
-    },
-    "DrainGracePeriodHours": {
-      "type": "int",
-      "defaultValue": 24,
-      "metadata": {
-        "description": "Required: No | Grace period in hours for session hosts to drain before deletion. | Default: 24 hours."
-      }
-    },
-    "FixSessionHostTags": {
+    "intuneEnrollment": {
       "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Required: No | If true, will apply tags for Include In Auto Replace and Deployment Timestamp to existing session hosts. This will not enable automatic deletion of existing session hosts. | Default: True."
-      }
+      "defaultValue": false
     },
-    "SHRDeploymentPrefix": {
+    "keyVaultName": {
+      "type": "string"
+    },
+    "organizationUnitPath": {
       "type": "string",
-      "defaultValue": "AVDSessionHostReplacer",
-      "metadata": {
-        "description": "Required: No | Prefix used for the deployment name of the session hosts. | Default: AVDSessionHostReplacer"
-      }
+      "defaultValue": ""
     },
-    "AllowDownsizing": {
+    "keyVaultNetworkInterfaceName": {
+      "type": "string"
+    },
+    "keyVaultPrivateDnsZoneResourceId": {
+      "type": "string"
+    },
+    "keyVaultPrivateEndpointName": {
+      "type": "string"
+    },
+    "localAdminUsername": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "logAnalyticsWorkspaceResourceId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "marketPlaceImageOffer": {
+      "type": "string"
+    },
+    "marketPlaceImagePublisher": {
+      "type": "string"
+    },
+    "marketPlaceImageSku": {
+      "type": "string"
+    },
+    "privateLinkScopeResourceId": {
+      "type": "string"
+    },
+    "replaceSessionHostOnNewImageVersion": {
       "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Required: No | Allow deleting session hosts if count exceeds target. | Default: true"
-      }
+      "defaultValue": true
     },
-    "SessionHostInstanceNumberPadding": {
+    "replaceSessionHostOnNewImageVersionDelayDays": {
       "type": "int",
-      "defaultValue": 2,
-      "metadata": {
-        "description": "Required: No | Number of digits to use for the instance number of the session hosts (eg. AVDVM-01). | Default: 2"
-      }
+      "defaultValue": 0
     },
-    "ReplaceSessionHostOnNewImageVersion": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Required: No | If true, will replace session hosts when a new image version is detected. | Default: true"
-      }
+    "securityType": {
+      "type": "string"
     },
-    "ReplaceSessionHostOnNewImageVersionDelayDays": {
+    "sessionHostDiskType": {
+      "type": "string",
+      "defaultValue": "Premium_LRS"
+    },
+    "sessionHostInstanceNumberPadding": {
       "type": "int",
-      "defaultValue": 0,
-      "metadata": {
-        "description": "Required: No | Delay in days before replacing session hosts when a new image version is detected. | Default: 0 (no delay)."
-      }
+      "defaultValue": 2
     },
-    "VMNamesTemplateParameterName": {
+    "sessionHostNamePrefix": {
+      "type": "string"
+    },
+    "sessionHostResourceGroupName": {
       "type": "string",
-      "defaultValue": "VMNames",
-      "metadata": {
-        "description": "Required: No | The name of the parameter in the template that specifies the VM Names array."
-      }
+      "defaultValue": ""
     },
-    "SessionHostResourceGroupName": {
+    "sessionHostSize": {
+      "type": "string"
+    },
+    "sessionHostsRegion": {
+      "type": "string"
+    },
+    "shrDeploymentPrefix": {
       "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Required: No | Leave this empty to deploy to same resource group as the host pool."
-      }
+      "defaultValue": "AVDSessionHostReplacer"
     },
-    "TimeStamp": {
+    "storageAccountDiagnosticSettingName": {
+      "type": "string"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "storageAccountNetworkInterfaceName": {
+      "type": "string"
+    },
+    "storageAccountPrivateEndpointName": {
+      "type": "string"
+    },
+    "subnetResourceId": {
+      "type": "string"
+    },
+    "tagDeployTimestamp": {
+      "type": "string",
+      "defaultValue": "AutoReplaceDeployTimestamp"
+    },
+    "tagIncludeInAutomation": {
+      "type": "string",
+      "defaultValue": "IncludeInAutoReplace"
+    },
+    "tagPendingDrainTimestamp": {
+      "type": "string",
+      "defaultValue": "AutoReplacePendingDrainTimestamp"
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {}
+    },
+    "tagScalingPlanExclusionTag": {
+      "type": "string",
+      "defaultValue": "ScalingPlanExclusion"
+    },
+    "targetSessionHostCount": {
+      "type": "int"
+    },
+    "targetVMAgeDays": {
+      "type": "int",
+      "defaultValue": 45
+    },
+    "templateSpecName": {
+      "type": "string"
+    },
+    "timeStamp": {
       "type": "string",
       "defaultValue": "[utcNow()]"
+    },
+    "userAssignedIdentityName": {
+      "type": "string"
+    },
+    "vmNamesTemplateParameterName": {
+      "type": "string",
+      "defaultValue": "VMNames"
     }
   },
   "variables": {
-    "varMarketPlaceImages": {
-      "2022-datacenter-smalldisk-g2": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2022-datacenter-smalldisk-g2"
-      },
-      "win10-21h2-avd": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "windows-10",
-        "sku": "win10-21h2-avd"
-      },
-      "2022-datacenter-core-g2": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2022-datacenter-core-g2"
-      },
-      "win10-22h2-avd-m365-g2": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "office-365",
-        "sku": "win10-22h2-avd-m365-g2"
-      },
-      "win11-21h2-avd": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "Windows-11",
-        "sku": "win11-21h2-avd"
-      },
-      "win10-21h2-avd-m365": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "office-365",
-        "sku": "win10-21h2-avd-m365"
-      },
-      "win11-22h2-avd-m365": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "office-365",
-        "sku": "win11-22h2-avd-m365"
-      },
-      "2022-datacenter-core-smalldisk-g2": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2022-datacenter-core-smalldisk-g2"
-      },
-      "win11-21h2-avd-m365": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "office-365",
-        "sku": "win11-21h2-avd-m365"
-      },
-      "win11-23h2-avd": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "Windows-11",
-        "sku": "win11-23h2-avd"
-      },
-      "win11-23h2-avd-m365": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "office-365",
-        "sku": "win11-23h2-avd-m365"
-      },
-      "win11-22h2-avd": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "Windows-11",
-        "sku": "win11-22h2-avd"
-      },
-      "2022-datacenter-g2": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2022-datacenter-g2"
-      },
-      "win10-22h2-avd-g2": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "windows-10",
-        "sku": "win10-22h2-avd-g2"
-      }
-    },
-    "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'Marketplace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
-    "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('securityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled'))))]",
-    "varDomainJoinObject": "[if(equals(parameters('IdentityServiceProvider'), 'EntraID'), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('IntuneEnrollment')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')))]",
-    "varUniqueString": "[uniqueString(resourceGroup().id, parameters('HostPoolName'))]",
-    "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', uniqueString(resourceGroup().id, parameters('HostPoolName')))]",
-    "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
+    "imageReference": "[if(empty(parameters('galleryImageId')), createObject('publisher', parameters('marketPlaceImagePublisher'), 'offer', parameters('marketPlaceImageOffer'), 'sku', parameters('marketPlaceImageSku'), 'version', 'latest'), createObject('Id', parameters('galleryImageId')))]",
+    "domainJoinObject": "[if(equals(parameters('identityServiceProvider'), 'EntraID'), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('intuneEnrollment')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('domainName'), 'DomainJoinUserName', parameters('domainJoinUserName'), 'ADOUPath', parameters('organizationUnitPath')))]"
   },
   "resources": [
     {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "2023-01-31",
+      "name": "[parameters('userAssignedIdentityName')]",
+      "location": "[parameters('location')]",
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.ManagedIdentity/userAssignedIdentities'), parameters('tags')['Microsoft.ManagedIdentity/userAssignedIdentities'], createObject())]"
+    },
+    {
+      "condition": "[not(equals(parameters('identityServiceProvider'), 'EntraID'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "deployFunctionApp",
+      "name": "[format('deploy-key-vault-{0}', parameters('timeStamp'))]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "Location": {
-            "value": "[parameters('Location')]"
+          "domainJoinPassword": {
+            "value": "[parameters('domainJoinPassword')]"
           },
-          "FunctionAppName": {
-            "value": "[variables('varFunctionAppName')]"
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
           },
-          "EnableMonitoring": {
-            "value": "[parameters('EnableMonitoring')]"
+          "keyVaultNetworkInterfaceName": {
+            "value": "[parameters('keyVaultNetworkInterfaceName')]"
           },
-          "UseExistingLAW": {
-            "value": "[parameters('UseExistingLAW')]"
+          "keyVaultPrivateDnsZoneResourceId": {
+            "value": "[parameters('keyVaultPrivateDnsZoneResourceId')]"
           },
-          "LogAnalyticsWorkspaceId": {
-            "value": "[parameters('LogAnalyticsWorkspaceId')]"
+          "keyVaultPrivateEndpointName": {
+            "value": "[parameters('keyVaultPrivateEndpointName')]"
           },
-          "ReplacementPlanSettings": {
+          "subnetResourceId": {
+            "value": "[parameters('subnetResourceId')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.29.47.4906",
+              "templateHash": "15088480330190824016"
+            }
+          },
+          "parameters": {
+            "domainJoinPassword": {
+              "type": "securestring"
+            },
+            "keyVaultName": {
+              "type": "string"
+            },
+            "keyVaultNetworkInterfaceName": {
+              "type": "string"
+            },
+            "keyVaultPrivateEndpointName": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "keyExpirationInDays": {
+              "type": "int",
+              "defaultValue": 30
+            },
+            "keyVaultPrivateDnsZoneResourceId": {
+              "type": "string"
+            },
+            "subnetResourceId": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2022-07-01",
+              "name": "[parameters('keyVaultName')]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.KeyVault/vaults'), parameters('tags')['Microsoft.KeyVault/vaults'], createObject())]",
+              "properties": {
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": false,
+                "enablePurgeProtection": true,
+                "enableRbacAuthorization": true,
+                "enableSoftDelete": true,
+                "networkAcls": {
+                  "bypass": "AzureServices",
+                  "defaultAction": "Deny",
+                  "ipRules": [],
+                  "virtualNetworkRules": []
+                },
+                "publicNetworkAccess": "Disabled",
+                "sku": {
+                  "family": "A",
+                  "name": "premium"
+                },
+                "softDeleteRetentionInDays": 90,
+                "tenantId": "[subscription().tenantId]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2023-04-01",
+              "name": "[parameters('keyVaultPrivateEndpointName')]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.Network/privateEndpoints'), parameters('tags')['Microsoft.Network/privateEndpoints'], createObject())]",
+              "properties": {
+                "customNetworkInterfaceName": "[parameters('keyVaultNetworkInterfaceName')]",
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "[parameters('keyVaultPrivateEndpointName')]",
+                    "properties": {
+                      "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+                      "groupIds": [
+                        "vault"
+                      ]
+                    }
+                  }
+                ],
+                "subnet": {
+                  "id": "[parameters('subnetResourceId')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', parameters('keyVaultPrivateEndpointName'), parameters('keyVaultName'))]",
+              "properties": {
+                "privateDnsZoneConfigs": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "privateDnsZoneId": "[parameters('keyVaultPrivateDnsZoneResourceId')]"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('keyVaultPrivateEndpointName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.KeyVault/vaults/keys",
+              "apiVersion": "2022-07-01",
+              "name": "[format('{0}/{1}', parameters('keyVaultName'), 'StorageEncryptionKey')]",
+              "properties": {
+                "attributes": {
+                  "enabled": true
+                },
+                "keySize": 4096,
+                "kty": "RSA",
+                "rotationPolicy": {
+                  "attributes": {
+                    "expiryTime": "[format('P{0}D', string(parameters('keyExpirationInDays')))]"
+                  },
+                  "lifetimeActions": [
+                    {
+                      "action": {
+                        "type": "Notify"
+                      },
+                      "trigger": {
+                        "timeBeforeExpiry": "P10D"
+                      }
+                    },
+                    {
+                      "action": {
+                        "type": "Rotate"
+                      },
+                      "trigger": {
+                        "timeAfterCreate": "[format('P{0}D', string(sub(parameters('keyExpirationInDays'), 7)))]"
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', parameters('keyVaultName'), 'DomainJoinPassword')]",
+              "properties": {
+                "value": "[parameters('domainJoinPassword')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "keyName": {
+              "type": "string",
+              "value": "StorageEncryptionKey"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+            },
+            "uri": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2022-07-01').vaultUri]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('deploy-storage-account-{0}', parameters('timeStamp'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "azureBlobsPrivateDnsZoneResourceId": {
+            "value": "[parameters('azureBlobsPrivateDnsZoneResourceId')]"
+          },
+          "azureFilesPrivateDnsZoneResourceId": {
+            "value": "[parameters('azureFilesPrivateDnsZoneResourceId')]"
+          },
+          "azureQueuesPrivateDnsZoneResourceId": {
+            "value": "[parameters('azureQueuesPrivateDnsZoneResourceId')]"
+          },
+          "azureTablesPrivateDnsZoneResourceId": {
+            "value": "[parameters('azureTablesPrivateDnsZoneResourceId')]"
+          },
+          "functionAppName": {
+            "value": "[parameters('functionAppName')]"
+          },
+          "keyName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp'))), '2022-09-01').outputs.keyName.value]"
+          },
+          "keyVaultUri": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp'))), '2022-09-01').outputs.uri.value]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "logAnalyticsWorkspaceResourceId": {
+            "value": "[parameters('logAnalyticsWorkspaceResourceId')]"
+          },
+          "storageAccountDiagnosticSettingName": {
+            "value": "[parameters('storageAccountDiagnosticSettingName')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('storageAccountName')]"
+          },
+          "storageAccountNetworkInterfaceName": {
+            "value": "[parameters('storageAccountNetworkInterfaceName')]"
+          },
+          "storageAccountPrivateEndpointName": {
+            "value": "[parameters('storageAccountPrivateEndpointName')]"
+          },
+          "subnetResourceId": {
+            "value": "[parameters('subnetResourceId')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "userAssignedIdentityResourceId": {
+            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName'))]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.29.47.4906",
+              "templateHash": "13991356661166191108"
+            }
+          },
+          "parameters": {
+            "azureBlobsPrivateDnsZoneResourceId": {
+              "type": "string"
+            },
+            "azureFilesPrivateDnsZoneResourceId": {
+              "type": "string"
+            },
+            "azureQueuesPrivateDnsZoneResourceId": {
+              "type": "string"
+            },
+            "azureTablesPrivateDnsZoneResourceId": {
+              "type": "string"
+            },
+            "functionAppName": {
+              "type": "string"
+            },
+            "keyName": {
+              "type": "string"
+            },
+            "keyVaultUri": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "logAnalyticsWorkspaceResourceId": {
+              "type": "string"
+            },
+            "storageAccountDiagnosticSettingName": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageAccountNetworkInterfaceName": {
+              "type": "string"
+            },
+            "storageAccountPrivateEndpointName": {
+              "type": "string"
+            },
+            "subnetResourceId": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "userAssignedIdentityResourceId": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "storagePrivateDnsZoneResourceIds": [
+              "[parameters('azureBlobsPrivateDnsZoneResourceId')]",
+              "[parameters('azureFilesPrivateDnsZoneResourceId')]",
+              "[parameters('azureQueuesPrivateDnsZoneResourceId')]",
+              "[parameters('azureTablesPrivateDnsZoneResourceId')]"
+            ],
+            "storageSubResources": [
+              "blob",
+              "file",
+              "queue",
+              "table"
+            ]
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.Storage/storageAccounts'), createObject())]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', parameters('userAssignedIdentityResourceId'))]": {}
+                }
+              },
+              "properties": {
+                "accessTier": "Hot",
+                "allowBlobPublicAccess": false,
+                "allowCrossTenantReplication": false,
+                "allowedCopyScope": "PrivateLink",
+                "allowSharedKeyAccess": true,
+                "azureFilesIdentityBasedAuthentication": {
+                  "directoryServiceOptions": "None"
+                },
+                "defaultToOAuthAuthentication": false,
+                "dnsEndpointType": "Standard",
+                "encryption": {
+                  "identity": {
+                    "userAssignedIdentity": "[parameters('userAssignedIdentityResourceId')]"
+                  },
+                  "requireInfrastructureEncryption": true,
+                  "keyvaultproperties": {
+                    "keyvaulturi": "[parameters('keyVaultUri')]",
+                    "keyname": "[parameters('keyName')]"
+                  },
+                  "services": {
+                    "file": {
+                      "keyType": "Account",
+                      "enabled": true
+                    },
+                    "table": {
+                      "keyType": "Account",
+                      "enabled": true
+                    },
+                    "queue": {
+                      "keyType": "Account",
+                      "enabled": true
+                    },
+                    "blob": {
+                      "keyType": "Account",
+                      "enabled": true
+                    }
+                  },
+                  "keySource": "Microsoft.KeyVault"
+                },
+                "largeFileSharesState": "Disabled",
+                "minimumTlsVersion": "TLS1_2",
+                "networkAcls": {
+                  "bypass": "AzureServices",
+                  "virtualNetworkRules": [],
+                  "ipRules": [],
+                  "defaultAction": "Deny"
+                },
+                "publicNetworkAccess": "Disabled",
+                "supportsHttpsTrafficOnly": true
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2021-09-01",
+              "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/fileServices",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+              "properties": {
+                "protocolSettings": {
+                  "smb": {
+                    "versions": "SMB3.1.1;",
+                    "authenticationMethods": "NTLMv2;",
+                    "channelEncryption": "AES-128-GCM;AES-256-GCM;"
+                  }
+                },
+                "shareDeleteRetentionPolicy": {
+                  "enabled": false
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', toLower(parameters('functionAppName')))]",
+              "properties": {
+                "accessTier": "TransactionOptimized",
+                "shareQuota": 5120,
+                "enabledProtocols": "SMB"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccountName'), 'default')]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "privateEndpoints",
+                "count": "[length(variables('storageSubResources'))]"
+              },
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2023-04-01",
+              "name": "[format('{0}-{1}', parameters('storageAccountPrivateEndpointName'), variables('storageSubResources')[copyIndex()])]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.Network/privateEndpoints'), parameters('tags')['Microsoft.Network/privateEndpoints'], createObject())]",
+              "properties": {
+                "customNetworkInterfaceName": "[format('{0}-{1}', parameters('storageAccountNetworkInterfaceName'), variables('storageSubResources')[copyIndex()])]",
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "[format('{0}-{1}', parameters('storageAccountPrivateEndpointName'), variables('storageSubResources')[copyIndex()])]",
+                    "properties": {
+                      "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+                      "groupIds": [
+                        "[variables('storageSubResources')[copyIndex()]]"
+                      ]
+                    }
+                  }
+                ],
+                "subnet": {
+                  "id": "[parameters('subnetResourceId')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "privateDnsZoneGroups",
+                "count": "[length(variables('storageSubResources'))]"
+              },
+              "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('storageAccountPrivateEndpointName'), variables('storageSubResources')[copyIndex()]), parameters('storageAccountName'))]",
+              "properties": {
+                "privateDnsZoneConfigs": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "privateDnsZoneId": "[variables('storagePrivateDnsZoneResourceIds')[copyIndex()]]"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('storageAccountPrivateEndpointName'), variables('storageSubResources')[copyIndex()]))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            },
+            {
+              "condition": "[not(empty(parameters('logAnalyticsWorkspaceResourceId')))]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2017-05-01-preview",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}/blobServices/{1}', parameters('storageAccountName'), 'default')]",
+              "name": "[parameters('storageAccountDiagnosticSettingName')]",
+              "properties": {
+                "logs": [
+                  {
+                    "category": "StorageWrite",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "Transaction",
+                    "enabled": true
+                  }
+                ],
+                "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp')))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('deploy-application-insights-{0}', parameters('timeStamp'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "applicationInsightsName": {
+            "value": "[parameters('applicationInsightsName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "privateLinkScopeResourceId": {
+            "value": "[parameters('privateLinkScopeResourceId')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "timestamp": {
+            "value": "[parameters('timeStamp')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.29.47.4906",
+              "templateHash": "10004591363284451245"
+            }
+          },
+          "parameters": {
+            "applicationInsightsName": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "privateLinkScopeResourceId": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "timestamp": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Insights/components",
+              "apiVersion": "2020-02-02",
+              "name": "[parameters('applicationInsightsName')]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.Insights/components'), parameters('tags')['Microsoft.Insights/components'], createObject())]",
+              "properties": {
+                "Application_Type": "web"
+              },
+              "kind": "web"
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('deploy-private-link-scope-{0}', parameters('timestamp'))]",
+              "subscriptionId": "[split(parameters('privateLinkScopeResourceId'), '/')[2]]",
+              "resourceGroup": "[split(parameters('privateLinkScopeResourceId'), '/')[4]]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "applicationInsightsName": {
+                    "value": "[parameters('applicationInsightsName')]"
+                  },
+                  "applicationInsightsResourceId": {
+                    "value": "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]"
+                  },
+                  "privateLinkScopeResourceId": {
+                    "value": "[parameters('privateLinkScopeResourceId')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.29.47.4906",
+                      "templateHash": "9527454008361250279"
+                    }
+                  },
+                  "parameters": {
+                    "applicationInsightsName": {
+                      "type": "string"
+                    },
+                    "applicationInsightsResourceId": {
+                      "type": "string"
+                    },
+                    "privateLinkScopeResourceId": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Insights/privateLinkScopes/scopedResources",
+                      "apiVersion": "2021-09-01",
+                      "name": "[format('{0}/{1}', split(parameters('privateLinkScopeResourceId'), '/')[8], parameters('applicationInsightsName'))]",
+                      "properties": {
+                        "linkedResourceId": "[parameters('applicationInsightsResourceId')]"
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('deploy-function-app-{0}', parameters('timeStamp'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "applicationInsightsName": {
+            "value": "[parameters('applicationInsightsName')]"
+          },
+          "appServicePlanName": {
+            "value": "[parameters('appServicePlanName')]"
+          },
+          "delegatedSubnetResourceId": {
+            "value": "[parameters('delegatedSubnetResourceId')]"
+          },
+          "functionAppName": {
+            "value": "[parameters('functionAppName')]"
+          },
+          "functionAppNetworkInterfaceName": {
+            "value": "[parameters('functionAppNetworkInterfaceName')]"
+          },
+          "functionAppPrivateDnsZoneResourceId": {
+            "value": "[parameters('functionAppPrivateDnsZoneResourceId')]"
+          },
+          "functionAppPrivateEndpointName": {
+            "value": "[parameters('functionAppPrivateEndpointName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "replacementPlanSettings": {
             "value": [
               {
                 "name": "_HostPoolResourceGroupName",
-                "value": "[parameters('HostPoolResourceGroupName')]"
+                "value": "[split(parameters('hostPoolResourceId'), '/')[4]]"
               },
               {
                 "name": "_HostPoolName",
-                "value": "[parameters('HostPoolName')]"
+                "value": "[split(parameters('hostPoolResourceId'), '/')[8]]"
               },
               {
                 "name": "_TargetSessionHostCount",
-                "value": "[parameters('TargetSessionHostCount')]"
+                "value": "[parameters('targetSessionHostCount')]"
               },
               {
                 "name": "_SessionHostNamePrefix",
-                "value": "[parameters('SessionHostNamePrefix')]"
+                "value": "[parameters('sessionHostNamePrefix')]"
               },
               {
                 "name": "_SessionHostTemplate",
-                "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deployStandardSessionHostTemplate'), '2022-09-01').outputs.TemplateSpecResourceId.value]"
+                "value": "[reference(resourceId('Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value]"
               },
               {
                 "name": "_SessionHostParameters",
-                "value": "[string(createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'tags', createObject()))]"
+                "value": "[string(createObject('location', parameters('sessionHostsRegion'), 'availabilityZones', parameters('availabilityZones'), 'vmSize', parameters('sessionHostSize'), 'acceleratedNetworking', parameters('acceleratedNetworking'), 'diskType', parameters('sessionHostDiskType'), 'imageReference', variables('imageReference'), 'securityProfile', createObject('securityType', parameters('securityType'), 'uefiSettings', createObject('secureBootEnabled', true(), 'vTpmEnabled', true())), 'subnetResourceId', parameters('subnetResourceId'), 'DomainJoinObject', variables('domainJoinObject'), 'DomainJoinPassword', if(equals(parameters('identityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('localAdminUsername'), 'tags', parameters('tags')))]"
               },
               {
                 "name": "_SubscriptionId",
@@ -409,72 +971,78 @@
               },
               {
                 "name": "_RemoveAzureADDevice",
-                "value": "[equals(parameters('IdentityServiceProvider'), 'EntraID')]"
+                "value": "[equals(parameters('identityServiceProvider'), 'EntraID')]"
               },
               {
                 "name": "_ClientResourceId",
-                "value": "[parameters('UserAssignedManagedIdentityResourceId')]"
+                "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName'))]"
               },
               {
                 "name": "_Tag_IncludeInAutomation",
-                "value": "[parameters('TagIncludeInAutomation')]"
+                "value": "[parameters('tagIncludeInAutomation')]"
               },
               {
                 "name": "_Tag_DeployTimestamp",
-                "value": "[parameters('TagDeployTimestamp')]"
+                "value": "[parameters('tagDeployTimestamp')]"
               },
               {
                 "name": "_Tag_PendingDrainTimestamp",
-                "value": "[parameters('TagPendingDrainTimestamp')]"
+                "value": "[parameters('tagPendingDrainTimestamp')]"
               },
               {
                 "name": "_Tag_ScalingPlanExclusionTag",
-                "value": "[parameters('TagScalingPlanExclusionTag')]"
+                "value": "[parameters('tagScalingPlanExclusionTag')]"
               },
               {
                 "name": "_TargetVMAgeDays",
-                "value": "[parameters('TargetVMAgeDays')]"
+                "value": "[parameters('targetVMAgeDays')]"
               },
               {
                 "name": "_DrainGracePeriodHours",
-                "value": "[parameters('DrainGracePeriodHours')]"
+                "value": "[parameters('drainGracePeriodHours')]"
               },
               {
                 "name": "_FixSessionHostTags",
-                "value": "[parameters('FixSessionHostTags')]"
+                "value": "[parameters('fixSessionHostTags')]"
               },
               {
                 "name": "_SHRDeploymentPrefix",
-                "value": "[parameters('SHRDeploymentPrefix')]"
+                "value": "[parameters('shrDeploymentPrefix')]"
               },
               {
                 "name": "_AllowDownsizing",
-                "value": "[parameters('AllowDownsizing')]"
+                "value": "[parameters('allowDownsizing')]"
               },
               {
                 "name": "_SessionHostInstanceNumberPadding",
-                "value": "[parameters('SessionHostInstanceNumberPadding')]"
+                "value": "[parameters('sessionHostInstanceNumberPadding')]"
               },
               {
                 "name": "_ReplaceSessionHostOnNewImageVersion",
-                "value": "[parameters('ReplaceSessionHostOnNewImageVersion')]"
+                "value": "[parameters('replaceSessionHostOnNewImageVersion')]"
               },
               {
                 "name": "_ReplaceSessionHostOnNewImageVersionDelayDays",
-                "value": "[parameters('ReplaceSessionHostOnNewImageVersionDelayDays')]"
+                "value": "[parameters('replaceSessionHostOnNewImageVersionDelayDays')]"
               },
               {
                 "name": "_VMNamesTemplateParameterName",
-                "value": "[parameters('VMNamesTemplateParameterName')]"
+                "value": "[parameters('vmNamesTemplateParameterName')]"
               },
               {
                 "name": "_SessionHostResourceGroupName",
-                "value": "[parameters('SessionHostResourceGroupName')]"
+                "value": "[parameters('sessionHostResourceGroupName')]"
               }
             ]
           },
-          "FunctionAppIdentity": {
-            "value": "[variables('varFunctionAppIdentity')]"
+          "storageAccountName": {
+            "value": "[parameters('storageAccountName')]"
+          },
+          "subnetResourceId": {
+            "value": "[parameters('subnetResourceId')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
           }
         },
         "template": {
@@ -483,203 +1051,177 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.45.22436",
-              "templateHash": "15051213884939347178"
+              "version": "0.29.47.4906",
+              "templateHash": "12614722600519321979"
             }
           },
           "parameters": {
-            "Location": {
+            "applicationInsightsName": {
+              "type": "string"
+            },
+            "appServicePlanName": {
+              "type": "string"
+            },
+            "delegatedSubnetResourceId": {
+              "type": "string"
+            },
+            "functionAppName": {
+              "type": "string"
+            },
+            "functionAppNetworkInterfaceName": {
+              "type": "string"
+            },
+            "functionAppPrivateDnsZoneResourceId": {
+              "type": "string"
+            },
+            "functionAppPrivateEndpointName": {
+              "type": "string"
+            },
+            "location": {
               "type": "string",
-              "defaultValue": "[resourceGroup().location]",
-              "metadata": {
-                "description": "Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group."
-              }
+              "defaultValue": "[resourceGroup().location]"
             },
-            "EnableMonitoring": {
-              "type": "bool",
-              "defaultValue": true
+            "replacementPlanSettings": {
+              "type": "array"
             },
-            "UseExistingLAW": {
-              "type": "bool",
-              "defaultValue": false
+            "storageAccountName": {
+              "type": "string"
             },
-            "LogAnalyticsWorkspaceId": {
-              "type": "string",
-              "defaultValue": "none",
-              "metadata": {
-                "description": "Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights."
-              }
+            "subnetResourceId": {
+              "type": "string"
             },
-            "FunctionAppName": {
-              "type": "string",
-              "metadata": {
-                "description": "Required: Yes | Name of the Function App."
-              }
-            },
-            "FunctionAppZipUrl": {
-              "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.7/FunctionApp.zip",
-              "metadata": {
-                "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
-              }
-            },
-            "AppPlanName": {
-              "type": "string",
-              "defaultValue": "Y1",
-              "metadata": {
-                "description": "Required: No | App Service Plan Name | Default: Y1 for consumption based plan"
-              }
-            },
-            "AppPlanTier": {
-              "type": "string",
-              "defaultValue": "Dynamic",
-              "metadata": {
-                "description": "Required: No | App Service Plan Tier | Default: Dynamic for consumption based plan"
-              }
-            },
-            "ReplacementPlanSettings": {
-              "type": "array",
-              "metadata": {
-                "description": "Required: Yes | The following settings are mandatory. Rest are optional.\n[\n  {\n    name: '_HostPoolResourceGroupName'\n    value: 'string'\n  }\n  {\n    name: '_HostPoolName'\n    value: 'string'\n  }\n  {\n    name: '_RemoveAzureADDevice'\n    value: 'bool'\n  }\n  {\n    name: '_SessionHostTemplate'\n    value: 'string'\n  }\n  {\n    name: '_SessionHostParameters'\n    value: 'hashtable'\n  }\n  {\n    name: '_SubscriptionId'\n    value: 'string'\n  }\n  {\n    name: '_TargetSessionHostCount'\n    value: 'int'\n  }\n  {\n    name: '_SessionHostNamePrefix'\n    value: 'string'\n  }\n]"
-              }
-            },
-            "FunctionAppIdentity": {
-              "type": "object",
-              "defaultValue": {
-                "type": "SystemAssigned"
-              }
+            "tags": {
+              "type": "object"
             }
           },
           "variables": {
-            "varStorageAccountName": "[format('stavdrpfunc{0}', uniqueString(parameters('FunctionAppName')))]",
-            "varLogAnalyticsWorkspaceName": "[format('{0}-law', parameters('FunctionAppName'))]",
-            "varAppServicePlanName": "[format('{0}-asp', parameters('FunctionAppName'))]"
+            "cloudSuffix": "[replace(replace(environment().resourceManager, 'https://management.', ''), '/', '')]"
           },
           "resources": [
             {
-              "type": "Microsoft.Web/sites/extensions",
-              "apiVersion": "2023-01-01",
-              "name": "[format('{0}/{1}', parameters('FunctionAppName'), 'MSDeploy')]",
-              "properties": {
-                "packageUri": "[parameters('FunctionAppZipUrl')]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.Storage/storageAccounts",
-              "apiVersion": "2022-05-01",
-              "name": "[variables('varStorageAccountName')]",
-              "location": "[parameters('Location')]",
-              "kind": "StorageV2",
-              "sku": {
-                "name": "Standard_LRS"
-              },
-              "properties": {}
-            },
-            {
-              "condition": "[and(parameters('EnableMonitoring'), not(parameters('UseExistingLAW')))]",
-              "type": "Microsoft.OperationalInsights/workspaces",
-              "apiVersion": "2023-09-01",
-              "name": "[variables('varLogAnalyticsWorkspaceName')]",
-              "location": "[parameters('Location')]",
-              "properties": {
-                "sku": {
-                  "name": "PerGB2018"
-                },
-                "retentionInDays": 30
-              }
-            },
-            {
               "type": "Microsoft.Web/serverfarms",
-              "apiVersion": "2022-03-01",
-              "name": "[variables('varAppServicePlanName')]",
-              "location": "[parameters('Location')]",
+              "apiVersion": "2023-01-01",
+              "name": "[parameters('appServicePlanName')]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.Web/serverfarms'), parameters('tags')['Microsoft.Web/serverfarms'], createObject())]",
               "sku": {
-                "name": "[parameters('AppPlanName')]",
-                "tier": "[parameters('AppPlanTier')]"
-              }
-            },
-            {
-              "condition": "[parameters('EnableMonitoring')]",
-              "type": "Microsoft.Insights/components",
-              "apiVersion": "2020-02-02",
-              "name": "[variables('varAppServicePlanName')]",
-              "location": "[parameters('Location')]",
-              "kind": "web",
-              "properties": {
-                "Application_Type": "web",
-                "publicNetworkAccessForIngestion": "Enabled",
-                "publicNetworkAccessForQuery": "Enabled",
-                "WorkspaceResourceId": "[if(parameters('UseExistingLAW'), parameters('LogAnalyticsWorkspaceId'), resourceId('Microsoft.OperationalInsights/workspaces', variables('varLogAnalyticsWorkspaceName')))]"
+                "tier": "ElasticPremium",
+                "name": "EP1"
               },
-              "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', variables('varLogAnalyticsWorkspaceName'))]"
-              ]
+              "kind": "functionapp",
+              "properties": {
+                "targetWorkerSizeId": 3,
+                "targetWorkerCount": 1,
+                "maximumElasticWorkerCount": 20,
+                "zoneRedundant": false
+              }
             },
             {
               "type": "Microsoft.Web/sites",
               "apiVersion": "2023-01-01",
-              "name": "[parameters('FunctionAppName')]",
-              "location": "[parameters('Location')]",
-              "kind": "functionApp",
-              "identity": "[parameters('FunctionAppIdentity')]",
+              "name": "[parameters('functionAppName')]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.Web/sites'), parameters('tags')['Microsoft.Web/sites'], createObject())]",
+              "kind": "functionapp",
+              "identity": {
+                "type": "SystemAssigned"
+              },
               "properties": {
+                "clientAffinityEnabled": false,
                 "httpsOnly": true,
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('varAppServicePlanName'))]",
+                "publicNetworkAccess": "Disabled",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "siteConfig": {
-                  "use32BitWorkerProcess": false,
-                  "powerShellVersion": "7.2",
-                  "netFrameworkVersion": "v6.0",
-                  "appSettings": "[union(createArray(createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'AzureWebJobsStorage', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey), createObject('name', 'WEBSITE_CONTENTSHARE', 'value', toLower(parameters('FunctionAppName')))), if(parameters('EnableMonitoring'), createArray(createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey)), createArray()), parameters('ReplacementPlanSettings'))]",
-                  "ftpsState": "Disabled",
+                  "appSettings": "[union(createArray(createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix={2}', parameters('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value, environment().suffixes.storage)), createObject('name', 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix={2}', parameters('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value, environment().suffixes.storage)), createObject('name', 'WEBSITE_CONTENTOVERVNET', 'value', 1), createObject('name', 'WEBSITE_CONTENTSHARE', 'value', toLower(parameters('functionAppName'))), createObject('name', 'EnvironmentName', 'value', environment().name), createObject('name', 'ResourceManagerUrl', 'value', if(endsWith(environment().resourceManager, '/'), environment().resourceManager, format('{0}/', environment().resourceManager))), createObject('name', 'SubscriptionId', 'value', subscription().subscriptionId), createObject('name', 'TenantId', 'value', subscription().tenantId)), parameters('replacementPlanSettings'))]",
                   "cors": {
                     "allowedOrigins": [
-                      "https://portal.azure.com"
+                      "[format('{0}', environment().portal)]",
+                      "[format('https://functions-next.{0}', variables('cloudSuffix'))]",
+                      "[format('https://functions-staging.{0}', variables('cloudSuffix'))]",
+                      "[format('https://functions.{0}', variables('cloudSuffix'))]"
                     ]
+                  },
+                  "ftpsState": "Disabled",
+                  "netFrameworkVersion": "v6.0",
+                  "powerShellVersion": "7.2",
+                  "use32BitWorkerProcess": false
+                },
+                "virtualNetworkSubnetId": "[parameters('delegatedSubnetResourceId')]",
+                "vnetContentShareEnabled": true,
+                "vnetRouteAllEnabled": true
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2023-04-01",
+              "name": "[parameters('functionAppPrivateEndpointName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "customNetworkInterfaceName": "[parameters('functionAppNetworkInterfaceName')]",
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "[parameters('functionAppPrivateEndpointName')]",
+                    "properties": {
+                      "privateLinkServiceId": "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]",
+                      "groupIds": [
+                        "sites"
+                      ]
+                    }
                   }
+                ],
+                "subnet": {
+                  "id": "[parameters('subnetResourceId')]"
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Insights/components', variables('varAppServicePlanName'))]",
-                "[resourceId('Microsoft.Web/serverfarms', variables('varAppServicePlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', parameters('functionAppPrivateEndpointName'), 'default')]",
+              "properties": {
+                "privateDnsZoneConfigs": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "privateDnsZoneId": "[parameters('functionAppPrivateDnsZoneResourceId')]"
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('functionAppPrivateEndpointName'))]"
               ]
             }
-          ],
-          "outputs": {
-            "functionAppPrincipalId": {
-              "type": "string",
-              "value": "[if(equals(parameters('FunctionAppIdentity').type, 'SystemAssigned'), reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2023-01-01', 'full').identity.principalId, '')]"
-            }
-          }
+          ]
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'deployKeyVault')]",
-        "[resourceId('Microsoft.Resources/deployments', 'deployStandardSessionHostTemplate')]"
+        "[resourceId('Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp')))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName'))]"
       ]
     },
     {
-      "condition": "[not(equals(parameters('IdentityServiceProvider'), 'EntraID'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "deployKeyVault",
+      "name": "[format('deploy-template-spec-{0}', parameters('timeStamp'))]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "Location": {
-            "value": "[parameters('Location')]"
+          "location": {
+            "value": "[parameters('location')]"
           },
-          "KeyVaultName": {
-            "value": "[format('kv-AVDSHR-{0}', variables('varUniqueString'))]"
-          },
-          "DomainJoinPassword": {
-            "value": "[parameters('ADJoinUserPassword')]"
+          "name": {
+            "value": "[parameters('templateSpecName')]"
           }
         },
         "template": {
@@ -688,93 +1230,17 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.45.22436",
-              "templateHash": "5445249370521833019"
+              "version": "0.29.47.4906",
+              "templateHash": "11179779577307341242"
             }
           },
           "parameters": {
-            "Location": {
+            "location": {
               "type": "string",
               "defaultValue": "[resourceGroup().location]"
             },
-            "KeyVaultName": {
+            "name": {
               "type": "string"
-            },
-            "DomainJoinPassword": {
-              "type": "securestring"
-            }
-          },
-          "resources": [
-            {
-              "type": "Microsoft.KeyVault/vaults/secrets",
-              "apiVersion": "2023-07-01",
-              "name": "[format('{0}/{1}', parameters('KeyVaultName'), 'DomainJoinPassword')]",
-              "properties": {
-                "value": "[parameters('DomainJoinPassword')]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.KeyVault/vaults",
-              "apiVersion": "2023-07-01",
-              "name": "[parameters('KeyVaultName')]",
-              "location": "[parameters('Location')]",
-              "properties": {
-                "sku": {
-                  "family": "A",
-                  "name": "standard"
-                },
-                "tenantId": "[subscription().tenantId]",
-                "enabledForTemplateDeployment": true,
-                "enableRbacAuthorization": true
-              }
-            }
-          ],
-          "outputs": {
-            "keyVaultId": {
-              "type": "string",
-              "value": "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
-            }
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
-      "name": "deployStandardSessionHostTemplate",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "Location": {
-            "value": "[parameters('Location')]"
-          },
-          "Name": {
-            "value": "[format('{0}-Spec', parameters('HostPoolName'))]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.29.45.22436",
-              "templateHash": "16930491596178402473"
-            }
-          },
-          "parameters": {
-            "Name": {
-              "type": "string"
-            },
-            "Location": {
-              "type": "string",
-              "defaultValue": "[resourceGroup().location]"
             }
           },
           "variables": {
@@ -1183,20 +1649,20 @@
             {
               "type": "Microsoft.Resources/templateSpecs/versions",
               "apiVersion": "2022-02-01",
-              "name": "[format('{0}/{1}', parameters('Name'), 'deploymentTemplateSpecVersion')]",
-              "location": "[parameters('Location')]",
+              "name": "[format('{0}/{1}', parameters('name'), 'deploymentTemplateSpecVersion')]",
+              "location": "[parameters('location')]",
               "properties": {
                 "mainTemplate": "[variables('$fxv#0')]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Resources/templateSpecs', parameters('Name'))]"
+                "[resourceId('Microsoft.Resources/templateSpecs', parameters('name'))]"
               ]
             },
             {
               "type": "Microsoft.Resources/templateSpecs",
               "apiVersion": "2022-02-01",
-              "name": "[parameters('Name')]",
-              "location": "[parameters('Location')]",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
               "properties": {
                 "description": "Template Spec for deploying VMs through the AVD Replacement Plan",
                 "displayName": "AVD Replacement Plan Session Host Template"
@@ -1204,19 +1670,18 @@
             }
           ],
           "outputs": {
-            "TemplateSpecResourceId": {
+            "resourceId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.Resources/templateSpecs', parameters('Name'))]"
+              "value": "[resourceId('Microsoft.Resources/templateSpecs', parameters('name'))]"
             }
           }
         }
       }
     },
     {
-      "condition": "[not(parameters('UseUserAssignedManagedIdentity'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('RBAC-vdiVMContributor-{0}', parameters('TimeStamp'))]",
+      "name": "[format('assign-rbac-host-pool-{0}', parameters('timeStamp'))]",
       "subscriptionId": "[subscription().subscriptionId]",
       "location": "[resourceGroup().location]",
       "properties": {
@@ -1225,13 +1690,13 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "PrinicpalId": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deployFunctionApp'), '2022-09-01').outputs.functionAppPrincipalId.value]"
+          "prinicpalId": {
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName')), '2023-01-31').principalId]"
           },
-          "RoleDefinitionId": {
+          "roleDefinitionId": {
             "value": "a959dbd1-f747-45e3-8ba6-dd80f235f97c"
           },
-          "Scope": {
+          "scope": {
             "value": "[subscription().id]"
           }
         },
@@ -1241,18 +1706,18 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.45.22436",
-              "templateHash": "15455176785742187947"
+              "version": "0.29.47.4906",
+              "templateHash": "852792330190262115"
             }
           },
           "parameters": {
-            "PrinicpalId": {
+            "prinicpalId": {
               "type": "string"
             },
-            "RoleDefinitionId": {
+            "roleDefinitionId": {
               "type": "string"
             },
-            "Scope": {
+            "scope": {
               "type": "string"
             }
           },
@@ -1260,24 +1725,23 @@
             {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
-              "name": "[guid(parameters('PrinicpalId'), parameters('RoleDefinitionId'), parameters('Scope'))]",
+              "name": "[guid(parameters('prinicpalId'), parameters('roleDefinitionId'), parameters('scope'))]",
               "properties": {
-                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
-                "principalId": "[parameters('PrinicpalId')]"
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('roleDefinitionId'))]",
+                "principalId": "[parameters('prinicpalId')]"
               }
             }
           ]
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'deployFunctionApp')]"
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName'))]"
       ]
     },
     {
-      "condition": "[not(parameters('UseUserAssignedManagedIdentity'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('RBAC-TemplateSpecReader-{0}', parameters('TimeStamp'))]",
+      "name": "[format('assign-rbac-template-spec-{0}', parameters('timeStamp'))]",
       "subscriptionId": "[subscription().subscriptionId]",
       "location": "[resourceGroup().location]",
       "properties": {
@@ -1286,14 +1750,14 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "PrinicpalId": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deployFunctionApp'), '2022-09-01').outputs.functionAppPrincipalId.value]"
+          "prinicpalId": {
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName')), '2023-01-31').principalId]"
           },
-          "RoleDefinitionId": {
+          "roleDefinitionId": {
             "value": "392ae280-861d-42bd-9ea5-08ee6d83b80e"
           },
-          "Scope": {
-            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deployStandardSessionHostTemplate'), '2022-09-01').outputs.TemplateSpecResourceId.value]"
+          "scope": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value]"
           }
         },
         "template": {
@@ -1302,18 +1766,18 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.45.22436",
-              "templateHash": "15455176785742187947"
+              "version": "0.29.47.4906",
+              "templateHash": "852792330190262115"
             }
           },
           "parameters": {
-            "PrinicpalId": {
+            "prinicpalId": {
               "type": "string"
             },
-            "RoleDefinitionId": {
+            "roleDefinitionId": {
               "type": "string"
             },
-            "Scope": {
+            "scope": {
               "type": "string"
             }
           },
@@ -1321,18 +1785,18 @@
             {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
-              "name": "[guid(parameters('PrinicpalId'), parameters('RoleDefinitionId'), parameters('Scope'))]",
+              "name": "[guid(parameters('prinicpalId'), parameters('roleDefinitionId'), parameters('scope'))]",
               "properties": {
-                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
-                "principalId": "[parameters('PrinicpalId')]"
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('roleDefinitionId'))]",
+                "principalId": "[parameters('prinicpalId')]"
               }
             }
           ]
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'deployFunctionApp')]",
-        "[resourceId('Microsoft.Resources/deployments', 'deployStandardSessionHostTemplate')]"
+        "[resourceId('Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp')))]",
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName'))]"
       ]
     }
   ]

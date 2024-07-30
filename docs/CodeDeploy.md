@@ -21,7 +21,6 @@ $TemplateParameters = @{
     # The identity can be in a different Azure Subscription. If not used, a system assigned identity will be created and assigned permissions against the current subscription.
     UseUserAssignedManagedIdentity               = $true
     UserAssignedManagedIdentityResourceId        = '<Resource Id of the User Assigned Managed Identity>'
-    UserAssignedManagedIdentityClientId          = '<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx>' # The client (Application) ID of the user managed identity
 
     ## Session Host Template Parameters ##
     SessionHostsRegion                           = 'NorthEurope' # Does not have to be the same as Host Pool

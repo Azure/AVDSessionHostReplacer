@@ -20,6 +20,50 @@
                             }
                         },
                         {
+                            "name": "HostPoolSettingsSection",
+                            "type": "Microsoft.Common.Section",
+                            "label": "Host Pool Settings",
+                            "visible": true,
+                            "elements": [
+                                {
+                                    "name": "HostPoolSelector",
+                                    "type": "Microsoft.Solutions.ResourceSelector",
+                                    "label": "Select target Host Pool",
+                                    "resourceType": "Microsoft.DesktopVirtualization/HostPools",
+                                    "constraints": {
+                                        "required": true
+                                    },
+                                    "options": {
+                                        "filter": {
+                                            "subscription": "onBasics",
+                                            "location": "onBasics"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "sessionHostsCount",
+                                    "type": "Microsoft.Common.TextBox",
+                                    "label": "Target Session Host Count",
+                                    "toolTip": "The target number of session hosts in the host pool.",
+                                    "constraints": {
+                                        "required": true,
+                                        "regex": "^\\d+$",
+                                        "validationMessage": "Must be an integer."
+                                    }
+                                },
+                                {
+                                    "name": "sessionHostNamePrefix",
+                                    "type": "Microsoft.Common.TextBox",
+                                    "label": "Session Host Name Prefix",
+                                    "toolTip": "The prefix for the session host names. The session host names will be in the format <prefix>-<number>.",
+                                    "constraints": {
+                                        "required": true,
+                                        "validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
+                                    }
+                                }
+                            ]
+                        },
+                        {
                             "name": "UseUserAssignedManagedIdentity",
                             "type": "Microsoft.Common.CheckBox",
                             "label": "Use User Assigned Managed Identity",
@@ -725,48 +769,6 @@
                     ]
                 },
                 {
-                    "name": "RequiredParametersStep",
-                    "label": "Required Parameters",
-                    "elements": [
-                        {
-                            "name": "HostPoolSelector",
-                            "type": "Microsoft.Solutions.ResourceSelector",
-                            "label": "Select target Host Pool",
-                            "resourceType": "Microsoft.DesktopVirtualization/HostPools",
-                            "constraints": {
-                                "required": true
-                            },
-                            "options": {
-                                "filter": {
-                                    "subscription": "onBasics",
-                                    "location": "onBasics"
-                                }
-                            }
-                        },
-                        {
-                            "name": "sessionHostsCount",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Target Session Host Count",
-                            "toolTip": "The target number of session hosts in the host pool.",
-                            "constraints": {
-                                "required": true,
-                                "regex": "^\\d+$",
-                                "validationMessage": "Must be an integer."
-                            }
-                        },
-                        {
-                            "name": "sessionHostNamePrefix",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Session Host Name Prefix",
-                            "toolTip": "The prefix for the session host names. The session host names will be in the format <prefix>-<number>.",
-                            "constraints": {
-                                "required": true,
-                                "validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
-                            }
-                        }
-                    ]
-                },
-                {
                     "name": "optionalParametersStep",
                     "label": "Optional Parameters",
                     "elements": [
@@ -918,6 +920,12 @@
         },
         "outputs": {
             "parameters": {
+                "HostPoolResourceGroupName": "[steps('basics').HostPoolSettingsSection.HostPoolSelector.resourceGroup]",
+                "HostPoolName": "[steps('basics').HostPoolSettingsSection.HostPoolSelector.name]",
+                "SessionHostNamePrefix": "[steps('basics').HostPoolSettingsSection.sessionHostNamePrefix]",
+                "UseUserAssignedManagedIdentity": "[if(steps('basics').UseUserAssignedManagedIdentity, true, false)]",
+                "UserAssignedManagedIdentityResourceId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentitySelector.id, '')]",
+                "TargetSessionHostCount": "[steps('basics').HostPoolSettingsSection.sessionHostsCount]",
                 "EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
                 "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
                 "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
@@ -940,10 +948,6 @@
                 "ADJoinUserPassword": "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",
                 "ADOUPath": "[steps('SessionHostsTemplate').DomainJoinSection.ADOUPath]",
                 "LocalAdminUsername": "[steps('SessionHostsTemplate').LocalAdminUsername]",
-                "HostPoolResourceGroupName": "[steps('RequiredParametersStep').HostPoolSelector.resourceGroup]",
-                "HostPoolName": "[steps('RequiredParametersStep').HostPoolSelector.name]",
-                "SessionHostNamePrefix": "[steps('RequiredParametersStep').sessionHostNamePrefix]",
-                "TargetSessionHostCount": "[steps('RequiredParametersStep').sessionHostsCount]",
                 "TagIncludeInAutomation": "[steps('optionalParametersStep')._Tag_IncludeInAutomation]",
                 "TagDeployTimestamp": "[steps('optionalParametersStep')._Tag_DeployTimestamp]",
                 "TagPendingDrainTimestamp": "[steps('optionalParametersStep')._Tag_PendingDrainTimestamp]",
@@ -957,9 +961,7 @@
                 "ReplaceSessionHostOnNewImageVersion": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
                 "ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",
                 "VMNamesTemplateParameterName": "[steps('optionalParametersStep')._VMNamesTemplateParameterName]",
-                "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]",
-                "UseUserAssignedManagedIdentity": "[if(steps('basics').UseUserAssignedManagedIdentity, true, false)]",
-                "UserAssignedManagedIdentityResourceId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentitySelector.id, '')]"
+                "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]"
             },
             "kind": "ResourceGroup",
             "location": "[steps('basics').resourceScope.location.name]",

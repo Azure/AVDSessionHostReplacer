@@ -15,7 +15,7 @@ function Remove-SHRSessionHostIntuneDevice {
         Write-PSFMessage -Level Host -Message "Retrieved device object for VM {0} with Id: {1}" -StringValues $VMName, ($device.Id -join ",")
         # Delete VM, deletes multiple entries if found in Intune
         $null = $device | ForEach-Object {Remove-MgDeviceManagementManagedDevice   -ManagedDeviceId $_.Id  -ErrorAction Stop}
-        Write-PSFMessage -Level Host -Message "Deleted device object for VM {0} from Azure AD" -StringValues $VMName
+        Write-PSFMessage -Level Host -Message "Deleted device object for VM {0} from Intune" -StringValues $VMName
     }
     else{
         Write-PSFMessage -Level Warning -Message "Could not find device object for VM {0}" -StringValues $VMName

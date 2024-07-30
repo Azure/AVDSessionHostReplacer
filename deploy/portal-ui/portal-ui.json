@@ -55,7 +55,7 @@
                                     "name": "sessionHostNamePrefix",
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "Session Host Name Prefix",
-                                    "toolTip": "The prefix for the session host names. The session host names will be in the format <prefix>-<number>.",
+                                    "toolTip": "The prefix for the session host names. The session host names will be in the format <prefix>-<number>. Make sure this produces a unique value across all device names in your tenant / Active Directory. Try selecting a prefix that helps you identify the host pool such as AVDHP01",
                                     "constraints": {
                                         "required": true,
                                         "validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
@@ -64,38 +64,47 @@
                             ]
                         },
                         {
-                            "name": "UseUserAssignedManagedIdentity",
-                            "type": "Microsoft.Common.CheckBox",
-                            "label": "Use User Assigned Managed Identity",
-                            "toolTip": "[Recommended] IF enabled, The Session Host Replacer will use the selected Identity to take actions. Otherwise System Identity (MSI) is used.",
-                            "defaultValue": true,
-                            "constraints": {
-                                "required": false
-                            }
+                            "name": "IdentitySection",
+                            "type": "Microsoft.Common.Section",
+                            "label": "Identity",
+                            "visible": true,
+                            "elements": [
+                                {
+                                    "name": "UseUserAssignedManagedIdentity",
+                                    "type": "Microsoft.Common.CheckBox",
+                                    "label": "Use User Assigned Managed Identity",
+                                    "toolTip": "[Recommended] IF enabled, The Session Host Replacer will use the selected Identity to take actions. Otherwise System Identity (MSI) is used.",
+                                    "defaultValue": true,
+                                    "constraints": {
+                                        "required": false
+                                    }
+                                },
+                                {
+                                    "name": "UserAssignedManagedIdentitySelector",
+                                    "type": "Microsoft.Solutions.ResourceSelector",
+                                    "visible": "[steps('basics').IdentitySection.UseUserAssignedManagedIdentity]",
+                                    "label": "Select User Assigned Managed Identity",
+                                    "resourceType": "Microsoft.ManagedIdentity/userAssignedIdentities",
+                                    "constraints": {
+                                        "required": true
+                                    },
+                                    "options": {
+                                        "filter": {}
+                                    }
+                                },
+                                {
+                                    "name": "UserAssignedManagedIdentityInfoBox",
+                                    "type": "Microsoft.Common.InfoBox",
+                                    "visible": "[steps('basics').IdentitySection.UseUserAssignedManagedIdentity]",
+                                    "options": {
+                                        "icon": "Info",
+                                        "text": "When using a User Assigned Managed Identity, make sure the identity has the needed permissions in Azure and Entra. Follow the link for more info.",
+                                        "uri": "https://github.com/Azure/AVDReplacementPlans/blob/v0.2.8-beta.3/docs/Permissions.md"
+                                    }
+                                }
+                            ]
                         },
-                        {
-                            "name": "UserAssignedManagedIdentitySelector",
-                            "type": "Microsoft.Solutions.ResourceSelector",
-                            "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
-                            "label": "Select User Assigned Managed Identity",
-                            "resourceType": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                            "constraints": {
-                                "required": true
-                            },
-                            "options": {
-                                "filter": {}
-                            }
-                        },
-                        {
-                            "name": "UserAssignedManagedIdentityInfoBox",
-                            "type": "Microsoft.Common.InfoBox",
-                            "visible": "[steps('basics').UseUserAssignedManagedIdentity]",
-                            "options": {
-                                "icon": "Info",
-                                "text": "When using a User Assigned Managed Identity, make sure the identity has the needed permissions in Azure and Entra. Follow the link for more info.",
-                                "uri": "https://github.com/Azure/AVDReplacementPlans/blob/v0.2.8-beta.3/docs/Permissions.md"
-                            }
-                        },
+
                         {
                             "name": "MonitoringSection",
                             "type": "Microsoft.Common.Section",
@@ -923,8 +932,8 @@
                 "HostPoolResourceGroupName": "[steps('basics').HostPoolSettingsSection.HostPoolSelector.resourceGroup]",
                 "HostPoolName": "[steps('basics').HostPoolSettingsSection.HostPoolSelector.name]",
                 "SessionHostNamePrefix": "[steps('basics').HostPoolSettingsSection.sessionHostNamePrefix]",
-                "UseUserAssignedManagedIdentity": "[if(steps('basics').UseUserAssignedManagedIdentity, true, false)]",
-                "UserAssignedManagedIdentityResourceId": "[if(steps('basics').UseUserAssignedManagedIdentity, steps('basics').UserAssignedManagedIdentitySelector.id, '')]",
+                "UseUserAssignedManagedIdentity": "[if(steps('basics').IdentitySection.UseUserAssignedManagedIdentity, true, false)]",
+                "UserAssignedManagedIdentityResourceId": "[if(steps('basics').IdentitySection.UseUserAssignedManagedIdentity, steps('basics').IdentitySection.UserAssignedManagedIdentitySelector.id, '')]",
                 "TargetSessionHostCount": "[steps('basics').HostPoolSettingsSection.sessionHostsCount]",
                 "EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
                 "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",

@@ -131,7 +131,7 @@ resource privateEndpoints 'Microsoft.Network/privateEndpoints@2023-04-01' = [
   for resource in storageSubResources: {
     name: '${storageAccountPrivateEndpointName}-${resource}'
     location: location
-    tags: contains(tags, 'Microsoft.Network/privateEndpoints') ? tags['Microsoft.Network/privateEndpoints'] : {}
+    tags: tags[?'Microsoft.Network/privateEndpoints'] ?? {}
     properties: {
       customNetworkInterfaceName: '${storageAccountNetworkInterfaceName}-${resource}'
       privateLinkServiceConnections: [

@@ -286,6 +286,7 @@ module templateSpec 'modules/templateSpec.bicep' = {
   params: {
     location: location
     name: templateSpecName
+    tags: tags
   }
 }
 

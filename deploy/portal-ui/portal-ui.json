@@ -512,17 +512,21 @@
                             "type": "Microsoft.Common.DropDown",
                             "label": "OS Disk type",
                             "filter": false,
-                            "defaultValue": "Premium",
+                            "defaultValue": "Premium SSD",
                             "toolTip": "Select session host disk type to host the OS.",
                             "constraints": {
                                 "required": true,
                                 "allowedValues": [
                                     {
-                                        "label": "Standard",
+                                        "label": "Standard HDD",
                                         "value": "Standard_LRS"
                                     },
                                     {
-                                        "label": "Premium",
+                                        "label": "Standard SSD",
+                                        "value": "StandardSSD_LRS"
+                                    },
+                                    {
+                                        "label": "Premium SSD",
                                         "value": "Premium_LRS"
                                     }
                                 ]

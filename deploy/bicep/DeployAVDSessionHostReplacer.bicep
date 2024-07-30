@@ -15,8 +15,9 @@ param SessionHostSize string
 param AcceleratedNetworking bool
 
 @allowed([
-  'Premium_LRS'
-  'StandardSSD_LRS'
+  'Standard_LRS' // Standard HDD
+  'StandardSSD_LRS' // Standard SSD
+  'Premium_LRS' // Premium SSD
 ])
 param SessionHostDiskType string = 'Premium_LRS'
 

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.45.22436",
-      "templateHash": "14246960422630239327"
+      "templateHash": "17924683468449347714"
     }
   },
   "parameters": {
@@ -492,7 +492,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.45.22436",
-              "templateHash": "7849826334083398337"
+              "templateHash": "12640477074519769920"
             }
           },
           "parameters": {
@@ -526,7 +526,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.8-beta.7/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.8-beta.8/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }
@@ -773,7 +773,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.45.22436",
-              "templateHash": "16930491596178402473"
+              "templateHash": "5880759918468442717"
             }
           },
           "parameters": {
@@ -793,7 +793,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.29.45.22436",
-                  "templateHash": "15758060740360418364"
+                  "templateHash": "2229400358260549179"
                 }
               },
               "parameters": {
@@ -831,7 +831,8 @@
                   "type": "object"
                 },
                 "SecurityProfile": {
-                  "type": "object"
+                  "type": "object",
+                  "defaultValue": {}
                 },
                 "HostPoolName": {
                   "type": "string"
@@ -923,7 +924,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.29.45.22436",
-                          "templateHash": "7197712868022024044"
+                          "templateHash": "13883562713745559077"
                         }
                       },
                       "parameters": {
@@ -1096,8 +1097,8 @@
                             "autoUpgradeMinorVersion": true,
                             "settings": {
                               "Name": "[[parameters('DomainJoinObject').DomainName]",
-                              "OUPath": "[[parameters('DomainJoinObject').OUPath]",
-                              "User": "[[format('{0}\\{1}', parameters('DomainJoinObject').DomainName, parameters('DomainJoinObject').UserName)]",
+                              "OUPath": "[[parameters('DomainJoinObject').ADOUPath]",
+                              "User": "[[format('{0}\\{1}', parameters('DomainJoinObject').DomainName, parameters('DomainJoinObject').DomainJoinUserName)]",
                               "Restart": "true",
                               "Options": 3
                             },

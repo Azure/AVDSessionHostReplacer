@@ -2,7 +2,6 @@ param azureBlobsPrivateDnsZoneResourceId string
 param azureFilesPrivateDnsZoneResourceId string
 param azureQueuesPrivateDnsZoneResourceId string
 param azureTablesPrivateDnsZoneResourceId string
-param functionAppName string
 param keyName string
 param keyVaultUri string
 param location string
@@ -47,11 +46,11 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     allowBlobPublicAccess: false
     allowCrossTenantReplication: false
     allowedCopyScope: 'PrivateLink'
-    allowSharedKeyAccess: true
+    allowSharedKeyAccess: false
     azureFilesIdentityBasedAuthentication: {
       directoryServiceOptions: 'None'
     }
-    defaultToOAuthAuthentication: false
+    defaultToOAuthAuthentication: true
     dnsEndpointType: 'Standard'
     encryption: {
       identity: {
@@ -100,33 +99,6 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2021-09-01'
   name: 'default'
 }
 
-resource fileServices 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
-  parent: storageAccount
-  name: 'default'
-  properties: {
-    protocolSettings: {
-      smb: {
-        versions: 'SMB3.1.1;'
-        authenticationMethods: 'NTLMv2;'
-        channelEncryption: 'AES-128-GCM;AES-256-GCM;'
-      }
-    }
-    shareDeleteRetentionPolicy: {
-      enabled: false
-    }
-  }
-}
-
-resource share 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {
-  parent: fileServices
-  name: toLower(functionAppName)
-  properties: {
-    accessTier: 'TransactionOptimized'
-    shareQuota: 5120
-    enabledProtocols: 'SMB'
-  }
-}
-
 resource privateEndpoints 'Microsoft.Network/privateEndpoints@2023-04-01' = [
   for resource in storageSubResources: {
     name: '${storageAccountPrivateEndpointName}-${resource}'
@@ -170,7 +142,7 @@ resource privateDnsZoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZone
   }
 ]
 
-resource diagnosticSetting_storage_blob 'Microsoft.Insights/diagnosticsettings@2017-05-01-preview' = if (!empty(logAnalyticsWorkspaceResourceId)) {
+resource diagnosticSetting_blobs 'Microsoft.Insights/diagnosticsettings@2017-05-01-preview' = if (!empty(logAnalyticsWorkspaceResourceId)) {
   scope: blobService
   name: storageAccountDiagnosticSettingName
   properties: {
@@ -189,3 +161,6 @@ resource diagnosticSetting_storage_blob 'Microsoft.Insights/diagnosticsettings@2
     workspaceId: logAnalyticsWorkspaceResourceId
   }
 }
+
+output name string = storageAccount.name
+output resourceId string = storageAccount.id

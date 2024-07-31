@@ -8,8 +8,9 @@
 #
 # You can define helper functions, run commands, or specify environment variables
 # NOTE: any variables defined that are not environment variables will get reset after the first execution
+$ErrorActionPreference = 'Stop'
 
-Import-Module 'PSFrameWork' ,'Az.Resources' ,'Az.Compute' ,'Az.DesktopVirtualization', 'SessionHostReplacer', 'AzureFunctionConfiguration' -ErrorAction 'Stop'
+Import-Module 'PSFrameWork' ,'Az.Resources' ,'Az.Compute' ,'Az.DesktopVirtualization', 'SessionHostReplacer', 'AzureFunctionConfiguration'
 
 # Configure PSFramework settings
 Set-PSFConfig -FullName PSFramework.Message.style.NoColor -Value $true #This is required for logs to look good in FunctionApp Logs
@@ -21,7 +22,7 @@ Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}" 
 
 # Import Function Parameters
 try{
-    Import-FunctionConfig -FunctionParametersFilePath '.\FunctionParameters.psd1' -ErrorAction 'Stop'
+    Import-FunctionConfig -FunctionParametersFilePath '.\FunctionParameters.psd1'
 }
 catch{
     Write-PSFMessage -Level Error -Message "Failed to import Function Parameters. Error: {0}" -StringValues $_.Exception.Message
@@ -34,7 +35,7 @@ if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
     if([string]::IsNullOrEmpty($env:_ClientResourceId)){
         Write-PSFMessage -Level Host -Message "Authenticating with system assigned identity"
-        Connect-AzAccount -Environment $env:_EnvironmentName -Tenant $env:_TenantId -SubscriptionId (Get-FunctionConfig _SubscriptionId) -Identity -ErrorAction 'Stop'
+        Connect-AzAccount -Environment $env:_EnvironmentName -Tenant $env:_TenantId -SubscriptionId (Get-FunctionConfig _SubscriptionId) -Identity
         if(Get-FunctionConfig _RemoveAzureADDevice){
             Write-PSFMessage -Level Host -Message "Connecting to Graph API"
             Connect-MGGraph -Identity
@@ -44,13 +45,13 @@ if ($env:MSI_SECRET) {
         Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Resource ID: $env:_ClientResourceId"
 
         $entraAzureConnection = Connect-EntraService -Identity -IdentityType 'ResourceID' -IdentityID $env:_ClientResourceId -Service 'Azure' -PassThru
-        Connect-AzAccount -Environment $env:_EnvironmentName -Tenant $env:_TenantId -Subscription (Get-FunctionConfig _SubscriptionId) -AccountId $env:_ClientResourceId -AccessToken $entraAzureConnection.AccessToken -ErrorAction 'Stop'
+        Connect-AzAccount -Environment $env:_EnvironmentName -Tenant $env:_TenantId -Subscription (Get-FunctionConfig _SubscriptionId) -AccountId $env:_ClientResourceId -AccessToken $entraAzureConnection.AccessToken
 
 
         if(Get-FunctionConfig _RemoveAzureADDevice){
             Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID. Connecting to Graph API using User Managed Identity with Resource ID: $env:_ClientResourceId"
             $entraGraphConnection = Connect-EntraService -Identity -IdentityType 'ResourceID' -IdentityID $env:_ClientResourceId -Service 'Graph' -PassThru
-            Connect-MGGraph -AccessToken (ConvertTo-SecureString $entraGraphConnection.AccessToken -AsPlainText -Force) -ErrorAction 'Stop'
+            Connect-MGGraph -AccessToken (ConvertTo-SecureString $entraGraphConnection.AccessToken -AsPlainText -Force)
         }
     }
 }
@@ -59,4 +60,3 @@ else{
     Write-PSFMessage "MSI_Secret environment variable not found. This should only happen when testing locally. Otherwise confirm that a System or User Managed Identity is defined."
     Set-AzContext -SubscriptionId (Get-FunctionConfig _SubscriptionId)
 }
-$ErrorActionPreference = 'Stop'

@@ -1,14 +1,12 @@
-targetScope = 'subscription'
-
-param prinicpalId string
+param functionAppPrincipalId string
+param functionAppResourceId string
 param roleDefinitionId string
-param scope string
 
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(prinicpalId, roleDefinitionId, scope)
+  name: guid(functionAppResourceId, roleDefinitionId, resourceGroup().id)
   properties: {
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId)
-    principalId: prinicpalId
+    principalId: functionAppPrincipalId
     principalType: 'ServicePrincipal'
   }
 }

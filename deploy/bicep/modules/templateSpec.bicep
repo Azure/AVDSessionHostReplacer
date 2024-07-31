@@ -19,4 +19,5 @@ resource templateSpec 'Microsoft.Resources/templateSpecs@2022-02-01' = {
   }
 }
 
+output name string = templateSpec.name
 output resourceId string = templateSpec.id

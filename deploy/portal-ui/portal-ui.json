@@ -104,7 +104,6 @@
                                 }
                             ]
                         },
-
                         {
                             "name": "MonitoringSection",
                             "type": "Microsoft.Common.Section",
@@ -570,12 +569,60 @@
                             "constraints": {
                                 "allowedValues": [
                                     {
-                                        "label": "Windows 11 22H2 multi-session",
+                                        "label": "Windows 10 Enterprise 21h2 multi-session",
+                                        "value": "win10-21h2-avd"
+                                    },
+                                    {
+                                        "label": "Windows 10 Enterprise 21h2 multi-session (Gen 2)",
+                                        "value": "win10-21h2-avd-g2"
+                                    },
+                                    {
+                                        "label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps",
+                                        "value": "win10-21h2-avd-m365"
+                                    },
+                                    {
+                                        "label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps (Gen 2)",
+                                        "value": "win10-21h2-avd-m365-g2"
+                                    },
+                                    {
+                                        "label": "Windows 10 Enterprise 22h2 multi-session",
+                                        "value": "win10-22h2-avd"
+                                    },
+                                    {
+                                        "label": "Windows 10 Enterprise 22h2 multi-session (Gen 2)",
+                                        "value": "win10-22h2-avd-g2"
+                                    },
+                                    {
+                                        "label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps",
+                                        "value": "win10-22h2-avd-m365"
+                                    },
+                                    {
+                                        "label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps (Gen 2)",
+                                        "value": "win10-22h2-avd-m365-g2"
+                                    },
+                                    {
+                                        "label": "Windows 11 Enterprise 21h2 multi-session",
+                                        "value": "win11-21h2-avd"
+                                    },
+                                    {
+                                        "label": "Windows 11 Enterprise 21h2 multi-session + Microsoft 365 Apps",
+                                        "value": "win11-21h2-avd-m365"
+                                    },
+                                    {
+                                        "label": "Windows 11 Enterprise 22h2 multi-session",
                                         "value": "win11-22h2-avd"
                                     },
                                     {
-                                        "label": "Windows 11 23H2 multi-session",
+                                        "label": "Windows 11 Enterprise 22h2 multi-session + Microsoft 365 Apps",
+                                        "value": "win11-22h2-avd-m365"
+                                    },
+                                    {
+                                        "label": "Windows 11 Enterprise 23h2 multi-session",
                                         "value": "win11-23h2-avd"
+                                    },
+                                    {
+                                        "label": "Windows 11 Enterprise 23h2 multi-session + Microsoft 365 Apps",
+                                        "value": "win11-23h2-avd-m365"
                                     }
                                 ],
                                 "required": true

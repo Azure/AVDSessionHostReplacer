@@ -1,4 +1,4 @@
-param acceleratedNetworking bool
+param acceleratedNetworking bool = true
 param allowDownsizing bool = true
 param applicationInsightsName string
 param appServicePlanName string
@@ -19,7 +19,7 @@ param functionAppNetworkInterfaceName string
 param functionAppPrivateDnsZoneResourceId string
 param functionAppPrivateEndpointName string
 param functionAppScmPrivateDnsZoneResourceId string
-param functionAppZipUrl string
+param functionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.7/FunctionApp.zip'
 param galleryImageId string = ''
 param hostPoolResourceId string
 param identityServiceProvider string
@@ -38,7 +38,7 @@ param marketPlaceImageSku string
 param privateLinkScopeResourceId string
 param replaceSessionHostOnNewImageVersion bool = true
 param replaceSessionHostOnNewImageVersionDelayDays int = 0
-param securityType string
+param securityType string = 'TrustedLaunch'
 param sessionHostDiskType string = 'Premium_LRS'
 param sessionHostInstanceNumberPadding int = 2
 param sessionHostNamePrefix string
@@ -118,7 +118,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   tags: tags[?'Microsoft.ManagedIdentity/userAssignedIdentities'] ?? {}
 }
 
-module keyVault 'modules/keyVault.bicep' = if (identityServiceProvider != 'EntraID') {
+module keyVault 'modules/keyVault.bicep' = {
   name: 'deploy-key-vault-${timeStamp}'
   params: {
     domainJoinPassword: domainJoinPassword
@@ -128,6 +128,8 @@ module keyVault 'modules/keyVault.bicep' = if (identityServiceProvider != 'Entra
     keyVaultPrivateEndpointName: keyVaultPrivateEndpointName
     subnetResourceId: subnetResourceId
     tags: tags
+    userAssignedIdentityName: userAssignedIdentityName
+    userAssignedIdentityPrincipalId: userAssignedIdentity.properties.principalId
   }
 }
 
@@ -138,7 +140,6 @@ module storageAccount 'modules/storageAccount.bicep' = {
     azureFilesPrivateDnsZoneResourceId: azureFilesPrivateDnsZoneResourceId
     azureQueuesPrivateDnsZoneResourceId: azureQueuesPrivateDnsZoneResourceId
     azureTablesPrivateDnsZoneResourceId: azureTablesPrivateDnsZoneResourceId
-    functionAppName: functionAppName
     keyName: keyVault.outputs.keyName
     keyVaultUri: keyVault.outputs.uri
     location: location
@@ -164,10 +165,19 @@ module applicationInsights 'modules/applicationInsights.bicep' = {
   }
 }
 
+module templateSpec 'modules/templateSpec.bicep' = {
+  name: 'deploy-template-spec-${timeStamp}'
+  params: {
+    location: location
+    name: templateSpecName
+    tags: tags
+  }
+}
+
 module functionApp 'modules/functionApp.bicep' = {
   name: 'deploy-function-app-${timeStamp}'
   params: {
-    applicationInsightsName: applicationInsightsName
+    applicationInsightsName: applicationInsights.outputs.name
     appServicePlanName: appServicePlanName
     delegatedSubnetResourceId: delegatedSubnetResourceId
     functionAppName: functionAppName
@@ -202,10 +212,6 @@ module functionApp 'modules/functionApp.bicep' = {
       {
         name: '_SessionHostParameters'
         value: string(sessionHostTemplateParameters)
-      }
-      {
-        name: '_SubscriptionId'
-        value: subscription().subscriptionId
       }
       {
         name: '_RemoveAzureADDevice'
@@ -274,38 +280,28 @@ module functionApp 'modules/functionApp.bicep' = {
         value: sessionHostResourceGroupName
       }
     ]
-    storageAccountName: storageAccountName
+    storageAccountName: storageAccount.outputs.name
     subnetResourceId: subnetResourceId
     tags: tags
     timestamp: timeStamp
   }
 }
 
-module templateSpec 'modules/templateSpec.bicep' = {
-  name: 'deploy-template-spec-${timeStamp}'
-  params: {
-    location: location
-    name: templateSpecName
-    tags: tags
-  }
-}
-
-module roleAssignment_HostPool 'modules/roleAssignment.bicep' = {
-  name: 'assign-rbac-host-pool-${timeStamp}'
-  scope: subscription()
-  params: {
-    prinicpalId: userAssignedIdentity.properties.principalId
-    roleDefinitionId: 'a959dbd1-f747-45e3-8ba6-dd80f235f97c' // Desktop Virtualization Virtual Machine Contributor
-    scope: subscription().id
-  }
-}
-
-module roleAssignment_TemplateSpec 'modules/roleAssignment.bicep' = {
+module roleAssignment_TemplateSpec 'modules/roleAssignment_TemplateSpec.bicep' = {
   name: 'assign-rbac-template-spec-${timeStamp}'
-  scope: subscription()
   params: {
-    prinicpalId: userAssignedIdentity.properties.principalId
-    roleDefinitionId: '392ae280-861d-42bd-9ea5-08ee6d83b80e' // Template Spec Reader
-    scope: templateSpec.outputs.resourceId
+    functionAppPrincipalId: functionApp.outputs.principalId
+    functionAppResourceId: functionApp.outputs.resourceId
+    templateSpecName: templateSpec.outputs.name
   }
 }
+
+module roleAssignments_AVD 'modules/roleAssignment_AVD.bicep' = [for rg in [sessionHostResourceGroupName, split(hostPoolResourceId, '/')[4]] : {
+  name: 'assign-rbac-AVD-${timeStamp}'
+  scope: resourceGroup(rg)
+  params: {
+    functionAppPrincipalId: functionApp.outputs.principalId
+    functionAppResourceId: functionApp.outputs.resourceId
+    roleDefinitionId: 'a959dbd1-f747-45e3-8ba6-dd80f235f97c' // Desktop Virtualization Virtual Machine Contributor
+  }
+}]

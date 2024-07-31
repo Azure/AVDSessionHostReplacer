@@ -15,29 +15,31 @@ param tags object
 param timestamp string
 
 var cloudSuffix = replace(replace(environment().resourceManager, 'https://management.', ''), '/', '')
+var roleDefinitionIds = [
+  '17d1049b-9a84-46fb-8f53-869881c3d3ab' // Storage Account Contributor
+  'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' // Storage Blob Data Owner
+  '974c5e8b-45b9-4653-ba55-5f855dd0fb88' // Storage Queue Data Contributor
+]
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: appServicePlanName
   location: location
   tags: tags[?'Microsoft.Web/serverfarms'] ?? {}
   sku: {
-    tier: 'ElasticPremium'
-    name: 'EP1'
-  }
+    name: 'P1v3'
+    tier: 'PremiumV3'
+    size: 'P1v3'
+    family: 'Pv3'
+    capacity: 1
+}
   kind: 'functionapp'
-  properties: {
-    targetWorkerSizeId: 3
-    targetWorkerCount: 1
-    maximumElasticWorkerCount: 20
-    zoneRedundant: false
-  }
 }
 
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: applicationInsightsName
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: storageAccountName
 }
 
@@ -55,36 +57,9 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     publicNetworkAccess: 'Disabled'
     serverFarmId: appServicePlan.id
     siteConfig: {
+      alwaysOn: true
       appSettings: union(
         [
-          {
-            name: 'FUNCTIONS_EXTENSION_VERSION'
-            value: '~4'
-          }
-          {
-            name: 'FUNCTIONS_WORKER_RUNTIME'
-            value: 'powershell'
-          }
-          {
-            name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-            value: applicationInsights.properties.ConnectionString
-          }
-          {
-            name: 'AzureWebJobsStorage'
-            value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${listKeys(storageAccount.id,'2019-06-01').keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
-          }
-          {
-            name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-            value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${listKeys(storageAccount.id,'2019-06-01').keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
-          }
-          {
-            name: 'WEBSITE_CONTENTOVERVNET'
-            value: 1
-          }
-          {
-            name: 'WEBSITE_CONTENTSHARE'
-            value: toLower(functionAppName)
-          }
           {
             name: '_EnvironmentName'
             value: environment().name
@@ -96,6 +71,30 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
           {
             name: '_TenantId'
             value: subscription().tenantId
+          }
+          {
+            name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+            value: applicationInsights.properties.ConnectionString
+          }
+          {
+            name: 'AzureWebJobsStorage__blobServiceUri'
+            value: 'https://${storageAccountName}.blob.${environment().suffixes.storage}'
+          }
+          {
+            name: 'AzureWebJobsStorage__queueServiceUri'
+            value: 'https://${storageAccountName}.queue.${environment().suffixes.storage}'
+          }
+          {
+            name: 'AzureWebJobsStorage__tableServiceUri'
+            value: 'https://${storageAccountName}.table.${environment().suffixes.storage}'
+          }
+          {
+            name: 'FUNCTIONS_EXTENSION_VERSION'
+            value: '~4'
+          }
+          {
+            name: 'FUNCTIONS_WORKER_RUNTIME'
+            value: 'powershell'
           }
         ],
         replacementPlanSettings
@@ -111,13 +110,24 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       ftpsState: 'Disabled'
       netFrameworkVersion: 'v6.0'
       powerShellVersion: '7.2'
+      publicNetworkAccess: 'Disabled'
       use32BitWorkerProcess: false
     }
     virtualNetworkSubnetId: delegatedSubnetResourceId
-    vnetContentShareEnabled: true
+    vnetContentShareEnabled: false
     vnetRouteAllEnabled: true
   }
 }
+
+resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for roleDefinitionId in roleDefinitionIds : {
+  name: guid(functionApp.id, roleDefinitionId, storageAccount.id)
+  scope: storageAccount
+  properties: {
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId)
+    principalId: functionApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}]
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-04-01' = {
   name: functionAppPrivateEndpointName
@@ -157,7 +167,7 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
   }
 }
 
-resource deployFromZip 'Microsoft.Web/sites/extensions@2023-01-01' = {
+resource msDeploy 'Microsoft.Web/sites/extensions@2023-01-01' = {
   parent: functionApp
   name: 'MSDeploy'
   properties: {
@@ -171,11 +181,15 @@ resource deployFromZip 'Microsoft.Web/sites/extensions@2023-01-01' = {
 
 // This module is used to deploy the A record for the SCM site which does not use a dedicated private endpoint
 module scmARecord 'aRecord.bicep' = {
-  name: 'deploy-a-record-${timestamp}'
+  name: 'deploy-scm-a-record-${timestamp}'
   scope: resourceGroup(split(functionAppScmPrivateDnsZoneResourceId, '/')[2], split(functionAppScmPrivateDnsZoneResourceId, '/')[4])
   params: {
     functionAppName: functionAppName
-    ipv4Address: privateEndpoint.properties.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress
+    ipv4Address: filter(privateDnsZoneGroup.properties.privateDnsZoneConfigs[0].properties.recordSets, record => record.recordSetName == functionAppName)[0].ipAddresses[0]
     privateDnsZoneName: split(functionAppScmPrivateDnsZoneResourceId, '/')[8]
   }
 }
+
+output name string = functionApp.name
+output principalId string = functionApp.identity.principalId
+output resourceId string = functionApp.id

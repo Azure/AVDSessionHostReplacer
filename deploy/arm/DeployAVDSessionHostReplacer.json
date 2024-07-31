@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.45.22436",
-      "templateHash": "17924683468449347714"
+      "templateHash": "8555026431704615598"
     }
   },
   "parameters": {
@@ -277,20 +277,40 @@
   },
   "variables": {
     "varMarketPlaceImages": {
-      "2022-datacenter-smalldisk-g2": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2022-datacenter-smalldisk-g2"
-      },
       "win10-21h2-avd": {
         "publisher": "MicrosoftWindowsDesktop",
         "offer": "windows-10",
         "sku": "win10-21h2-avd"
       },
-      "2022-datacenter-core-g2": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2022-datacenter-core-g2"
+      "win10-21h2-avd-g2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "windows-10",
+        "sku": "win10-21h2-avd-g2"
+      },
+      "win10-21h2-avd-m365": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win10-21h2-avd-m365"
+      },
+      "win10-21h2-avd-m365-g2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win10-21h2-avd-m365-g2"
+      },
+      "win10-22h2-avd": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "windows-10",
+        "sku": "win10-22h2-avd"
+      },
+      "win10-22h2-avd-g2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "windows-10",
+        "sku": "win10-22h2-avd-g2"
+      },
+      "win10-22h2-avd-m365": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win10-22h2-avd-m365"
       },
       "win10-22h2-avd-m365-g2": {
         "publisher": "MicrosoftWindowsDesktop",
@@ -299,53 +319,33 @@
       },
       "win11-21h2-avd": {
         "publisher": "MicrosoftWindowsDesktop",
-        "offer": "Windows-11",
+        "offer": "windows-11",
         "sku": "win11-21h2-avd"
-      },
-      "win10-21h2-avd-m365": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "office-365",
-        "sku": "win10-21h2-avd-m365"
-      },
-      "win11-22h2-avd-m365": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "office-365",
-        "sku": "win11-22h2-avd-m365"
-      },
-      "2022-datacenter-core-smalldisk-g2": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2022-datacenter-core-smalldisk-g2"
       },
       "win11-21h2-avd-m365": {
         "publisher": "MicrosoftWindowsDesktop",
         "offer": "office-365",
         "sku": "win11-21h2-avd-m365"
       },
+      "win11-22h2-avd": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "windows-11",
+        "sku": "win11-22h2-avd"
+      },
+      "win11-22h2-avd-m365": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win11-22h2-avd-m365"
+      },
       "win11-23h2-avd": {
         "publisher": "MicrosoftWindowsDesktop",
-        "offer": "Windows-11",
+        "offer": "windows-11",
         "sku": "win11-23h2-avd"
       },
       "win11-23h2-avd-m365": {
         "publisher": "MicrosoftWindowsDesktop",
         "offer": "office-365",
         "sku": "win11-23h2-avd-m365"
-      },
-      "win11-22h2-avd": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "Windows-11",
-        "sku": "win11-22h2-avd"
-      },
-      "2022-datacenter-g2": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2022-datacenter-g2"
-      },
-      "win10-22h2-avd-g2": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "windows-10",
-        "sku": "win10-22h2-avd-g2"
       }
     },
     "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'Marketplace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
@@ -492,7 +492,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.45.22436",
-              "templateHash": "12640477074519769920"
+              "templateHash": "8902630548122361506"
             }
           },
           "parameters": {
@@ -526,7 +526,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.8-beta.8/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.8-beta.9/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

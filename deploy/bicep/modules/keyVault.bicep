@@ -8,6 +8,8 @@ param keyExpirationInDays int = 30
 param keyVaultPrivateDnsZoneResourceId string
 param subnetResourceId string
 param tags object
+param userAssignedIdentityName string
+param userAssignedIdentityPrincipalId string
 
 
 resource vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
@@ -34,6 +36,16 @@ resource vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     }
     softDeleteRetentionInDays: 90
     tenantId: subscription().tenantId
+  }
+}
+
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(userAssignedIdentityName, 'e147488a-f6f5-4113-8e2d-b22465e65bf6', keyVaultName)
+  scope: vault
+  properties: {
+    principalId: userAssignedIdentityPrincipalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'e147488a-f6f5-4113-8e2d-b22465e65bf6')  // Key Vault Crypto Service Encryption User
   }
 }
 

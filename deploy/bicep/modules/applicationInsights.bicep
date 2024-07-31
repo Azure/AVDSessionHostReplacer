@@ -10,6 +10,8 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   tags: tags[?'Microsoft.Insights/components'] ?? {}
   properties: {
     Application_Type: 'web'
+    publicNetworkAccessForIngestion: 'Disabled'
+    publicNetworkAccessForQuery: 'Disabled'
   }
   kind: 'web'
 }
@@ -23,3 +25,5 @@ module privateLinkScope 'privateLinkScope.bicep' = {
     privateLinkScopeResourceId: privateLinkScopeResourceId
   }
 }
+
+output name string = applicationInsights.name

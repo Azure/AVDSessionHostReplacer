@@ -55,11 +55,13 @@ function Get-SHRLatestImageVersion {
             }
 
             # Get the latest version of the image
-            $availableImageVersions = Get-AzGalleryImageVersion -ResourceGroupName $imageResourceGroup -GalleryName $imageGalleryName -GalleryImageName $imageDefinitionName | Where-Object { $_.PublishingProfile.ExcludeFromLatest -eq $false }
-            if ($availableImageVersions.Count -eq 0) {
+            $latestImageVersion = Get-AzGalleryImageVersion -ResourceGroupName $imageResourceGroup -GalleryName $imageGalleryName -GalleryImageName $imageDefinitionName |
+                                         Where-Object { $_.PublishingProfile.ExcludeFromLatest -eq $false } |
+                                         Sort-Object -Property {$_.PublishingProfile.PublishedDate} -Descending |
+                                         Select-Object -First 1
+            if (-not $latestImageVersion) {
                 throw "No available image versions found."
             }
-            $latestImageVersion = $availableImageVersions | Select-Object -Last 1
             Write-PSFMessage -Level Host -Message "Selected image version with resource Id {0}" -StringValues $latestImageVersion.Id
             $azImageVersion = $latestImageVersion.Name
             $azImageDate = $latestImageVersion.PublishingProfile.PublishedDate

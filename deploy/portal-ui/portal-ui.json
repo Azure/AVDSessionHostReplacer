@@ -466,7 +466,7 @@
                                 "allowedValues": [
                                     {
                                         "label": "Standard",
-                                        "value": "Standard_LRS"
+                                        "value": "StandardSSD_LRS"
                                     },
                                     {
                                         "label": "Premium",

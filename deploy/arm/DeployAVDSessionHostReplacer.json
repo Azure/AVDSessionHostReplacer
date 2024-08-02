@@ -5,60 +5,102 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "11332591055595572308"
+      "templateHash": "11909329038440776783"
     }
   },
   "parameters": {
     "acceleratedNetworking": {
       "type": "bool",
-      "defaultValue": true
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable accelerated networking on the AVD session hosts."
+      }
     },
     "allowDownsizing": {
       "type": "bool",
-      "defaultValue": true
+      "defaultValue": true,
+      "metadata": {
+        "description": "Allow the session hosts to be downsized to a smaller VM size."
+      }
     },
     "applicationInsightsName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Application Insights resource."
+      }
     },
     "appServicePlanName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "The name of the app service plan."
+      }
     },
     "availabilityZones": {
       "type": "array",
-      "defaultValue": []
+      "defaultValue": [],
+      "metadata": {
+        "description": "The zones for the AVD session hosts."
+      }
     },
     "azureBlobsPrivateDnsZoneResourceId": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the Azure Blobs private DNS zone."
+      }
     },
     "azureFilesPrivateDnsZoneResourceId": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the Azure Files private DNS zone."
+      }
     },
     "azureQueuesPrivateDnsZoneResourceId": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the Azure Queues private DNS zone."
+      }
     },
     "azureTablesPrivateDnsZoneResourceId": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the Azure Tables private DNS zone."
+      }
     },
     "delegatedSubnetResourceId": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the delegated subnet for the function app."
+      }
     },
     "domainJoinPassword": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "The password for the domain join account."
+      }
     },
     "domainJoinUserName": {
       "type": "string",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "The username for the domain join account."
+      }
     },
     "domainName": {
       "type": "string",
-      "defaultValue": ""
+      "defaultValue": "",
+      "metadata": {
+        "description": "The name of the domain to join."
+      }
     },
     "drainGracePeriodHours": {
       "type": "int",
-      "defaultValue": 24
+      "defaultValue": 24,
+      "metadata": {
+        "description": "The number of hours to wait before draining a session host."
+      }
     },
-    "entraTenantType": {
+    "entraEnvironmentName": {
       "type": "string",
       "defaultValue": "Global",
       "allowedValues": [
@@ -66,7 +108,10 @@
         "Global",
         "USGov",
         "USGovDoD"
-      ]
+      ],
+      "metadata": {
+        "description": "The environment name of the Entra ID tenant for connecting to Microsoft Graph."
+      }
     },
     "fixSessionHostTags": {
       "type": "bool",
@@ -1575,8 +1620,8 @@
           "delegatedSubnetResourceId": {
             "value": "[parameters('delegatedSubnetResourceId')]"
           },
-          "entraTenantType": {
-            "value": "[parameters('entraTenantType')]"
+          "entraEnvironmentName": {
+            "value": "[parameters('entraEnvironmentName')]"
           },
           "functionAppName": {
             "value": "[parameters('functionAppName')]"
@@ -1714,7 +1759,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "5705700411725423619"
+              "templateHash": "9391456275831379598"
             }
           },
           "parameters": {
@@ -1727,7 +1772,7 @@
             "delegatedSubnetResourceId": {
               "type": "string"
             },
-            "entraTenantType": {
+            "entraEnvironmentName": {
               "type": "string"
             },
             "functionAppName": {
@@ -1810,7 +1855,7 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "siteConfig": {
                   "alwaysOn": true,
-                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', parameters('entraTenantType')), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell')), parameters('replacementPlanSettings'))]",
+                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', parameters('entraEnvironmentName')), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell')), parameters('replacementPlanSettings'))]",
                   "cors": {
                     "allowedOrigins": [
                       "[format('{0}', environment().portal)]",

@@ -1,7 +1,7 @@
 param applicationInsightsName string
 param appServicePlanName string
 param delegatedSubnetResourceId string
-param entraTenantType string
+param entraEnvironmentName string
 param functionAppName string
 param functionAppNetworkInterfaceName string
 param functionAppPrivateDnsZoneResourceId string
@@ -62,7 +62,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
           }
           {
             name: '_EntraEnvironmentName'
-            value: entraTenantType
+            value: entraEnvironmentName
           }
           {
             name: '_SubscriptionId'

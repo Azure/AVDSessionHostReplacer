@@ -1,27 +1,56 @@
 targetScope = 'subscription'
 
+@description('Enable accelerated networking on the AVD session hosts.')
 param acceleratedNetworking bool = true
+
+@description('Allow the session hosts to be downsized to a smaller VM size.')
 param allowDownsizing bool = true
+
+@description('The name of the Application Insights resource.')
 param applicationInsightsName string
+
+@description('The name of the app service plan.')
 param appServicePlanName string
+
+@description('The zones for the AVD session hosts.')
 param availabilityZones array = []
+
+@description('The resource ID of the Azure Blobs private DNS zone.')
 param azureBlobsPrivateDnsZoneResourceId string
+
+@description('The resource ID of the Azure Files private DNS zone.')
 param azureFilesPrivateDnsZoneResourceId string
+
+@description('The resource ID of the Azure Queues private DNS zone.')
 param azureQueuesPrivateDnsZoneResourceId string
+
+@description('The resource ID of the Azure Tables private DNS zone.')
 param azureTablesPrivateDnsZoneResourceId string
+
+@description('The resource ID of the delegated subnet for the function app.')
 param delegatedSubnetResourceId string
+
 @secure()
+@description('The password for the domain join account.')
 param domainJoinPassword string = ''
+
+@description('The username for the domain join account.')
 param domainJoinUserName string = ''
+
+@description('The name of the domain to join.')
 param domainName string = ''
+
+@description('The number of hours to wait before draining a session host.')
 param drainGracePeriodHours int = 24
+
 @allowed([
   'China'
   'Global'
   'USGov'
   'USGovDoD'
 ])
-param entraTenantType string = 'Global'
+@description('The environment name of the Entra ID tenant for connecting to Microsoft Graph.')
+param entraEnvironmentName string = 'Global'
 param fixSessionHostTags bool = true
 param functionAppName string
 param functionAppNetworkInterfaceName string
@@ -224,7 +253,7 @@ module functionApp 'modules/functionApp.bicep' = {
     applicationInsightsName: applicationInsights.outputs.name
     appServicePlanName: appServicePlanName
     delegatedSubnetResourceId: delegatedSubnetResourceId
-    entraTenantType: entraTenantType
+    entraEnvironmentName: entraEnvironmentName
     functionAppName: functionAppName
     functionAppNetworkInterfaceName: functionAppNetworkInterfaceName
     functionAppPrivateDnsZoneResourceId: functionAppPrivateDnsZoneResourceId

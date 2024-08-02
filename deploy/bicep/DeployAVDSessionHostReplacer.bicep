@@ -1,3 +1,5 @@
+targetScope = 'subscription'
+
 param acceleratedNetworking bool = true
 param allowDownsizing bool = true
 param applicationInsightsName string
@@ -30,7 +32,7 @@ param keyVaultNetworkInterfaceName string
 param keyVaultPrivateDnsZoneResourceId string
 param keyVaultPrivateEndpointName string
 param localAdminUsername string
-param location string = resourceGroup().location
+param location string = deployment().location
 param logAnalyticsWorkspaceResourceId string = ''
 param marketPlaceImageOffer string
 param marketPlaceImagePublisher string
@@ -61,6 +63,7 @@ param targetVMAgeDays int = 45
 param templateSpecName string
 param timeStamp string = utcNow() // Used for unique deployment names. Do Not supply a value for this parameter.
 param userAssignedIdentityName string
+param userAssignedIdentityResourceId string
 param vmNamesTemplateParameterName string = 'VMNames'
 
 var imageReference = empty(galleryImageId) ? {
@@ -112,29 +115,59 @@ var sessionHostTemplateParameters = {
   tags: tags
 }
 
-resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: userAssignedIdentityName
-  location: location
-  tags: tags[?'Microsoft.ManagedIdentity/userAssignedIdentities'] ?? {}
+resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
+  name: guid(subscription().id, 'Key Vault Deployment Operator')
+  properties: {
+    roleName: 'Key Vault Deployment Operator'
+    description: 'Deploy a resource manager template with the access to the secrets in the Key Vault.'
+    assignableScopes: [
+      subscription().id
+    ]
+    permissions: [
+      {
+        actions: [
+          'Microsoft.KeyVault/vaults/deploy/action'
+        ]
+      }
+    ]
+  }
+}
+
+module userAssignedIdentity_Encryption 'modules/userAssignedIdentity.bicep' = {
+  name: 'deploy-user-assigned-identity-encryption-${timeStamp}'
+  scope: resourceGroup(split(userAssignedIdentityResourceId, '/')[2], split(userAssignedIdentityResourceId, '/')[4])
+  params: {
+    location: location
+    tags: tags
+    userAssignedIdentityName: '${userAssignedIdentityName}-Encryption'
+  }
+}
+
+resource userAssignedIdentity_FunctionApp 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+  scope: resourceGroup(split(userAssignedIdentityResourceId, '/')[2], split(userAssignedIdentityResourceId, '/')[4])
+  name: split(userAssignedIdentityResourceId, '/')[8]
 }
 
 module keyVault 'modules/keyVault.bicep' = {
   name: 'deploy-key-vault-${timeStamp}'
+  scope: resourceGroup(split(userAssignedIdentityResourceId, '/')[2], split(userAssignedIdentityResourceId, '/')[4])
   params: {
     domainJoinPassword: domainJoinPassword
     keyVaultName: keyVaultName
     keyVaultNetworkInterfaceName: keyVaultNetworkInterfaceName
     keyVaultPrivateDnsZoneResourceId: keyVaultPrivateDnsZoneResourceId
     keyVaultPrivateEndpointName: keyVaultPrivateEndpointName
+    deployActionRoleDefinitionId: roleDefinition.id
     subnetResourceId: subnetResourceId
     tags: tags
-    userAssignedIdentityName: userAssignedIdentityName
-    userAssignedIdentityPrincipalId: userAssignedIdentity.properties.principalId
+    userAssignedIdentityResourceId: userAssignedIdentity_Encryption.outputs.resourceId
+    userAssignedIdentityPrincipalId: userAssignedIdentity_Encryption.outputs.principalId
   }
 }
 
 module storageAccount 'modules/storageAccount.bicep' = {
   name: 'deploy-storage-account-${timeStamp}'
+  scope: resourceGroup(split(userAssignedIdentityResourceId, '/')[2], split(userAssignedIdentityResourceId, '/')[4])
   params: {
     azureBlobsPrivateDnsZoneResourceId: azureBlobsPrivateDnsZoneResourceId
     azureFilesPrivateDnsZoneResourceId: azureFilesPrivateDnsZoneResourceId
@@ -150,12 +183,14 @@ module storageAccount 'modules/storageAccount.bicep' = {
     storageAccountPrivateEndpointName: storageAccountPrivateEndpointName
     subnetResourceId: subnetResourceId
     tags: tags
-    userAssignedIdentityResourceId: userAssignedIdentity.id
+    userAssignedIdentityResourceId_Encryption: userAssignedIdentity_Encryption.outputs.resourceId
+    userAssignedIdentityResourceId_FunctionApp: userAssignedIdentity_FunctionApp.id
   }
 }
 
 module applicationInsights 'modules/applicationInsights.bicep' = {
   name: 'deploy-application-insights-${timeStamp}'
+  scope: resourceGroup(split(userAssignedIdentityResourceId, '/')[2], split(userAssignedIdentityResourceId, '/')[4])
   params: {
     applicationInsightsName: applicationInsightsName
     location: location
@@ -167,6 +202,7 @@ module applicationInsights 'modules/applicationInsights.bicep' = {
 
 module templateSpec 'modules/templateSpec.bicep' = {
   name: 'deploy-template-spec-${timeStamp}'
+  scope: resourceGroup(split(userAssignedIdentityResourceId, '/')[2], split(userAssignedIdentityResourceId, '/')[4])
   params: {
     location: location
     name: templateSpecName
@@ -176,6 +212,7 @@ module templateSpec 'modules/templateSpec.bicep' = {
 
 module functionApp 'modules/functionApp.bicep' = {
   name: 'deploy-function-app-${timeStamp}'
+  scope: resourceGroup(split(userAssignedIdentityResourceId, '/')[2], split(userAssignedIdentityResourceId, '/')[4])
   params: {
     applicationInsightsName: applicationInsights.outputs.name
     appServicePlanName: appServicePlanName
@@ -218,8 +255,8 @@ module functionApp 'modules/functionApp.bicep' = {
         value: identityServiceProvider == 'EntraID'
       }
       {
-        name: '_ClientResourceId'
-        value: userAssignedIdentity.id
+        name: '_ClientId'
+        value: userAssignedIdentity_FunctionApp.properties.clientId
       }
     
       // Optional Parameters //
@@ -284,14 +321,17 @@ module functionApp 'modules/functionApp.bicep' = {
     subnetResourceId: subnetResourceId
     tags: tags
     timestamp: timeStamp
+    userAssignedIdentityResourceId: userAssignedIdentityResourceId
   }
 }
 
 module roleAssignment_TemplateSpec 'modules/roleAssignment_TemplateSpec.bicep' = {
   name: 'assign-rbac-template-spec-${timeStamp}'
+  scope: resourceGroup(split(userAssignedIdentityResourceId, '/')[2], split(userAssignedIdentityResourceId, '/')[4])
   params: {
-    functionAppPrincipalId: functionApp.outputs.principalId
-    functionAppResourceId: functionApp.outputs.resourceId
+    principalId: userAssignedIdentity_FunctionApp.properties.principalId
+    resourceId: userAssignedIdentityResourceId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '392ae280-861d-42bd-9ea5-08ee6d83b80e') // Template Spec Reader
     templateSpecName: templateSpec.outputs.name
   }
 }
@@ -300,8 +340,8 @@ module roleAssignments_AVD 'modules/roleAssignment_AVD.bicep' = [for rg in [sess
   name: 'assign-rbac-AVD-${timeStamp}'
   scope: resourceGroup(rg)
   params: {
-    functionAppPrincipalId: functionApp.outputs.principalId
-    functionAppResourceId: functionApp.outputs.resourceId
-    roleDefinitionId: 'a959dbd1-f747-45e3-8ba6-dd80f235f97c' // Desktop Virtualization Virtual Machine Contributor
+    principalId: userAssignedIdentity_FunctionApp.properties.principalId
+    resourceId: userAssignedIdentityResourceId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'a959dbd1-f747-45e3-8ba6-dd80f235f97c') // Desktop Virtualization Virtual Machine Contributor
   }
 }]

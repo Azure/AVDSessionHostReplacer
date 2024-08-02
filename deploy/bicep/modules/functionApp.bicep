@@ -1,6 +1,7 @@
 param applicationInsightsName string
 param appServicePlanName string
 param delegatedSubnetResourceId string
+param entraTenantType string
 param functionAppName string
 param functionAppNetworkInterfaceName string
 param functionAppPrivateDnsZoneResourceId string
@@ -16,12 +17,6 @@ param timestamp string
 param userAssignedIdentityResourceId string
 
 var cloudSuffix = replace(replace(environment().resourceManager, 'https://management.', ''), '/', '')
-var entraEnvironmentName = {
-  'https://graph.microsoft.com': 'Global'
-  'https://graph.microsoft.us': 'USGov'
-  'https://dod-graph.microsoft.us': 'USGovDoD'
-  'https://microsoftgraph.chinacloudapi.cn': 'China'
-}
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: appServicePlanName
@@ -67,7 +62,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
           }
           {
             name: '_EntraEnvironmentName'
-            value: entraEnvironmentName[environment().graph]
+            value: entraTenantType
           }
           {
             name: '_SubscriptionId'

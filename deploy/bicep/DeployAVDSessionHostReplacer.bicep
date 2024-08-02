@@ -15,6 +15,13 @@ param domainJoinPassword string = ''
 param domainJoinUserName string = ''
 param domainName string = ''
 param drainGracePeriodHours int = 24
+@allowed([
+  'China'
+  'Global'
+  'USGov'
+  'USGovDoD'
+])
+param entraTenantType string
 param fixSessionHostTags bool = true
 param functionAppName string
 param functionAppNetworkInterfaceName string
@@ -217,6 +224,7 @@ module functionApp 'modules/functionApp.bicep' = {
     applicationInsightsName: applicationInsights.outputs.name
     appServicePlanName: appServicePlanName
     delegatedSubnetResourceId: delegatedSubnetResourceId
+    entraTenantType: entraTenantType
     functionAppName: functionAppName
     functionAppNetworkInterfaceName: functionAppNetworkInterfaceName
     functionAppPrivateDnsZoneResourceId: functionAppPrivateDnsZoneResourceId

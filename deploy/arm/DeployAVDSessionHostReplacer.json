@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "248739500466701574"
+      "templateHash": "2234758255963626620"
     }
   },
   "parameters": {
@@ -57,6 +57,15 @@
     "drainGracePeriodHours": {
       "type": "int",
       "defaultValue": 24
+    },
+    "entraTenantType": {
+      "type": "string",
+      "allowedValues": [
+        "China",
+        "Global",
+        "USGov",
+        "USGovDoD"
+      ]
     },
     "fixSessionHostTags": {
       "type": "bool",
@@ -1565,6 +1574,9 @@
           "delegatedSubnetResourceId": {
             "value": "[parameters('delegatedSubnetResourceId')]"
           },
+          "entraTenantType": {
+            "value": "[parameters('entraTenantType')]"
+          },
           "functionAppName": {
             "value": "[parameters('functionAppName')]"
           },
@@ -1701,7 +1713,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "4879425415147632138"
+              "templateHash": "5705700411725423619"
             }
           },
           "parameters": {
@@ -1712,6 +1724,9 @@
               "type": "string"
             },
             "delegatedSubnetResourceId": {
+              "type": "string"
+            },
+            "entraTenantType": {
               "type": "string"
             },
             "functionAppName": {
@@ -1756,13 +1771,7 @@
             }
           },
           "variables": {
-            "cloudSuffix": "[replace(replace(environment().resourceManager, 'https://management.', ''), '/', '')]",
-            "entraEnvironmentName": {
-              "https://graph.microsoft.com": "Global",
-              "https://graph.microsoft.us": "USGov",
-              "https://dod-graph.microsoft.us": "USGovDoD",
-              "https://microsoftgraph.chinacloudapi.cn": "China"
-            }
+            "cloudSuffix": "[replace(replace(environment().resourceManager, 'https://management.', ''), '/', '')]"
           },
           "resources": [
             {
@@ -1800,7 +1809,7 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "siteConfig": {
                   "alwaysOn": true,
-                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', variables('entraEnvironmentName')[environment().graph]), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell')), parameters('replacementPlanSettings'))]",
+                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', parameters('entraTenantType')), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell')), parameters('replacementPlanSettings'))]",
                   "cors": {
                     "allowedOrigins": [
                       "[format('{0}', environment().portal)]",

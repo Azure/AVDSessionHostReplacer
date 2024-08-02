@@ -33,30 +33,17 @@ catch{
 
 if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
-    if([string]::IsNullOrEmpty($env:_ClientResourceId)){
-        Write-PSFMessage -Level Host -Message "Authenticating with system assigned identity"
-        Connect-AzAccount -Environment $env:_EnvironmentName -Tenant $env:_TenantId -SubscriptionId (Get-FunctionConfig _SubscriptionId) -Identity
-        if(Get-FunctionConfig _RemoveAzureADDevice){
-            Write-PSFMessage -Level Host -Message "Connecting to Graph API"
-            Connect-MGGraph -Identity
-        }
-    }
-    else{
-        Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Resource ID: $env:_ClientResourceId"
+    Write-PSFMessage -Level Host -Message "Connecting to Azure using User Assigned Managed Identity with Client ID: $env:_ClientId"
 
-        $entraAzureConnection = Connect-EntraService -Identity -IdentityType 'ResourceID' -IdentityID $env:_ClientResourceId -Service 'Azure' -PassThru
-        Connect-AzAccount -Environment $env:_EnvironmentName -Tenant $env:_TenantId -Subscription (Get-FunctionConfig _SubscriptionId) -AccountId $env:_ClientResourceId -AccessToken $entraAzureConnection.AccessToken
+    Connect-AzAccount -Environment (Get-FunctionConfig _AzureEnvironmentName) -Tenant (Get-FunctionConfig _TenantId) -Subscription (Get-FunctionConfig _SubscriptionId) -Identity -AccountId $env:_ClientId
 
-
-        if(Get-FunctionConfig _RemoveAzureADDevice){
-            Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID. Connecting to Graph API using User Managed Identity with Resource ID: $env:_ClientResourceId"
-            $entraGraphConnection = Connect-EntraService -Identity -IdentityType 'ResourceID' -IdentityID $env:_ClientResourceId -Service 'Graph' -PassThru
-            Connect-MGGraph -AccessToken (ConvertTo-SecureString $entraGraphConnection.AccessToken -AsPlainText -Force)
-        }
+    if(Get-FunctionConfig _RemoveAzureADDevice){
+        Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID. Connecting to Graph API using User Assigned Managed Identity with Resource ID: $env:_ClientId"
+        Connect-MGGraph -Environment (Get-FunctionConfig _EntraEnvironmentName) -Tenant (Get-FunctionConfig _TenantId) -Identity -AccountId $env:_ClientId
     }
 }
 else{
     # This is for testing locally
-    Write-PSFMessage "MSI_Secret environment variable not found. This should only happen when testing locally. Otherwise confirm that a System or User Managed Identity is defined."
+    Write-PSFMessage "MSI_Secret environment variable not found. This should only happen when testing locally. Otherwise confirm that a User Assigned Managed Identity is defined."
     Set-AzContext -SubscriptionId (Get-FunctionConfig _SubscriptionId)
 }

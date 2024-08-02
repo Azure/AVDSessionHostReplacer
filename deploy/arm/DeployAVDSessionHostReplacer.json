@@ -1,16 +1,11 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
-  "languageVersion": "2.1-experimental",
   "contentVersion": "1.0.0.0",
   "metadata": {
-    "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-    "_EXPERIMENTAL_FEATURES_ENABLED": [
-      "Extensibility"
-    ],
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "4887159811443617164"
+      "templateHash": "4274217574941993781"
     }
   },
   "parameters": {
@@ -240,8 +235,8 @@
     "imageReference": "[if(empty(parameters('galleryImageId')), createObject('publisher', parameters('marketPlaceImagePublisher'), 'offer', parameters('marketPlaceImageOffer'), 'sku', parameters('marketPlaceImageSku'), 'version', 'latest'), createObject('Id', parameters('galleryImageId')))]",
     "domainJoinObject": "[if(equals(parameters('identityServiceProvider'), 'EntraID'), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('intuneEnrollment')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('domainName'), 'DomainJoinUserName', parameters('domainJoinUserName'), 'ADOUPath', parameters('organizationUnitPath')))]"
   },
-  "resources": {
-    "roleDefinition": {
+  "resources": [
+    {
       "type": "Microsoft.Authorization/roleDefinitions",
       "apiVersion": "2022-04-01",
       "name": "[guid(subscription().id, 'Key Vault Deployment Operator')]",
@@ -260,15 +255,7 @@
         ]
       }
     },
-    "userAssignedIdentity_FunctionApp": {
-      "existing": true,
-      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-      "apiVersion": "2023-01-31",
-      "subscriptionId": "[split(parameters('userAssignedIdentityResourceId'), '/')[2]]",
-      "resourceGroup": "[split(parameters('userAssignedIdentityResourceId'), '/')[4]]",
-      "name": "[split(parameters('userAssignedIdentityResourceId'), '/')[8]]"
-    },
-    "userAssignedIdentity_Encryption": {
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('deploy-user-assigned-identity-encryption-{0}', parameters('timeStamp'))]",
@@ -338,7 +325,7 @@
         }
       }
     },
-    "keyVault": {
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('deploy-key-vault-{0}', parameters('timeStamp'))]",
@@ -375,10 +362,10 @@
             "value": "[parameters('tags')]"
           },
           "userAssignedIdentityResourceId": {
-            "value": "[reference('userAssignedIdentity_Encryption').outputs.resourceId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-user-assigned-identity-encryption-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value]"
           },
           "userAssignedIdentityPrincipalId": {
-            "value": "[reference('userAssignedIdentity_Encryption').outputs.principalId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-user-assigned-identity-encryption-{0}', parameters('timeStamp'))), '2022-09-01').outputs.principalId.value]"
           }
         },
         "template": {
@@ -609,11 +596,11 @@
         }
       },
       "dependsOn": [
-        "roleDefinition",
-        "userAssignedIdentity_Encryption"
+        "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', guid(subscription().id, 'Key Vault Deployment Operator'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-user-assigned-identity-encryption-{0}', parameters('timeStamp')))]"
       ]
     },
-    "storageAccount": {
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('deploy-storage-account-{0}', parameters('timeStamp'))]",
@@ -638,10 +625,10 @@
             "value": "[parameters('azureTablesPrivateDnsZoneResourceId')]"
           },
           "keyName": {
-            "value": "[reference('keyVault').outputs.keyName.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp'))), '2022-09-01').outputs.keyName.value]"
           },
           "keyVaultUri": {
-            "value": "[reference('keyVault').outputs.uri.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp'))), '2022-09-01').outputs.uri.value]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -668,7 +655,7 @@
             "value": "[parameters('tags')]"
           },
           "userAssignedIdentityResourceId_Encryption": {
-            "value": "[reference('userAssignedIdentity_Encryption').outputs.resourceId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-user-assigned-identity-encryption-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value]"
           },
           "userAssignedIdentityResourceId_FunctionApp": {
             "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('userAssignedIdentityResourceId'), '/')[8])]"
@@ -955,12 +942,11 @@
         }
       },
       "dependsOn": [
-        "keyVault",
-        "userAssignedIdentity_Encryption",
-        "userAssignedIdentity_FunctionApp"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-user-assigned-identity-encryption-{0}', parameters('timeStamp')))]"
       ]
     },
-    "applicationInsights": {
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('deploy-application-insights-{0}', parameters('timeStamp'))]",
@@ -990,17 +976,12 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "languageVersion": "2.1-experimental",
           "contentVersion": "1.0.0.0",
           "metadata": {
-            "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-            "_EXPERIMENTAL_FEATURES_ENABLED": [
-              "Extensibility"
-            ],
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "6506392736823118863"
+              "templateHash": "16837093563248366099"
             }
           },
           "parameters": {
@@ -1020,8 +1001,8 @@
               "type": "string"
             }
           },
-          "resources": {
-            "applicationInsights": {
+          "resources": [
+            {
               "type": "Microsoft.Insights/components",
               "apiVersion": "2020-02-02",
               "name": "[parameters('applicationInsightsName')]",
@@ -1034,7 +1015,7 @@
               },
               "kind": "web"
             },
-            "privateLinkScope": {
+            {
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "[format('deploy-private-link-scope-{0}', parameters('timestamp'))]",
@@ -1058,17 +1039,12 @@
                 },
                 "template": {
                   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                  "languageVersion": "2.1-experimental",
                   "contentVersion": "1.0.0.0",
                   "metadata": {
-                    "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-                    "_EXPERIMENTAL_FEATURES_ENABLED": [
-                      "Extensibility"
-                    ],
                     "_generator": {
                       "name": "bicep",
                       "version": "0.29.47.4906",
-                      "templateHash": "9827824975592821096"
+                      "templateHash": "9527454008361250279"
                     }
                   },
                   "parameters": {
@@ -1082,32 +1058,23 @@
                       "type": "string"
                     }
                   },
-                  "resources": {
-                    "privateLinkScope": {
-                      "existing": true,
-                      "type": "Microsoft.Insights/privateLinkScopes",
-                      "apiVersion": "2021-09-01",
-                      "name": "[split(parameters('privateLinkScopeResourceId'), '/')[8]]"
-                    },
-                    "scopedResource": {
+                  "resources": [
+                    {
                       "type": "Microsoft.Insights/privateLinkScopes/scopedResources",
                       "apiVersion": "2021-09-01",
                       "name": "[format('{0}/{1}', split(parameters('privateLinkScopeResourceId'), '/')[8], parameters('applicationInsightsName'))]",
                       "properties": {
                         "linkedResourceId": "[parameters('applicationInsightsResourceId')]"
-                      },
-                      "dependsOn": [
-                        "privateLinkScope"
-                      ]
+                      }
                     }
-                  }
+                  ]
                 }
               },
               "dependsOn": [
-                "applicationInsights"
+                "[resourceId('Microsoft.Insights/components', parameters('applicationInsightsName'))]"
               ]
             }
-          },
+          ],
           "outputs": {
             "name": {
               "type": "string",
@@ -1117,7 +1084,7 @@
         }
       }
     },
-    "templateSpec": {
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('deploy-template-spec-{0}', parameters('timeStamp'))]",
@@ -1141,17 +1108,12 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "languageVersion": "2.1-experimental",
           "contentVersion": "1.0.0.0",
           "metadata": {
-            "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-            "_EXPERIMENTAL_FEATURES_ENABLED": [
-              "Extensibility"
-            ],
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "6942477372429502197"
+              "templateHash": "5906753604464338326"
             }
           },
           "parameters": {
@@ -1568,8 +1530,8 @@
               ]
             }
           },
-          "resources": {
-            "templateSpec::deployTemplateSpecVersion": {
+          "resources": [
+            {
               "type": "Microsoft.Resources/templateSpecs/versions",
               "apiVersion": "2022-02-01",
               "name": "[format('{0}/{1}', parameters('name'), 'deploymentTemplateSpecVersion')]",
@@ -1578,10 +1540,10 @@
                 "mainTemplate": "[variables('$fxv#0')]"
               },
               "dependsOn": [
-                "templateSpec"
+                "[resourceId('Microsoft.Resources/templateSpecs', parameters('name'))]"
               ]
             },
-            "templateSpec": {
+            {
               "type": "Microsoft.Resources/templateSpecs",
               "apiVersion": "2022-02-01",
               "name": "[parameters('name')]",
@@ -1592,7 +1554,7 @@
                 "displayName": "AVD Replacement Plan Session Host Template"
               }
             }
-          },
+          ],
           "outputs": {
             "name": {
               "type": "string",
@@ -1606,7 +1568,7 @@
         }
       }
     },
-    "functionApp": {
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('deploy-function-app-{0}', parameters('timeStamp'))]",
@@ -1619,7 +1581,7 @@
         "mode": "Incremental",
         "parameters": {
           "applicationInsightsName": {
-            "value": "[reference('applicationInsights').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-application-insights-{0}', parameters('timeStamp'))), '2022-09-01').outputs.name.value]"
           },
           "appServicePlanName": {
             "value": "[parameters('appServicePlanName')]"
@@ -1668,11 +1630,11 @@
               },
               {
                 "name": "_SessionHostTemplate",
-                "value": "[reference('templateSpec').outputs.resourceId.value]"
+                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value]"
               },
               {
                 "name": "_SessionHostParameters",
-                "value": "[string(createObject('location', parameters('sessionHostsRegion'), 'availabilityZones', parameters('availabilityZones'), 'vmSize', parameters('sessionHostSize'), 'acceleratedNetworking', parameters('acceleratedNetworking'), 'diskType', parameters('sessionHostDiskType'), 'imageReference', variables('imageReference'), 'securityProfile', createObject('securityType', parameters('securityType'), 'uefiSettings', createObject('secureBootEnabled', true(), 'vTpmEnabled', true())), 'subnetResourceId', parameters('subnetResourceId'), 'DomainJoinObject', variables('domainJoinObject'), 'DomainJoinPassword', if(equals(parameters('identityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference('keyVault').outputs.resourceId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('localAdminUsername'), 'tags', parameters('tags')))]"
+                "value": "[string(createObject('location', parameters('sessionHostsRegion'), 'availabilityZones', parameters('availabilityZones'), 'vmSize', parameters('sessionHostSize'), 'acceleratedNetworking', parameters('acceleratedNetworking'), 'diskType', parameters('sessionHostDiskType'), 'imageReference', variables('imageReference'), 'securityProfile', createObject('securityType', parameters('securityType'), 'uefiSettings', createObject('secureBootEnabled', true(), 'vTpmEnabled', true())), 'subnetResourceId', parameters('subnetResourceId'), 'DomainJoinObject', variables('domainJoinObject'), 'DomainJoinPassword', if(equals(parameters('identityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('localAdminUsername'), 'tags', parameters('tags')))]"
               },
               {
                 "name": "_RemoveAzureADDevice",
@@ -1680,7 +1642,7 @@
               },
               {
                 "name": "_ClientId",
-                "value": "[reference('userAssignedIdentity_FunctionApp').clientId]"
+                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('userAssignedIdentityResourceId'), '/')[8]), '2023-01-31').clientId]"
               },
               {
                 "name": "_Tag_IncludeInAutomation",
@@ -1741,7 +1703,7 @@
             ]
           },
           "storageAccountName": {
-            "value": "[reference('storageAccount').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-storage-account-{0}', parameters('timeStamp'))), '2022-09-01').outputs.name.value]"
           },
           "subnetResourceId": {
             "value": "[parameters('subnetResourceId')]"
@@ -1758,17 +1720,12 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "languageVersion": "2.1-experimental",
           "contentVersion": "1.0.0.0",
           "metadata": {
-            "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-            "_EXPERIMENTAL_FEATURES_ENABLED": [
-              "Extensibility"
-            ],
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "5330738797263169813"
+              "templateHash": "4879425415147632138"
             }
           },
           "parameters": {
@@ -1831,8 +1788,8 @@
               "https://microsoftgraph.chinacloudapi.cn": "China"
             }
           },
-          "resources": {
-            "appServicePlan": {
+          "resources": [
+            {
               "type": "Microsoft.Web/serverfarms",
               "apiVersion": "2023-01-01",
               "name": "[parameters('appServicePlanName')]",
@@ -1847,13 +1804,7 @@
               },
               "kind": "functionapp"
             },
-            "applicationInsights": {
-              "existing": true,
-              "type": "Microsoft.Insights/components",
-              "apiVersion": "2020-02-02",
-              "name": "[parameters('applicationInsightsName')]"
-            },
-            "functionApp": {
+            {
               "type": "Microsoft.Web/sites",
               "apiVersion": "2023-01-01",
               "name": "[parameters('functionAppName')]",
@@ -1873,7 +1824,7 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "siteConfig": {
                   "alwaysOn": true,
-                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', variables('entraEnvironmentName')[environment().graph]), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference('applicationInsights').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell')), parameters('replacementPlanSettings'))]",
+                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', variables('entraEnvironmentName')[environment().graph]), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell')), parameters('replacementPlanSettings'))]",
                   "cors": {
                     "allowedOrigins": [
                       "[format('{0}', environment().portal)]",
@@ -1893,11 +1844,10 @@
                 "vnetRouteAllEnabled": true
               },
               "dependsOn": [
-                "applicationInsights",
-                "appServicePlan"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
               ]
             },
-            "privateEndpoint": {
+            {
               "type": "Microsoft.Network/privateEndpoints",
               "apiVersion": "2023-04-01",
               "name": "[parameters('functionAppPrivateEndpointName')]",
@@ -1921,10 +1871,10 @@
                 }
               },
               "dependsOn": [
-                "functionApp"
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
               ]
             },
-            "privateDnsZoneGroup": {
+            {
               "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
               "apiVersion": "2021-08-01",
               "name": "[format('{0}/{1}', parameters('functionAppPrivateEndpointName'), 'default')]",
@@ -1939,10 +1889,10 @@
                 ]
               },
               "dependsOn": [
-                "privateEndpoint"
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('functionAppPrivateEndpointName'))]"
               ]
             },
-            "msDeploy": {
+            {
               "type": "Microsoft.Web/sites/extensions",
               "apiVersion": "2023-01-01",
               "name": "[format('{0}/{1}', parameters('functionAppName'), 'MSDeploy')]",
@@ -1950,12 +1900,12 @@
                 "packageUri": "[parameters('functionAppZipUrl')]"
               },
               "dependsOn": [
-                "functionApp",
-                "privateDnsZoneGroup",
-                "privateEndpoint"
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]",
+                "[resourceId('Microsoft.Network/privateEndpoints/privateDnsZoneGroups', parameters('functionAppPrivateEndpointName'), 'default')]",
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('functionAppPrivateEndpointName'))]"
               ]
             },
-            "scmARecord": {
+            {
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "[format('deploy-scm-a-record-{0}', parameters('timestamp'))]",
@@ -1971,7 +1921,7 @@
                     "value": "[parameters('functionAppName')]"
                   },
                   "ipv4Address": {
-                    "value": "[filter(reference('privateDnsZoneGroup').privateDnsZoneConfigs[0].properties.recordSets, lambda('record', equals(lambdaVariables('record').recordSetName, parameters('functionAppName'))))[0].ipAddresses[0]]"
+                    "value": "[filter(reference(resourceId('Microsoft.Network/privateEndpoints/privateDnsZoneGroups', parameters('functionAppPrivateEndpointName'), 'default'), '2021-08-01').privateDnsZoneConfigs[0].properties.recordSets, lambda('record', equals(lambdaVariables('record').recordSetName, parameters('functionAppName'))))[0].ipAddresses[0]]"
                   },
                   "privateDnsZoneName": {
                     "value": "[split(parameters('functionAppScmPrivateDnsZoneResourceId'), '/')[8]]"
@@ -1979,17 +1929,12 @@
                 },
                 "template": {
                   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                  "languageVersion": "2.1-experimental",
                   "contentVersion": "1.0.0.0",
                   "metadata": {
-                    "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-                    "_EXPERIMENTAL_FEATURES_ENABLED": [
-                      "Extensibility"
-                    ],
                     "_generator": {
                       "name": "bicep",
                       "version": "0.29.47.4906",
-                      "templateHash": "1354550571225608750"
+                      "templateHash": "7030409442479244335"
                     }
                   },
                   "parameters": {
@@ -2003,14 +1948,8 @@
                       "type": "string"
                     }
                   },
-                  "resources": {
-                    "privateDnsZone": {
-                      "existing": true,
-                      "type": "Microsoft.Network/privateDnsZones",
-                      "apiVersion": "2020-06-01",
-                      "name": "[parameters('privateDnsZoneName')]"
-                    },
-                    "a": {
+                  "resources": [
+                    {
                       "type": "Microsoft.Network/privateDnsZones/A",
                       "apiVersion": "2020-06-01",
                       "name": "[format('{0}/{1}', parameters('privateDnsZoneName'), parameters('functionAppName'))]",
@@ -2021,30 +1960,26 @@
                           }
                         ],
                         "ttl": 3600
-                      },
-                      "dependsOn": [
-                        "privateDnsZone"
-                      ]
+                      }
                     }
-                  }
+                  ]
                 }
               },
               "dependsOn": [
-                "privateDnsZoneGroup"
+                "[resourceId('Microsoft.Network/privateEndpoints/privateDnsZoneGroups', parameters('functionAppPrivateEndpointName'), 'default')]"
               ]
             }
-          }
+          ]
         }
       },
       "dependsOn": [
-        "applicationInsights",
-        "keyVault",
-        "storageAccount",
-        "templateSpec",
-        "userAssignedIdentity_FunctionApp"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-application-insights-{0}', parameters('timeStamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-storage-account-{0}', parameters('timeStamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp')))]"
       ]
     },
-    "roleAssignment_TemplateSpec": {
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('assign-rbac-template-spec-{0}', parameters('timeStamp'))]",
@@ -2057,7 +1992,7 @@
         "mode": "Incremental",
         "parameters": {
           "principalId": {
-            "value": "[reference('userAssignedIdentity_FunctionApp').principalId]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('userAssignedIdentityResourceId'), '/')[8]), '2023-01-31').principalId]"
           },
           "resourceId": {
             "value": "[parameters('userAssignedIdentityResourceId')]"
@@ -2066,7 +2001,7 @@
             "value": "[resourceId('Microsoft.Authorization/roleDefinitions', '392ae280-861d-42bd-9ea5-08ee6d83b80e')]"
           },
           "templateSpecName": {
-            "value": "[reference('templateSpec').outputs.name.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp'))), '2022-09-01').outputs.name.value]"
           }
         },
         "template": {
@@ -2123,11 +2058,10 @@
         }
       },
       "dependsOn": [
-        "templateSpec",
-        "userAssignedIdentity_FunctionApp"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp')))]"
       ]
     },
-    "roleAssignments_AVD": {
+    {
       "copy": {
         "name": "roleAssignments_AVD",
         "count": "[length(createArray(parameters('sessionHostResourceGroupName'), split(parameters('hostPoolResourceId'), '/')[4]))]"
@@ -2143,7 +2077,7 @@
         "mode": "Incremental",
         "parameters": {
           "principalId": {
-            "value": "[reference('userAssignedIdentity_FunctionApp').principalId]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('userAssignedIdentityResourceId'), '/')[8]), '2023-01-31').principalId]"
           },
           "resourceId": {
             "value": "[parameters('userAssignedIdentityResourceId')]"
@@ -2191,10 +2125,7 @@
             }
           }
         }
-      },
-      "dependsOn": [
-        "userAssignedIdentity_FunctionApp"
-      ]
+      }
     }
-  }
+  ]
 }

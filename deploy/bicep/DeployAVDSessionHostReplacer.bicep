@@ -131,24 +131,24 @@ var domainJoinPasswordReference = identityServiceProvider == 'EntraID' ? null : 
 }
 
 var sessionHostTemplateParameters = {
-  location: sessionHostsRegion
-  availabilityZones: availabilityZones
-  vmSize: sessionHostSize
-  acceleratedNetworking: acceleratedNetworking
-  diskType: sessionHostDiskType
-  imageReference: imageReference
-  securityProfile: {
+  AcceleratedNetworking: acceleratedNetworking
+  AdminUsername: localAdminUsername
+  AvailabilityZones: availabilityZones
+  DiskType: sessionHostDiskType
+  DomainJoinObject: domainJoinObject
+  DomainJoinPassword: domainJoinPasswordReference
+  ImageReference: imageReference
+  Location: sessionHostsRegion
+  SecurityProfile: {
     securityType: securityType
     uefiSettings: {
       secureBootEnabled: true
       vTpmEnabled: true
     }
   }
-  subnetResourceId: subnetResourceId
-  DomainJoinObject: domainJoinObject
-  DomainJoinPassword: domainJoinPasswordReference
-  AdminUsername: localAdminUsername
+  SubnetId: subnetResourceId
   tags: tags
+  VMSize: sessionHostSize
 }
 
 resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
@@ -373,7 +373,8 @@ module roleAssignment_TemplateSpec 'modules/roleAssignment_TemplateSpec.bicep' =
   }
 }
 
-module roleAssignments_AVD 'modules/roleAssignment_AVD.bicep' = [for rg in [sessionHostResourceGroupName, split(hostPoolResourceId, '/')[4]] : {
+@batchSize(1) // Batching is needed in case the resource groups are the same
+module roleAssignments_AVD 'modules/roleAssignment_AVD.bicep' = [for rg in [sessionHostResourceGroupName, split(hostPoolResourceId, '/')[4], split(subnetResourceId, '/')[4]] : {
   name: 'assign-rbac-AVD-${timeStamp}'
   scope: resourceGroup(rg)
   params: {

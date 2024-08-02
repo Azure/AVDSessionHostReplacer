@@ -38,8 +38,8 @@ if ($env:MSI_SECRET) {
     Connect-AzAccount -Environment (Get-FunctionConfig _AzureEnvironmentName) -Tenant (Get-FunctionConfig _TenantId) -Subscription (Get-FunctionConfig _SubscriptionId) -Identity -AccountId $env:_ClientId
 
     if(Get-FunctionConfig _RemoveAzureADDevice){
-        Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID. Connecting to Graph API using User Assigned Managed Identity with Resource ID: $env:_ClientId"
-        Connect-MGGraph -Environment (Get-FunctionConfig _EntraEnvironmentName) -Tenant (Get-FunctionConfig _TenantId) -Identity -AccountId $env:_ClientId
+        Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID. Connecting to Graph API using User Assigned Managed Identity with Client ID: $env:_ClientId"
+        Connect-MGGraph -Environment (Get-FunctionConfig _EntraEnvironmentName) -Identity -ClientId $env:_ClientId
     }
 }
 else{

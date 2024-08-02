@@ -12,8 +12,14 @@ param storageAccountNetworkInterfaceName string
 param storageAccountPrivateEndpointName string
 param subnetResourceId string
 param tags object
-param userAssignedIdentityResourceId string
+param userAssignedIdentityResourceId_Encryption string
+param userAssignedIdentityResourceId_FunctionApp string
 
+var roleDefinitionIds = [
+  '17d1049b-9a84-46fb-8f53-869881c3d3ab' // Storage Account Contributor
+  'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' // Storage Blob Data Owner
+  '974c5e8b-45b9-4653-ba55-5f855dd0fb88' // Storage Queue Data Contributor
+]
 var storagePrivateDnsZoneResourceIds = [
   azureBlobsPrivateDnsZoneResourceId
   azureFilesPrivateDnsZoneResourceId
@@ -27,7 +33,7 @@ var storageSubResources = [
   'table'
 ]
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: storageAccountName
   location: location
   tags: tags[?'Microsoft.Storage/storageAccounts'] ?? {}
@@ -38,7 +44,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${userAssignedIdentityResourceId}': {}
+      '${userAssignedIdentityResourceId_Encryption}': {}
     }
   }
   properties: {
@@ -54,7 +60,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     dnsEndpointType: 'Standard'
     encryption: {
       identity: {
-        userAssignedIdentity: userAssignedIdentityResourceId
+        userAssignedIdentity: userAssignedIdentityResourceId_Encryption
       }
       requireInfrastructureEncryption: true
       keyvaultproperties: {
@@ -94,10 +100,25 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
 }
 
-resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2021-09-01' = {
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
   parent: storageAccount
   name: 'default'
 }
+
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+  scope: resourceGroup(split(userAssignedIdentityResourceId_FunctionApp, '/')[2], split(userAssignedIdentityResourceId_FunctionApp, '/')[4])
+  name: split(userAssignedIdentityResourceId_FunctionApp, '/')[8]
+}
+
+resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for roleDefinitionId in roleDefinitionIds : {
+  name: guid(userAssignedIdentityResourceId_FunctionApp, roleDefinitionId, storageAccount.id)
+  scope: storageAccount
+  properties: {
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId)
+    principalId: userAssignedIdentity.properties.principalId
+    principalType: 'ServicePrincipal'
+  }
+}]
 
 resource privateEndpoints 'Microsoft.Network/privateEndpoints@2023-04-01' = [
   for resource in storageSubResources: {
@@ -124,7 +145,7 @@ resource privateEndpoints 'Microsoft.Network/privateEndpoints@2023-04-01' = [
   }
 ]
 
-resource privateDnsZoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-08-01' = [
+resource privateDnsZoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-11-01' = [
   for (resource, i) in storageSubResources: {
     parent: privateEndpoints[i]
     name: storageAccount.name
@@ -142,7 +163,7 @@ resource privateDnsZoneGroups 'Microsoft.Network/privateEndpoints/privateDnsZone
   }
 ]
 
-resource diagnosticSetting_blobs 'Microsoft.Insights/diagnosticsettings@2017-05-01-preview' = if (!empty(logAnalyticsWorkspaceResourceId)) {
+resource diagnosticSetting_blobs 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = if (!empty(logAnalyticsWorkspaceResourceId)) {
   scope: blobService
   name: storageAccountDiagnosticSettingName
   properties: {

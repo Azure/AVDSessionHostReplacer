@@ -21,7 +21,7 @@ param drainGracePeriodHours int = 24
   'USGov'
   'USGovDoD'
 ])
-param entraTenantType string
+param entraTenantType string = 'Global'
 param fixSessionHostTags bool = true
 param functionAppName string
 param functionAppNetworkInterfaceName string

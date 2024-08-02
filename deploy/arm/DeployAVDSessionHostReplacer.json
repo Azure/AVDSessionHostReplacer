@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "11909329038440776783"
+      "templateHash": "2771178702537958253"
     }
   },
   "parameters": {
@@ -1759,7 +1759,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "9391456275831379598"
+              "templateHash": "9292861880293687659"
             }
           },
           "parameters": {
@@ -1855,7 +1855,7 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "siteConfig": {
                   "alwaysOn": true,
-                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', parameters('entraEnvironmentName')), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell')), parameters('replacementPlanSettings'))]",
+                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', parameters('entraEnvironmentName')), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'WEBSITE_LOAD_USER_PROFILE', 'value', '1')), parameters('replacementPlanSettings'))]",
                   "cors": {
                     "allowedOrigins": [
                       "[format('{0}', environment().portal)]",

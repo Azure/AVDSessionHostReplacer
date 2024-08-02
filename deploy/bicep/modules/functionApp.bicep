@@ -104,6 +104,10 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
             name: 'FUNCTIONS_WORKER_RUNTIME'
             value: 'powershell'
           }
+          {
+            name: 'WEBSITE_LOAD_USER_PROFILE'
+            value: '1'
+          }
         ],
         replacementPlanSettings
       )

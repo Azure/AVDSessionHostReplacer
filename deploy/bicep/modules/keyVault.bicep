@@ -6,11 +6,13 @@ param keyVaultPrivateEndpointName string
 param location string = resourceGroup().location
 param keyExpirationInDays int = 30
 param keyVaultPrivateDnsZoneResourceId string
+param deployActionRoleDefinitionId string
 param subnetResourceId string
 param tags object
-param userAssignedIdentityName string
+param userAssignedIdentityResourceId string
 param userAssignedIdentityPrincipalId string
 
+var encryptionRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', 'e147488a-f6f5-4113-8e2d-b22465e65bf6')  // Key Vault Crypto Service Encryption User
 
 resource vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: keyVaultName
@@ -39,13 +41,23 @@ resource vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   }
 }
 
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(userAssignedIdentityName, 'e147488a-f6f5-4113-8e2d-b22465e65bf6', keyVaultName)
+resource roleAssignment_Encryption 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(userAssignedIdentityResourceId, encryptionRoleDefinitionId, vault.id)
   scope: vault
   properties: {
     principalId: userAssignedIdentityPrincipalId
     principalType: 'ServicePrincipal'
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'e147488a-f6f5-4113-8e2d-b22465e65bf6')  // Key Vault Crypto Service Encryption User
+    roleDefinitionId: encryptionRoleDefinitionId
+  }
+}
+
+resource roleAssignment_DeployAction 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(userAssignedIdentityResourceId, deployActionRoleDefinitionId, vault.id)
+  scope: vault
+  properties: {
+    principalId: userAssignedIdentityPrincipalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: deployActionRoleDefinitionId
   }
 }
 

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "2771178702537958253"
+      "templateHash": "13428905592457523159"
     }
   },
   "parameters": {
@@ -1668,7 +1668,7 @@
               },
               {
                 "name": "_SessionHostParameters",
-                "value": "[string(createObject('location', parameters('sessionHostsRegion'), 'availabilityZones', parameters('availabilityZones'), 'vmSize', parameters('sessionHostSize'), 'acceleratedNetworking', parameters('acceleratedNetworking'), 'diskType', parameters('sessionHostDiskType'), 'imageReference', variables('imageReference'), 'securityProfile', createObject('securityType', parameters('securityType'), 'uefiSettings', createObject('secureBootEnabled', true(), 'vTpmEnabled', true())), 'subnetResourceId', parameters('subnetResourceId'), 'DomainJoinObject', variables('domainJoinObject'), 'DomainJoinPassword', if(equals(parameters('identityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('localAdminUsername'), 'tags', parameters('tags')))]"
+                "value": "[string(createObject('AcceleratedNetworking', parameters('acceleratedNetworking'), 'AdminUsername', parameters('localAdminUsername'), 'AvailabilityZones', parameters('availabilityZones'), 'DiskType', parameters('sessionHostDiskType'), 'DomainJoinObject', variables('domainJoinObject'), 'DomainJoinPassword', if(equals(parameters('identityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value), 'secretName', 'DomainJoinPassword'))), 'ImageReference', variables('imageReference'), 'Location', parameters('sessionHostsRegion'), 'SecurityProfile', createObject('securityType', parameters('securityType'), 'uefiSettings', createObject('secureBootEnabled', true(), 'vTpmEnabled', true())), 'SubnetId', parameters('subnetResourceId'), 'tags', parameters('tags'), 'VMSize', parameters('sessionHostSize')))]"
               },
               {
                 "name": "_RemoveAzureADDevice",
@@ -2081,12 +2081,14 @@
     {
       "copy": {
         "name": "roleAssignments_AVD",
-        "count": "[length(createArray(parameters('sessionHostResourceGroupName'), split(parameters('hostPoolResourceId'), '/')[4]))]"
+        "count": "[length(createArray(parameters('sessionHostResourceGroupName'), split(parameters('hostPoolResourceId'), '/')[4], split(parameters('subnetResourceId'), '/')[4]))]",
+        "mode": "serial",
+        "batchSize": 1
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('assign-rbac-AVD-{0}', parameters('timeStamp'))]",
-      "resourceGroup": "[createArray(parameters('sessionHostResourceGroupName'), split(parameters('hostPoolResourceId'), '/')[4])[copyIndex()]]",
+      "resourceGroup": "[createArray(parameters('sessionHostResourceGroupName'), split(parameters('hostPoolResourceId'), '/')[4], split(parameters('subnetResourceId'), '/')[4])[copyIndex()]]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"

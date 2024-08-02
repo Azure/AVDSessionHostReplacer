@@ -20,12 +20,14 @@ var roleDefinitionIds = [
   'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' // Storage Blob Data Owner
   '974c5e8b-45b9-4653-ba55-5f855dd0fb88' // Storage Queue Data Contributor
 ]
+
 var storagePrivateDnsZoneResourceIds = [
   azureBlobsPrivateDnsZoneResourceId
   azureFilesPrivateDnsZoneResourceId
   azureQueuesPrivateDnsZoneResourceId
   azureTablesPrivateDnsZoneResourceId
 ]
+
 var storageSubResources = [
   'blob'
   'file'

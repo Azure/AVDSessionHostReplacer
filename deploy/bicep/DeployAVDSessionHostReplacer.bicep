@@ -192,6 +192,8 @@ param tagPendingDrainTimestamp string = 'AutoReplacePendingDrainTimestamp'
 
 @description('Required: No | Tags to apply to the resources.')
 param tags object = {}
+
+@description('')
 param tagScalingPlanExclusionTag string = 'ScalingPlanExclusion'
 
 @description('Required: Yes | Number of AVD session hosts to deploy.')
@@ -212,7 +214,7 @@ param userAssignedIdentityName string
 @description('Required: Yes | Resource ID of the user assigned identity to support the function app. The resource group name in this value is used as the deployment scope for all resources.')
 param userAssignedIdentityResourceId string
 
-@description('')
+@description('The name of the array parameter used in the Session Host deployment template to define the VM names. Default is "VMNames"')
 param vmNamesTemplateParameterName string = 'VMNames'
 
 var imageReference = empty(galleryImageId) ? {

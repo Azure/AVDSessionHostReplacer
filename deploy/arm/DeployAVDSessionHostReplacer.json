@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "785832862800577527"
+      "templateHash": "2618690446376085644"
     }
   },
   "parameters": {
@@ -403,7 +403,10 @@
     },
     "tagScalingPlanExclusionTag": {
       "type": "string",
-      "defaultValue": "ScalingPlanExclusion"
+      "defaultValue": "ScalingPlanExclusion",
+      "metadata": {
+        "description": ""
+      }
     },
     "targetSessionHostCount": {
       "type": "int",
@@ -447,7 +450,7 @@
       "type": "string",
       "defaultValue": "VMNames",
       "metadata": {
-        "description": ""
+        "description": "The name of the array parameter used in the Session Host deployment template to define the VM names. Default is \"VMNames\""
       }
     }
   },

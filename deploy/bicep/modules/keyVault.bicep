@@ -12,7 +12,7 @@ param tags object
 param userAssignedIdentityResourceId string
 param userAssignedIdentityPrincipalId string
 
-var encryptionRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', 'e147488a-f6f5-4113-8e2d-b22465e65bf6')  // Key Vault Crypto Service Encryption User
+
 
 resource vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: keyVaultName
@@ -42,12 +42,12 @@ resource vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 }
 
 resource roleAssignment_Encryption 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(userAssignedIdentityResourceId, encryptionRoleDefinitionId, vault.id)
+  name: guid(userAssignedIdentityResourceId, 'e147488a-f6f5-4113-8e2d-b22465e65bf6', vault.id)
   scope: vault
   properties: {
     principalId: userAssignedIdentityPrincipalId
     principalType: 'ServicePrincipal'
-    roleDefinitionId: encryptionRoleDefinitionId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', 'e147488a-f6f5-4113-8e2d-b22465e65bf6')  // Key Vault Crypto Service Encryption User
   }
 }
 
@@ -57,7 +57,7 @@ resource roleAssignment_DeployAction 'Microsoft.Authorization/roleAssignments@20
   properties: {
     principalId: userAssignedIdentityPrincipalId
     principalType: 'ServicePrincipal'
-    roleDefinitionId: deployActionRoleDefinitionId
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', deployActionRoleDefinitionId)
   }
 }
 

@@ -13,13 +13,15 @@ param storageAccountName string
 param subnetResourceId string
 param tags object
 param timestamp string
+param userAssignedIdentityResourceId string
 
 var cloudSuffix = replace(replace(environment().resourceManager, 'https://management.', ''), '/', '')
-var roleDefinitionIds = [
-  '17d1049b-9a84-46fb-8f53-869881c3d3ab' // Storage Account Contributor
-  'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' // Storage Blob Data Owner
-  '974c5e8b-45b9-4653-ba55-5f855dd0fb88' // Storage Queue Data Contributor
-]
+var entraEnvironmentName = {
+  'https://graph.microsoft.com': 'Global'
+  'https://graph.microsoft.us': 'USGov'
+  'https://dod-graph.microsoft.us': 'USGovDoD'
+  'https://microsoftgraph.chinacloudapi.cn': 'China'
+}
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: appServicePlanName
@@ -39,17 +41,16 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing
   name: applicationInsightsName
 }
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: storageAccountName
-}
-
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: functionAppName
   location: location
   tags: tags[?'Microsoft.Web/sites'] ?? {}
   kind: 'functionapp'
   identity: {
-    type: 'SystemAssigned'
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${userAssignedIdentityResourceId}': {}
+    }
   }
   properties: {
     clientAffinityEnabled: false
@@ -61,8 +62,12 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       appSettings: union(
         [
           {
-            name: '_EnvironmentName'
+            name: '_AzureEnvironmentName'
             value: environment().name
+          }
+          {
+            name: '_EntraEnvironmentName'
+            value: entraEnvironmentName[environment().graph]
           }
           {
             name: '_SubscriptionId'
@@ -79,6 +84,14 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
           {
             name: 'AzureWebJobsStorage__blobServiceUri'
             value: 'https://${storageAccountName}.blob.${environment().suffixes.storage}'
+          }
+          {
+            name: 'AzureWebJobsStorage__credential'
+            value: 'managedidentity'
+          }
+          {
+            name: 'AzureWebJobsStorage__managedIdentityResourceId'
+            value: userAssignedIdentityResourceId
           }
           {
             name: 'AzureWebJobsStorage__queueServiceUri'
@@ -118,16 +131,6 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     vnetRouteAllEnabled: true
   }
 }
-
-resource roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for roleDefinitionId in roleDefinitionIds : {
-  name: guid(functionApp.id, roleDefinitionId, storageAccount.id)
-  scope: storageAccount
-  properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId)
-    principalId: functionApp.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}]
 
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-04-01' = {
   name: functionAppPrivateEndpointName
@@ -189,7 +192,3 @@ module scmARecord 'aRecord.bicep' = {
     privateDnsZoneName: split(functionAppScmPrivateDnsZoneResourceId, '/')[8]
   }
 }
-
-output name string = functionApp.name
-output principalId string = functionApp.identity.principalId
-output resourceId string = functionApp.id

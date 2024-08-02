@@ -21,7 +21,7 @@ param functionAppNetworkInterfaceName string
 param functionAppPrivateDnsZoneResourceId string
 param functionAppPrivateEndpointName string
 param functionAppScmPrivateDnsZoneResourceId string
-param functionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.7/FunctionApp.zip'
+param functionAppZipUrl string = 'https://github.com/jamasten/AVDSessionHostReplacer/raw/main/FunctionApp.zip'
 param galleryImageId string = ''
 param hostPoolResourceId string
 param identityServiceProvider string

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "4274217574941993781"
+      "templateHash": "248739500466701574"
     }
   },
   "parameters": {
@@ -79,7 +79,7 @@
     },
     "functionAppZipUrl": {
       "type": "string",
-      "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.7/FunctionApp.zip"
+      "defaultValue": "https://github.com/jamasten/AVDSessionHostReplacer/raw/main/FunctionApp.zip"
     },
     "galleryImageId": {
       "type": "string",
@@ -279,17 +279,12 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "languageVersion": "2.1-experimental",
           "contentVersion": "1.0.0.0",
           "metadata": {
-            "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-            "_EXPERIMENTAL_FEATURES_ENABLED": [
-              "Extensibility"
-            ],
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "14904327947849671335"
+              "templateHash": "6010960606493396717"
             }
           },
           "parameters": {
@@ -303,19 +298,19 @@
               "type": "string"
             }
           },
-          "resources": {
-            "userAssignedIdentity": {
+          "resources": [
+            {
               "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
               "apiVersion": "2023-01-31",
               "name": "[parameters('userAssignedIdentityName')]",
               "location": "[parameters('location')]",
               "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.ManagedIdentity/userAssignedIdentities'), createObject())]"
             }
-          },
+          ],
           "outputs": {
             "principalId": {
               "type": "string",
-              "value": "[reference('userAssignedIdentity').principalId]"
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName')), '2023-01-31').principalId]"
             },
             "resourceId": {
               "type": "string",
@@ -370,17 +365,12 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "languageVersion": "2.1-experimental",
           "contentVersion": "1.0.0.0",
           "metadata": {
-            "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-            "_EXPERIMENTAL_FEATURES_ENABLED": [
-              "Extensibility"
-            ],
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "7209831847992913773"
+              "templateHash": "11256594767960692153"
             }
           },
           "parameters": {
@@ -426,8 +416,8 @@
           "variables": {
             "encryptionRoleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', 'e147488a-f6f5-4113-8e2d-b22465e65bf6')]"
           },
-          "resources": {
-            "vault": {
+          "resources": [
+            {
               "type": "Microsoft.KeyVault/vaults",
               "apiVersion": "2022-07-01",
               "name": "[parameters('keyVaultName')]",
@@ -455,7 +445,7 @@
                 "tenantId": "[subscription().tenantId]"
               }
             },
-            "roleAssignment_Encryption": {
+            {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2020-04-01-preview",
               "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('keyVaultName'))]",
@@ -466,10 +456,10 @@
                 "roleDefinitionId": "[variables('encryptionRoleDefinitionId')]"
               },
               "dependsOn": [
-                "vault"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
               ]
             },
-            "roleAssignment_DeployAction": {
+            {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2020-04-01-preview",
               "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('keyVaultName'))]",
@@ -480,10 +470,10 @@
                 "roleDefinitionId": "[parameters('deployActionRoleDefinitionId')]"
               },
               "dependsOn": [
-                "vault"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
               ]
             },
-            "privateEndpoint": {
+            {
               "type": "Microsoft.Network/privateEndpoints",
               "apiVersion": "2023-04-01",
               "name": "[parameters('keyVaultPrivateEndpointName')]",
@@ -507,10 +497,10 @@
                 }
               },
               "dependsOn": [
-                "vault"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
               ]
             },
-            "privateDnsZoneGroup": {
+            {
               "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
               "apiVersion": "2021-08-01",
               "name": "[format('{0}/{1}', parameters('keyVaultPrivateEndpointName'), parameters('keyVaultName'))]",
@@ -525,11 +515,11 @@
                 ]
               },
               "dependsOn": [
-                "privateEndpoint",
-                "vault"
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('keyVaultPrivateEndpointName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
               ]
             },
-            "key": {
+            {
               "type": "Microsoft.KeyVault/vaults/keys",
               "apiVersion": "2022-07-01",
               "name": "[format('{0}/{1}', parameters('keyVaultName'), 'StorageEncryptionKey')]",
@@ -564,10 +554,10 @@
                 }
               },
               "dependsOn": [
-                "vault"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
               ]
             },
-            "secret": {
+            {
               "type": "Microsoft.KeyVault/vaults/secrets",
               "apiVersion": "2023-07-01",
               "name": "[format('{0}/{1}', parameters('keyVaultName'), 'DomainJoinPassword')]",
@@ -575,10 +565,10 @@
                 "value": "[parameters('domainJoinPassword')]"
               },
               "dependsOn": [
-                "vault"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
               ]
             }
-          },
+          ],
           "outputs": {
             "keyName": {
               "type": "string",
@@ -590,7 +580,7 @@
             },
             "uri": {
               "type": "string",
-              "value": "[reference('vault').vaultUri]"
+              "value": "[reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2022-07-01').vaultUri]"
             }
           }
         }
@@ -663,17 +653,12 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "languageVersion": "2.1-experimental",
           "contentVersion": "1.0.0.0",
           "metadata": {
-            "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-            "_EXPERIMENTAL_FEATURES_ENABLED": [
-              "Extensibility"
-            ],
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "1127970327468967980"
+              "templateHash": "17752844431231547933"
             }
           },
           "parameters": {
@@ -745,8 +730,8 @@
               "table"
             ]
           },
-          "resources": {
-            "storageAccount": {
+          "resources": [
+            {
               "type": "Microsoft.Storage/storageAccounts",
               "apiVersion": "2023-05-01",
               "name": "[parameters('storageAccountName')]",
@@ -814,23 +799,15 @@
                 "supportsHttpsTrafficOnly": true
               }
             },
-            "blobService": {
+            {
               "type": "Microsoft.Storage/storageAccounts/blobServices",
               "apiVersion": "2023-05-01",
               "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
               "dependsOn": [
-                "storageAccount"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
               ]
             },
-            "userAssignedIdentity": {
-              "existing": true,
-              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-              "apiVersion": "2023-01-31",
-              "subscriptionId": "[split(parameters('userAssignedIdentityResourceId_FunctionApp'), '/')[2]]",
-              "resourceGroup": "[split(parameters('userAssignedIdentityResourceId_FunctionApp'), '/')[4]]",
-              "name": "[split(parameters('userAssignedIdentityResourceId_FunctionApp'), '/')[8]]"
-            },
-            "roleAssignments": {
+            {
               "copy": {
                 "name": "roleAssignments",
                 "count": "[length(variables('roleDefinitionIds'))]"
@@ -841,15 +818,14 @@
               "name": "[guid(parameters('userAssignedIdentityResourceId_FunctionApp'), variables('roleDefinitionIds')[copyIndex()], resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')))]",
               "properties": {
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('roleDefinitionIds')[copyIndex()])]",
-                "principalId": "[reference('userAssignedIdentity').principalId]",
+                "principalId": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId_FunctionApp'), '/')[2], split(parameters('userAssignedIdentityResourceId_FunctionApp'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('userAssignedIdentityResourceId_FunctionApp'), '/')[8]), '2023-01-31').principalId]",
                 "principalType": "ServicePrincipal"
               },
               "dependsOn": [
-                "storageAccount",
-                "userAssignedIdentity"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
               ]
             },
-            "privateEndpoints": {
+            {
               "copy": {
                 "name": "privateEndpoints",
                 "count": "[length(variables('storageSubResources'))]"
@@ -877,10 +853,10 @@
                 }
               },
               "dependsOn": [
-                "storageAccount"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
               ]
             },
-            "privateDnsZoneGroups": {
+            {
               "copy": {
                 "name": "privateDnsZoneGroups",
                 "count": "[length(variables('storageSubResources'))]"
@@ -899,11 +875,11 @@
                 ]
               },
               "dependsOn": [
-                "[format('privateEndpoints[{0}]', copyIndex())]",
-                "storageAccount"
+                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('storageAccountPrivateEndpointName'), variables('storageSubResources')[copyIndex()]))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
               ]
             },
-            "diagnosticSetting_blobs": {
+            {
               "condition": "[not(empty(parameters('logAnalyticsWorkspaceResourceId')))]",
               "type": "Microsoft.Insights/diagnosticSettings",
               "apiVersion": "2017-05-01-preview",
@@ -925,10 +901,10 @@
                 "workspaceId": "[parameters('logAnalyticsWorkspaceResourceId')]"
               },
               "dependsOn": [
-                "blobService"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
               ]
             }
-          },
+          ],
           "outputs": {
             "name": {
               "type": "string",
@@ -2006,17 +1982,12 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "languageVersion": "2.1-experimental",
           "contentVersion": "1.0.0.0",
           "metadata": {
-            "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-            "_EXPERIMENTAL_FEATURES_ENABLED": [
-              "Extensibility"
-            ],
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "2514832969367394781"
+              "templateHash": "460060904000489594"
             }
           },
           "parameters": {
@@ -2033,14 +2004,8 @@
               "type": "string"
             }
           },
-          "resources": {
-            "templateSpec": {
-              "existing": true,
-              "type": "Microsoft.Resources/templateSpecs",
-              "apiVersion": "2022-02-01",
-              "name": "[parameters('templateSpecName')]"
-            },
-            "roleAssignment": {
+          "resources": [
+            {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
               "scope": "[format('Microsoft.Resources/templateSpecs/{0}', parameters('templateSpecName'))]",
@@ -2049,12 +2014,9 @@
                 "roleDefinitionId": "[parameters('roleDefinitionId')]",
                 "principalId": "[parameters('principalId')]",
                 "principalType": "ServicePrincipal"
-              },
-              "dependsOn": [
-                "templateSpec"
-              ]
+              }
             }
-          }
+          ]
         }
       },
       "dependsOn": [
@@ -2088,17 +2050,12 @@
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "languageVersion": "2.1-experimental",
           "contentVersion": "1.0.0.0",
           "metadata": {
-            "_EXPERIMENTAL_WARNING": "This template uses ARM features that are experimental. Experimental features should be enabled for testing purposes only, as there are no guarantees about the quality or stability of these features. Do not enable these settings for any production usage, or your production environment may be subject to breaking.",
-            "_EXPERIMENTAL_FEATURES_ENABLED": [
-              "Extensibility"
-            ],
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "10900131744271936630"
+              "templateHash": "5678979467842513170"
             }
           },
           "parameters": {
@@ -2112,8 +2069,8 @@
               "type": "string"
             }
           },
-          "resources": {
-            "roleAssignment": {
+          "resources": [
+            {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
               "name": "[guid(parameters('resourceId'), parameters('roleDefinitionId'), resourceGroup().id)]",
@@ -2123,7 +2080,7 @@
                 "principalType": "ServicePrincipal"
               }
             }
-          }
+          ]
         }
       }
     }

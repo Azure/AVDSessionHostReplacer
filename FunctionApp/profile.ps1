@@ -16,7 +16,7 @@ Set-PSFConfig -FullName PSFramework.Message.style.NoColor -Value $true #This is 
 
 ## Version Banner ## Updated by Build\Build-Zip-File.ps1
 
-Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}" -StringValues 'v0.2.7'
+Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}" -StringValues 'v0.2.8-beta.10'
 
 
 # Import Function Parameters
@@ -35,7 +35,7 @@ if ($env:MSI_SECRET) {
     if([string]::IsNullOrEmpty($env:_ClientResourceId)){
         Write-PSFMessage -Level Host -Message "Authenticating with system assigned identity"
         Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId) -ErrorAction Stop
-        if(Get-FunctionConfig _RemoveAzureADDevice){
+        if(Get-FunctionConfig _RemoveEntraDevice){
             Write-PSFMessage -Level Host -Message "Connecting to Graph API"
             Connect-MGGraph -Identity
         }
@@ -47,8 +47,8 @@ if ($env:MSI_SECRET) {
         Connect-AzAccount -AccessToken $entraAzureConnection.AccessToken  -ErrorAction Stop -AccountId $env:_ClientResourceId -Subscription (Get-FunctionConfig _SubscriptionId)
 
 
-        if(Get-FunctionConfig _RemoveAzureADDevice){
-            Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID. Connecting to Graph API using User Managed Identity with Resource ID: $env:_ClientResourceId"
+        if((Get-FunctionConfig _RemoveEntraDevice) -or (Get-FunctionConfig _RemoveIntuneDevice) ){
+            Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID and/or Intune. Connecting to Graph API using User Managed Identity with Resource ID: $env:_ClientResourceId"
             $entraGraphConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Graph -PassThru
             Connect-MGGraph -AccessToken (ConvertTo-SecureString $entraGraphConnection.AccessToken -AsPlainText -Force)  -ErrorAction Stop
         }

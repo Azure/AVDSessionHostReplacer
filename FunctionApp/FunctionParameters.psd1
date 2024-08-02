@@ -20,6 +20,7 @@
     _SessionHostTemplate                          = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }
     _SessionHostParameters                        = @{Required = $true  ; Type = 'hashtable'                                              ; Description = '' }
     _SubscriptionId                               = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }
-    _RemoveAzureADDevice                          = @{Required = $true  ; Type = 'bool'                                                   ; Description = 'When deleting a session host, will also delete the Azure AD Device record. This is required for Azure AD Joined Session Hosts' }
+    _RemoveEntraDevice                            = @{Required = $true  ; Type = 'bool'                                                   ; Description = 'When deleting a session host, will also delete the Entra ID Device record. This is required for Entra Joined Session Hosts' }
+    _RemoveIntuneDevice                           = @{Required = $true  ; Type = 'bool'                                                   ; Description = 'When deleting a session host, will also delete the Intune Device record. This is recommended for Intune Managed devices to avoid duplicates' }
     _ClientResourceId                             = @{Required = $false ; Type = 'string' ; Default = ''                                  ; Description = 'When using a User Managed Identity, the Client Resource Id is used to take all actions.' }
 }

@@ -54,8 +54,9 @@ if ($hostPoolDecisions.PossibleDeploymentsCount -gt 0) {
 if ($hostPoolDecisions.AllowSessionHostDelete -and $hostPoolDecisions.SessionHostsPendingDelete.Count -gt 0) {
     Write-PSFMessage -Level Host -Message "We will decommission {0} session hosts: {1}" -StringValues $hostPoolDecisions.SessionHostsPendingDelete.Count, ($hostPoolDecisions.SessionHostsPendingDelete.VMName -join ',')
     # Decommission session hosts
-    $removeAzureDevice = Get-FunctionConfig _RemoveAzureADDevice
-    Remove-SHRSessionHost -SessionHostsPendingDelete $hostPoolDecisions.SessionHostsPendingDelete -RemoveAzureDevice $removeAzureDevice
+    $removeEntraDevice = Get-FunctionConfig _RemoveEntraDevice
+    $removeIntuneDevice = Get-FunctionConfig _RemoveIntuneDevice
+    Remove-SHRSessionHost -SessionHostsPendingDelete $hostPoolDecisions.SessionHostsPendingDelete -RemoveEntraDevice $removeEntraDevice -RemoveIntuneDevice $removeIntuneDevice
 }
 
 

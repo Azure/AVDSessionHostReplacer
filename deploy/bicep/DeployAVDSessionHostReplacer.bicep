@@ -15,8 +15,9 @@ param SessionHostSize string
 param AcceleratedNetworking bool
 
 @allowed([
-  'Premium_LRS'
-  'StandardSSD_LRS'
+  'Standard_LRS' // Standard HDD
+  'StandardSSD_LRS' // Standard SSD
+  'Premium_LRS' // Premium SSD
 ])
 param SessionHostDiskType string = 'Premium_LRS'
 
@@ -26,7 +27,8 @@ param SessionHostDiskType string = 'Premium_LRS'
 ])
 param MarketPlaceOrCustomImage string
 
-@allowed([ '2022-datacenter-smalldisk-g2'
+@allowed([
+  '2022-datacenter-smalldisk-g2'
   'win10-21h2-avd'
   '2022-datacenter-core-g2'
   'win10-22h2-avd-m365-g2'
@@ -39,7 +41,8 @@ param MarketPlaceOrCustomImage string
   'win11-23h2-avd-m365'
   'win11-22h2-avd'
   '2022-datacenter-g2'
-  'win10-22h2-avd-g2' ])
+  'win10-22h2-avd-g2'
+])
 param MarketPlaceImage string = 'win11-23h2-avd-m365'
 param GalleryImageId string = ''
 
@@ -48,9 +51,9 @@ param GalleryImageId string = ''
   'TrustedLaunch'
   'ConfidentialVM'
 ])
-param SecurityType string
-param SecureBootEnabled bool
-param TpmEnabled bool
+param SecurityType string = 'TrustedLaunch'
+param SecureBootEnabled bool = true
+param TpmEnabled bool = true
 param SubnetId string
 
 @allowed([
@@ -134,20 +137,40 @@ param TimeStamp string = utcNow() // Used for unique deployment names. Do Not su
 
 //---- Variables ----//
 var varMarketPlaceImages = {
-  '2022-datacenter-smalldisk-g2': {
-    publisher: 'MicrosoftWindowsServer'
-    offer: 'WindowsServer'
-    sku: '2022-datacenter-smalldisk-g2'
-  }
   'win10-21h2-avd': {
     publisher: 'MicrosoftWindowsDesktop'
     offer: 'windows-10'
     sku: 'win10-21h2-avd'
   }
-  '2022-datacenter-core-g2': {
-    publisher: 'MicrosoftWindowsServer'
-    offer: 'WindowsServer'
-    sku: '2022-datacenter-core-g2'
+  'win10-21h2-avd-g2': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'windows-10'
+    sku: 'win10-21h2-avd-g2'
+  }
+  'win10-21h2-avd-m365': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win10-21h2-avd-m365'
+  }
+  'win10-21h2-avd-m365-g2': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win10-21h2-avd-m365-g2'
+  }
+  'win10-22h2-avd': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'windows-10'
+    sku: 'win10-22h2-avd'
+  }
+  'win10-22h2-avd-g2': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'windows-10'
+    sku: 'win10-22h2-avd-g2'
+  }
+  'win10-22h2-avd-m365': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win10-22h2-avd-m365'
   }
   'win10-22h2-avd-m365-g2': {
     publisher: 'MicrosoftWindowsDesktop'
@@ -156,32 +179,27 @@ var varMarketPlaceImages = {
   }
   'win11-21h2-avd': {
     publisher: 'MicrosoftWindowsDesktop'
-    offer: 'Windows-11'
+    offer: 'windows-11'
     sku: 'win11-21h2-avd'
-  }
-  'win10-21h2-avd-m365': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win10-21h2-avd-m365'
-  }
-  'win11-22h2-avd-m365': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'office-365'
-    sku: 'win11-22h2-avd-m365'
-  }
-  '2022-datacenter-core-smalldisk-g2': {
-    publisher: 'MicrosoftWindowsServer'
-    offer: 'WindowsServer'
-    sku: '2022-datacenter-core-smalldisk-g2'
   }
   'win11-21h2-avd-m365': {
     publisher: 'MicrosoftWindowsDesktop'
     offer: 'office-365'
     sku: 'win11-21h2-avd-m365'
   }
+  'win11-22h2-avd': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'windows-11'
+    sku: 'win11-22h2-avd'
+  }
+  'win11-22h2-avd-m365': {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-22h2-avd-m365'
+  }
   'win11-23h2-avd': {
     publisher: 'MicrosoftWindowsDesktop'
-    offer: 'Windows-11'
+    offer: 'windows-11'
     sku: 'win11-23h2-avd'
   }
   'win11-23h2-avd-m365': {
@@ -189,57 +207,50 @@ var varMarketPlaceImages = {
     offer: 'office-365'
     sku: 'win11-23h2-avd-m365'
   }
-  'win11-22h2-avd': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'Windows-11'
-    sku: 'win11-22h2-avd'
-  }
-  '2022-datacenter-g2': {
-    publisher: 'MicrosoftWindowsServer'
-    offer: 'WindowsServer'
-    sku: '2022-datacenter-g2'
-  }
-  'win10-22h2-avd-g2': {
-    publisher: 'MicrosoftWindowsDesktop'
-    offer: 'windows-10'
-    sku: 'win10-22h2-avd-g2'
-  }
 }
-var varImageReference = MarketPlaceOrCustomImage == 'Marketplace' ? {
-  publisher: varMarketPlaceImages[MarketPlaceImage].publisher
-  offer: varMarketPlaceImages[MarketPlaceImage].offer
-  sku: varMarketPlaceImages[MarketPlaceImage].sku
-  version: 'latest'
-} : {
-  Id: GalleryImageId
-}
-
-var varSecurityProfile = SecurityType == 'Standard' ? null : {
-  securityType: SecurityType
-  uefiSettings: {
-    secureBootEnabled: SecureBootEnabled
-    vTpmEnabled: TpmEnabled
-  }
-}
-
-var varDomainJoinObject = IdentityServiceProvider == 'EntraID' ? {
-  DomainType: 'EntraID'
-  IntuneJoin: IntuneEnrollment
-} : {
-  DomainType: 'ActiveDirectory'
-  DomainName: ADDomainName
-  DomainJoinUserName: ADDomainJoinUserName
-  ADOUPath: ADOUPath
-}
-
-var varDomainJoinPasswordReference = IdentityServiceProvider == 'EntraID' ? null : {
-  reference: {
-    keyVault: {
-      id: deployKeyVault.outputs.keyVaultId
+var varImageReference = MarketPlaceOrCustomImage == 'Marketplace'
+  ? {
+      publisher: varMarketPlaceImages[MarketPlaceImage].publisher
+      offer: varMarketPlaceImages[MarketPlaceImage].offer
+      sku: varMarketPlaceImages[MarketPlaceImage].sku
+      version: 'latest'
     }
-    secretName: 'DomainJoinPassword'
-  }
-}
+  : {
+      Id: GalleryImageId
+    }
+
+var varSecurityProfile = SecurityType == 'Standard'
+  ? null
+  : {
+      securityType: SecurityType
+      uefiSettings: {
+        secureBootEnabled: SecureBootEnabled
+        vTpmEnabled: TpmEnabled
+      }
+    }
+
+var varDomainJoinObject = IdentityServiceProvider == 'EntraID'
+  ? {
+      DomainType: 'EntraID'
+      IntuneJoin: IntuneEnrollment
+    }
+  : {
+      DomainType: 'ActiveDirectory'
+      DomainName: ADDomainName
+      DomainJoinUserName: ADDomainJoinUserName
+      ADOUPath: ADOUPath
+    }
+
+var varDomainJoinPasswordReference = IdentityServiceProvider == 'EntraID'
+  ? null
+  : {
+      reference: {
+        keyVault: {
+          id: deployKeyVault.outputs.keyVaultId
+        }
+        secretName: 'DomainJoinPassword'
+      }
+    }
 var varSessionHostTemplateParameters = {
   Location: SessionHostsRegion
   AvailabilityZones: AvailabilityZones
@@ -285,8 +296,12 @@ var varReplacementPlanSettings = [
     value: subscription().subscriptionId
   }
   {
-    name: '_RemoveAzureADDevice'
+    name: '_RemoveEntraDevice'
     value: IdentityServiceProvider == 'EntraID'
+  }
+  {
+    name: '_RemoveIntuneDevice'
+    value: IntuneEnrollment
   }
   {
     name: '_ClientResourceId'
@@ -355,20 +370,20 @@ var varReplacementPlanSettings = [
 var varUniqueString = uniqueString(resourceGroup().id, HostPoolName)
 var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
 
-var varFunctionAppIdentity = UseUserAssignedManagedIdentity ? {
-  type: 'UserAssigned'
-  userAssignedIdentities:{
-    '${UserAssignedManagedIdentityResourceId}': {}
-}
-} : {
-  type: 'SystemAssigned'
-}
-
+var varFunctionAppIdentity = UseUserAssignedManagedIdentity
+  ? {
+      type: 'UserAssigned'
+      userAssignedIdentities: {
+        '${UserAssignedManagedIdentityResourceId}': {}
+      }
+    }
+  : {
+      type: 'SystemAssigned'
+    }
 
 // Outputs for verification
 
 //---- Resources ----//
-
 
 module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'
@@ -409,7 +424,7 @@ module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = if (
     Scope: subscription().id
   }
 }
-module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity){
+module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
   name: 'RBAC-TemplateSpecReader-${TimeStamp}'
   scope: subscription()
   params: {

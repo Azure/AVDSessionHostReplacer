@@ -21,7 +21,6 @@ $TemplateParameters = @{
     # The identity can be in a different Azure Subscription. If not used, a system assigned identity will be created and assigned permissions against the current subscription.
     UseUserAssignedManagedIdentity               = $true
     UserAssignedManagedIdentityResourceId        = '<Resource Id of the User Assigned Managed Identity>'
-    UserAssignedManagedIdentityClientId          = '<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx>' # The client (Application) ID of the user managed identity
 
     ## Session Host Template Parameters ##
     SessionHostsRegion                           = 'NorthEurope' # Does not have to be the same as Host Pool
@@ -74,7 +73,7 @@ $TemplateParameters = @{
 $paramNewAzResourceGroupDeployment = @{
     Name = 'AVDSessionHostReplacer'
     ResourceGroupName = $ResourceGroupName
-    TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.2.7/deploy/arm/DeployAVDSessionHostReplacer.json'
+    TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.2.8-beta.10/deploy/arm/DeployAVDSessionHostReplacer.json'
 
     # If you cloned the repo and want to deploy using the bicep file use this instead of the above line
     #TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer.bicep'

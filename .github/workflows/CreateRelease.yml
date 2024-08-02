@@ -3,6 +3,7 @@ on:
     paths:
       - 'FunctionApp/**'
       - 'deploy/**'
+      - 'StandardSessionHostTemplate/**'
   workflow_dispatch:
     inputs:
       messages:

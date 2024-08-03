@@ -193,7 +193,7 @@ param tagPendingDrainTimestamp string = 'AutoReplacePendingDrainTimestamp'
 @description('Required: No | Tags to apply to the resources.')
 param tags object = {}
 
-@description('')
+@description('Required: No | Exclusion tag for the AVD scaling plan')
 param tagScalingPlanExclusionTag string = 'ScalingPlanExclusion'
 
 @description('Required: Yes | Number of AVD session hosts to deploy.')

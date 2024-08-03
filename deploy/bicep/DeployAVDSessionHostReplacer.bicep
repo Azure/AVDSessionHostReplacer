@@ -181,13 +181,13 @@ param storageAccountPrivateEndpointName string
 @description('Required: Yes | Resource ID of the subnet for the AVD session hosts.')
 param subnetResourceId string
 
-@description('')
+@description('Required: No | Tag used to track the timestamp of the AVD session host deployment.')
 param tagDeployTimestamp string = 'AutoReplaceDeployTimestamp'
 
-@description('')
+@description('Required: No | Tag used to determine when the AVD session host should be included in the automation.')
 param tagIncludeInAutomation string = 'IncludeInAutoReplace'
 
-@description('')
+@description('Required: No | Tag used on the AVD session hosts to determine when the host was placed in drain mode.')
 param tagPendingDrainTimestamp string = 'AutoReplacePendingDrainTimestamp'
 
 @description('Required: No | Tags to apply to the resources.')

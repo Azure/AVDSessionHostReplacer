@@ -27,9 +27,9 @@ $TemplateParameters = @{
     AvailabilityZones                            = @("1", "3") # Set to empty array if not using AZs
     SessionHostSize                              = 'Standard_D4ds_v5' # Make sure its available in the region / AZs
     AcceleratedNetworking                        = $true # Make sure the size supports it
-    SessionHostDiskType                          = 'Premium_LRS' # Premium_LRS or StandardSSD_LRS
+    SessionHostDiskType                          = 'Premium_LRS' #  STandard_LRS, StandardSSD_LRS, or Premium_LRS
 
-    MarketPlaceOrCustomImage                     = 'Marketplace' # MarketPlace or CustomImage
+    MarketPlaceOrCustomImage                     = 'Marketplace' # MarketPlace or Gallery
     MarketPlaceImage                             = 'win11-23h2-avd-m365'
     # If the Compute Gallery is in a different subscription assign the function app "Desktop Virtualization Virtual Machine Contributor" after deployment
     # GalleryImageId = '' # Only required for 'CustomImage'. Use ResourceId of an Image Definition.

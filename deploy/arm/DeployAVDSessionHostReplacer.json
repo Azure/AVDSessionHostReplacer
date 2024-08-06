@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "6964609305299878672"
+      "templateHash": "3074684596605019493"
     }
   },
   "parameters": {
@@ -420,8 +420,8 @@
                 "value": "[parameters('IntuneEnrollment')]"
               },
               {
-                "name": "_ClientResourceId",
-                "value": "[parameters('UserAssignedManagedIdentityResourceId')]"
+                "name": "_ClientId",
+                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId]"
               },
               {
                 "name": "_Tag_IncludeInAutomation",
@@ -492,7 +492,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "12011592686602955586"
+              "templateHash": "16899044224233362256"
             }
           },
           "parameters": {
@@ -526,7 +526,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.8/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.0/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

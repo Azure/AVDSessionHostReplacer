@@ -304,8 +304,8 @@ var varReplacementPlanSettings = [
     value: IntuneEnrollment
   }
   {
-    name: '_ClientResourceId'
-    value: UserAssignedManagedIdentityResourceId
+    name: '_ClientId'
+    value: userAssignedIdentity.properties.clientId
   }
 
   // Optional Parameters //
@@ -384,6 +384,12 @@ var varFunctionAppIdentity = UseUserAssignedManagedIdentity
 // Outputs for verification
 
 //---- Resources ----//
+
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing =  if (! empty(UserAssignedManagedIdentityResourceId) ) {
+  scope: resourceGroup(split(UserAssignedManagedIdentityResourceId, '/')[2], split(UserAssignedManagedIdentityResourceId, '/')[4]) //
+  name: split(UserAssignedManagedIdentityResourceId, '/')[8]
+}
+
 
 module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'

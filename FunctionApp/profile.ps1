@@ -32,7 +32,7 @@ catch{
 
 if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
-    if([string]::IsNullOrEmpty($env:_ClientResourceId)){
+    if([string]::IsNullOrEmpty($env:_ClientId)){
         Write-PSFMessage -Level Host -Message "Authenticating with system assigned identity"
         Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId) -ErrorAction Stop
         if(Get-FunctionConfig _RemoveEntraDevice){
@@ -41,16 +41,13 @@ if ($env:MSI_SECRET) {
         }
     }
     else{
-        Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Resource ID: $env:_ClientResourceId"
+        Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Client ID: $env:_ClientId"
 
-        $entraAzureConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Azure -PassThru
-        Connect-AzAccount -AccessToken $entraAzureConnection.AccessToken  -ErrorAction Stop -AccountId $env:_ClientResourceId -Subscription (Get-FunctionConfig _SubscriptionId)
-
+        Connect-AzAccount -Identity -ErrorAction Stop -AccountId $env:_ClientId -Subscription (Get-FunctionConfig _SubscriptionId)
 
         if((Get-FunctionConfig _RemoveEntraDevice) -or (Get-FunctionConfig _RemoveIntuneDevice) ){
-            Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID and/or Intune. Connecting to Graph API using User Managed Identity with Resource ID: $env:_ClientResourceId"
-            $entraGraphConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Graph -PassThru
-            Connect-MGGraph -AccessToken (ConvertTo-SecureString $entraGraphConnection.AccessToken -AsPlainText -Force)  -ErrorAction Stop
+            Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID and/or Intune. Connecting to Graph API using User Managed Identity with Client ID: $env:_ClientId"
+            Connect-MGGraph -Identity -ClientId $env:_ClientId  -ErrorAction Stop
         }
     }
 }

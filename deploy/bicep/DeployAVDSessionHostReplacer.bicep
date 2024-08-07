@@ -265,6 +265,26 @@ var varSessionHostTemplateParameters = {
   AdminUsername: LocalAdminUsername
   tags: {}
 }
+// This variable calculates the Entra Environment Name based on the Graph Endpoint in environment()
+// This uses infromation from  Get-MgEnvironment to map the endpoint to the Entra Environment Name
+// Define a mapping arrays for environment names and their Graph endpoints
+var varGraphEndpoints = [
+  'https://graph.microsoft.com' // Global
+  'https://graph.microsoft.us' // USGov
+  'https://dod-graph.microsoft.us' // USGovDoD
+  'https://graph.microsoft.de' // Germany
+  'https://microsoftgraph.chinacloudapi.cn' // China
+]
+var varGraphEnvironmentNames = [
+  'Global' // https://graph.microsoft.com
+  'USGov' // 'https://graph.microsoft.us'
+  'USGovDoD' // 'https://dod-graph.microsoft.us'
+  'Germany' // 'https://graph.microsoft.de'
+  'China' // 'https://microsoftgraph.chinacloudapi.cn'
+]
+// Find the corresponding environment name based on the graph endpoint
+var varEntraEnvironmentName = varGraphEnvironmentNames[ indexOf(varGraphEndpoints,environment().graph) ]
+
 var varReplacementPlanSettings = [
   // Required Parameters //
   {
@@ -306,6 +326,18 @@ var varReplacementPlanSettings = [
   {
     name: '_ClientId'
     value: userAssignedIdentity.properties.clientId
+  }
+  {
+    name: '_TenantId'
+    value: userAssignedIdentity.properties.tenantId
+  }
+  {
+    name: '_EntraEnvironmentName'
+    value: varEntraEnvironmentName
+  }
+  {
+    name: '_AzureEnvironmentName'
+    value: environment().name
   }
 
   // Optional Parameters //
@@ -385,11 +417,13 @@ var varFunctionAppIdentity = UseUserAssignedManagedIdentity
 
 //---- Resources ----//
 
-resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing =  if (! empty(UserAssignedManagedIdentityResourceId) ) {
-  scope: resourceGroup(split(UserAssignedManagedIdentityResourceId, '/')[2], split(UserAssignedManagedIdentityResourceId, '/')[4]) //
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (!empty(UserAssignedManagedIdentityResourceId)) {
+  scope: resourceGroup(
+    split(UserAssignedManagedIdentityResourceId, '/')[2],
+    split(UserAssignedManagedIdentityResourceId, '/')[4]
+  ) //
   name: split(UserAssignedManagedIdentityResourceId, '/')[8]
 }
-
 
 module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'

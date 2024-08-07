@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "1164581205174877065"
+      "templateHash": "14448020490511142665"
     }
   },
   "parameters": {
@@ -351,21 +351,17 @@
     "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'Marketplace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
     "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('securityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled'))))]",
     "varDomainJoinObject": "[if(equals(parameters('IdentityServiceProvider'), 'EntraID'), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('IntuneEnrollment')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')))]",
-    "varGraphEndpoints": [
-      "https://graph.microsoft.com",
-      "https://graph.microsoft.us",
-      "https://dod-graph.microsoft.us",
-      "https://graph.microsoft.de",
-      "https://microsoftgraph.chinacloudapi.cn"
+    "varAzureEnvironments": [
+      "AzureCloud",
+      "AzureUSGovernment",
+      "AzureChinaCloud"
     ],
     "varGraphEnvironmentNames": [
       "Global",
       "USGov",
-      "USGovDoD",
-      "Germany",
       "China"
     ],
-    "varEntraEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varGraphEndpoints'), environment().graph)]]",
+    "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
     "varUniqueString": "[uniqueString(resourceGroup().id, parameters('HostPoolName'))]",
     "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', uniqueString(resourceGroup().id, parameters('HostPoolName')))]",
     "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
@@ -443,8 +439,8 @@
                 "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId]"
               },
               {
-                "name": "_EntraEnvironmentName",
-                "value": "[variables('varEntraEnvironmentName')]"
+                "name": "_GraphEnvironmentName",
+                "value": "[variables('varGraphEnvironmentName')]"
               },
               {
                 "name": "_AzureEnvironmentName",
@@ -519,7 +515,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "10047550173975776736"
+              "templateHash": "5845384410593908058"
             }
           },
           "parameters": {
@@ -553,7 +549,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.1/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.2/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

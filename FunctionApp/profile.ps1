@@ -43,11 +43,11 @@ if ($env:MSI_SECRET) {
     else {
         Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Client ID: {0}" -StringValues (Get-FunctionConfig _ClientId)
 
-        Connect-AzAccount -Identity -ErrorAction Stop -AccountId (Get-FunctionConfig _ClientId) -Tenant (Get-FunctionConfig _TenantId) -Subscription (Get-FunctionConfig _SubscriptionId) -Environment (Get-FunctionConfig _EntraEnvironmentName)
+        Connect-AzAccount -Identity -ErrorAction Stop -AccountId (Get-FunctionConfig _ClientId) -Tenant (Get-FunctionConfig _TenantId) -Subscription (Get-FunctionConfig _SubscriptionId) -Environment (Get-FunctionConfig _AzureEnvironmentName)
 
         if ((Get-FunctionConfig _RemoveEntraDevice) -or (Get-FunctionConfig _RemoveIntuneDevice) ) {
             Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID and/or Intune. Connecting to Graph API using User Managed Identity with Client ID: {0}" -StringValues (Get-FunctionConfig _ClientId)
-            Connect-MgGraph -Identity -ClientId (Get-FunctionConfig _ClientId) -ErrorAction Stop -NoWelcome -Environment (Get-FunctionConfig _AzureEnvironmentName)
+            Connect-MgGraph -Identity -ClientId (Get-FunctionConfig _ClientId) -ErrorAction Stop -NoWelcome -Environment (Get-FunctionConfig _GraphEnvironmentName)
         }
     }
 }

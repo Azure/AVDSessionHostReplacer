@@ -265,25 +265,19 @@ var varSessionHostTemplateParameters = {
   AdminUsername: LocalAdminUsername
   tags: {}
 }
-// This variable calculates the Entra Environment Name based on the Graph Endpoint in environment()
-// This uses infromation from  Get-MgEnvironment to map the endpoint to the Entra Environment Name
-// Define a mapping arrays for environment names and their Graph endpoints
-var varGraphEndpoints = [
-  'https://graph.microsoft.com' // Global
-  'https://graph.microsoft.us' // USGov
-  'https://dod-graph.microsoft.us' // USGovDoD
-  'https://graph.microsoft.de' // Germany
-  'https://microsoftgraph.chinacloudapi.cn' // China
+// This variable calculates the Entra Environment Name based on the Azure Environment Name in environment()
+// Define  mapping arrays for environment names and their corresponding Graph name
+var varAzureEnvironments = [
+  'AzureCloud' // Global
+  'AzureUSGovernment' // USGov
+  'AzureChinaCloud' // China
 ]
 var varGraphEnvironmentNames = [
-  'Global' // https://graph.microsoft.com
-  'USGov' // 'https://graph.microsoft.us'
-  'USGovDoD' // 'https://dod-graph.microsoft.us'
-  'Germany' // 'https://graph.microsoft.de'
-  'China' // 'https://microsoftgraph.chinacloudapi.cn'
+  'Global' // AzureCloud
+  'USGov' // AzureUSGovernment
+  'China' // AzureChinaCloud
 ]
-// Find the corresponding environment name based on the graph endpoint
-var varEntraEnvironmentName = varGraphEnvironmentNames[ indexOf(varGraphEndpoints,environment().graph) ]
+var varGraphEnvironmentName = varGraphEnvironmentNames[indexOf(varAzureEnvironments, environment().name)]
 
 var varReplacementPlanSettings = [
   // Required Parameters //
@@ -332,8 +326,8 @@ var varReplacementPlanSettings = [
     value: userAssignedIdentity.properties.tenantId
   }
   {
-    name: '_EntraEnvironmentName'
-    value: varEntraEnvironmentName
+    name: '_GraphEnvironmentName'
+    value: varGraphEnvironmentName
   }
   {
     name: '_AzureEnvironmentName'

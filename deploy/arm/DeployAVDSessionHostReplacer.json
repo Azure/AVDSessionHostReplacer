@@ -5,24 +5,10 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "2618690446376085644"
+      "templateHash": "9583483459513955518"
     }
   },
   "parameters": {
-    "acceleratedNetworking": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Required: No | Enable accelerated networking on the AVD session hosts."
-      }
-    },
-    "allowDownsizing": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Required: No | Allow the session hosts to be downsized to a smaller VM size."
-      }
-    },
     "applicationInsightsName": {
       "type": "string",
       "metadata": {
@@ -33,13 +19,6 @@
       "type": "string",
       "metadata": {
         "description": "Required: Yes | Name of the app service plan resource."
-      }
-    },
-    "availabilityZones": {
-      "type": "array",
-      "defaultValue": [],
-      "metadata": {
-        "description": "Required: No | Zones for the AVD session hosts."
       }
     },
     "azureBlobsPrivateDnsZoneResourceId": {
@@ -72,27 +51,6 @@
         "description": "Required: Yes | Resource ID of the delegated subnet for the function app."
       }
     },
-    "domainJoinPassword": {
-      "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Required: No | Password for the domain join account in Active Directory Domain Services."
-      }
-    },
-    "domainJoinUserName": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Required: No | Username for the domain join account in Active Directory Domain Services."
-      }
-    },
-    "domainName": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Required: No | Name of the domain to join in Active Directory Domain Services."
-      }
-    },
     "drainGracePeriodHours": {
       "type": "int",
       "defaultValue": 24,
@@ -100,7 +58,7 @@
         "description": "Required: No | Number of hours to wait before draining a session host."
       }
     },
-    "entraEnvironmentName": {
+    "entraIdEnvironmentName": {
       "type": "string",
       "defaultValue": "Global",
       "allowedValues": [
@@ -117,7 +75,7 @@
       "type": "bool",
       "defaultValue": true,
       "metadata": {
-        "description": "Required: No | Choose whether to fix the session host tags."
+        "description": "Required: No | Choose whether the session host replacer will fix the tags on existing session hosts or if tags are mistakenly deleted. The tag values will NOT allow deletion of existing session hosts and must be changed post deployment. This is useful if you are deploying a new session host replacer to an existing host pool."
       }
     },
     "functionAppName": {
@@ -157,13 +115,6 @@
         "description": "Required: No | URL to the zip file for the function app. Ideally, this ZIP file should be hosted in Azure Blobs in a private container."
       }
     },
-    "galleryImageId": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Required: No | Resource ID of the compute gallery image definition to use for the session hosts."
-      }
-    },
     "hostPoolResourceId": {
       "type": "string",
       "metadata": {
@@ -181,24 +132,10 @@
         "description": "Required: Yes | Identity service provider for the AVD session hosts."
       }
     },
-    "intuneEnrollment": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Required: No | Enroll the session hosts in Intune. This only applies if the identity service provider is EntraID."
-      }
-    },
     "keyVaultName": {
       "type": "string",
       "metadata": {
         "description": "Required: Yes | Name of the key vault resource. This value must be globally unique."
-      }
-    },
-    "organizationUnitPath": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Required: No | Distinguished name of the organization unit to join in Active Directory Domain Services."
       }
     },
     "keyVaultNetworkInterfaceName": {
@@ -219,12 +156,6 @@
         "description": "Required: Yes | Name of the private endpoint resource for the key vault."
       }
     },
-    "localAdminUsername": {
-      "type": "string",
-      "metadata": {
-        "description": "Required: Yes | Username for the local admin account on the AVD session hosts."
-      }
-    },
     "location": {
       "type": "string",
       "defaultValue": "[deployment().location]",
@@ -234,30 +165,8 @@
     },
     "logAnalyticsWorkspaceResourceId": {
       "type": "string",
-      "defaultValue": "",
       "metadata": {
-        "description": "Required: No | Resource ID of the Log Analytics Workspace used by Application Insights to monitor the Function App."
-      }
-    },
-    "marketPlaceImageOffer": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Required: No | Offer of the Azure Marketplace image to use for the AVD session hosts."
-      }
-    },
-    "marketPlaceImagePublisher": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Required: No | Publisher of the Azure Marketplace image to use for the AVD session hosts."
-      }
-    },
-    "marketPlaceImageSku": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Required: No | SKU of the Azure Marketplace image to use for the AVD session hosts."
+        "description": "Required: Yes | Resource ID of the Log Analytics Workspace used by Application Insights to monitor the Function App."
       }
     },
     "privateLinkScopeResourceId": {
@@ -280,66 +189,17 @@
         "description": "Required: No | Number of days to wait before replacing the AVD session host when a new image version is available."
       }
     },
-    "securityType": {
-      "type": "string",
-      "defaultValue": "TrustedLaunch",
-      "allowedValues": [
-        "Standard",
-        "TrustedLaunch",
-        "ConfidentialVM"
-      ],
-      "metadata": {
-        "description": "Required: No | Security type of the AVD session hosts."
-      }
-    },
-    "sessionHostDiskType": {
-      "type": "string",
-      "defaultValue": "Premium_LRS",
-      "allowedValues": [
-        "Standard_LRS",
-        "StandardSSD_LRS",
-        "Premium_LRS"
-      ],
-      "metadata": {
-        "description": "The SKU of the AVD session host OS disk."
-      }
-    },
-    "sessionHostInstanceNumberPadding": {
-      "type": "int",
-      "defaultValue": 2,
-      "metadata": {
-        "description": "Required: No | Number of digits to pad the AVD session host instance number for the resource names."
-      }
-    },
-    "sessionHostNamePrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Required: Yes | Prefix for the AVD session host resource names."
-      }
-    },
-    "sessionHostResourceGroupName": {
+    "sessionHostsResourceGroupName": {
       "type": "string",
       "metadata": {
         "description": "Required: Yes | Resource group name for the AVD session hosts."
-      }
-    },
-    "sessionHostSize": {
-      "type": "string",
-      "metadata": {
-        "description": "Required: Yes | Virtual machine size for the AVD session hosts."
-      }
-    },
-    "sessionHostsRegion": {
-      "type": "string",
-      "metadata": {
-        "description": "Required: Yes | Location for the AVD session hosts."
       }
     },
     "shrDeploymentPrefix": {
       "type": "string",
       "defaultValue": "AVDSessionHostReplacer",
       "metadata": {
-        "description": "Required: No | Deployment prefix for the AVD session host deployments."
+        "description": "Required: No | The prefix of the deployment created in the session hosts resource group when replacement VMs are deploying. This is used to track running and failed deployments."
       }
     },
     "storageAccountDiagnosticSettingName": {
@@ -377,21 +237,21 @@
       "type": "string",
       "defaultValue": "AutoReplaceDeployTimestamp",
       "metadata": {
-        "description": ""
+        "description": "Required: No | Tag used to determine when the session host was deployed. This is updated by the session host replacer function on new session hosts. After deployment, you can edit the value of this tag to force replace a VM."
       }
     },
     "tagIncludeInAutomation": {
       "type": "string",
       "defaultValue": "IncludeInAutoReplace",
       "metadata": {
-        "description": ""
+        "description": "Required: No | Tag used to determine if an existing session host should be included in the automation. After deployment, if the tag is present and set to \"true\", the session host will be included. If the tag is not present or set to \"false\", the session host will be excluded."
       }
     },
     "tagPendingDrainTimestamp": {
       "type": "string",
       "defaultValue": "AutoReplacePendingDrainTimestamp",
       "metadata": {
-        "description": ""
+        "description": "Required: No | Tag used to determine when the session host was marked for drain. This is updated by the session host replacer function on hosts pending deletion."
       }
     },
     "tags": {
@@ -405,13 +265,7 @@
       "type": "string",
       "defaultValue": "ScalingPlanExclusion",
       "metadata": {
-        "description": ""
-      }
-    },
-    "targetSessionHostCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Required: Yes | Number of AVD session hosts to deploy."
+        "description": "Required: No | Tag used by session host replacer to exclude a session host from scaling plan actions."
       }
     },
     "targetVMAgeDays": {
@@ -421,10 +275,16 @@
         "description": "Required: No | Number of days to wait before replacing the AVD session host when a new image version is available."
       }
     },
-    "templateSpecName": {
+    "templateParametersUri": {
+      "type": "object",
+      "metadata": {
+        "description": "Required: Yes | URI for the parameters file needed for the template spec deployment to deploy new AVD session hosts."
+      }
+    },
+    "templateSpecVersionResourceId": {
       "type": "string",
       "metadata": {
-        "description": "Required: Yes | Name of the template spec resource."
+        "description": "Required: Yes | Resource ID of the template spec version resource."
       }
     },
     "timeStamp": {
@@ -445,18 +305,7 @@
       "metadata": {
         "description": "Required: Yes | Resource ID of the user assigned identity to support the function app. The resource group name in this value is used as the deployment scope for all resources."
       }
-    },
-    "vmNamesTemplateParameterName": {
-      "type": "string",
-      "defaultValue": "VMNames",
-      "metadata": {
-        "description": "The name of the array parameter used in the Session Host deployment template to define the VM names. Default is \"VMNames\""
-      }
     }
-  },
-  "variables": {
-    "imageReference": "[if(empty(parameters('galleryImageId')), createObject('publisher', parameters('marketPlaceImagePublisher'), 'offer', parameters('marketPlaceImageOffer'), 'sku', parameters('marketPlaceImageSku'), 'version', 'latest'), createObject('Id', parameters('galleryImageId')))]",
-    "domainJoinObject": "[if(equals(parameters('identityServiceProvider'), 'EntraID'), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('intuneEnrollment')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('domainName'), 'DomainJoinUserName', parameters('domainJoinUserName'), 'ADOUPath', parameters('organizationUnitPath')))]"
   },
   "resources": [
     {
@@ -555,9 +404,6 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "domainJoinPassword": {
-            "value": "[parameters('domainJoinPassword')]"
-          },
           "keyVaultName": {
             "value": "[parameters('keyVaultName')]"
           },
@@ -593,13 +439,10 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "3796658389440232687"
+              "templateHash": "11301093885206448383"
             }
           },
           "parameters": {
-            "domainJoinPassword": {
-              "type": "securestring"
-            },
             "keyVaultName": {
               "type": "string"
             },
@@ -772,17 +615,6 @@
                     }
                   ]
                 }
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.KeyVault/vaults/secrets",
-              "apiVersion": "2023-07-01",
-              "name": "[format('{0}/{1}', parameters('keyVaultName'), 'DomainJoinPassword')]",
-              "properties": {
-                "value": "[parameters('domainJoinPassword')]"
               },
               "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
@@ -1283,490 +1115,6 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('deploy-template-spec-{0}', parameters('timeStamp'))]",
-      "subscriptionId": "[split(parameters('userAssignedIdentityResourceId'), '/')[2]]",
-      "resourceGroup": "[split(parameters('userAssignedIdentityResourceId'), '/')[4]]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "name": {
-            "value": "[parameters('templateSpecName')]"
-          },
-          "tags": {
-            "value": "[parameters('tags')]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "5906753604464338326"
-            }
-          },
-          "parameters": {
-            "location": {
-              "type": "string",
-              "defaultValue": "[resourceGroup().location]"
-            },
-            "name": {
-              "type": "string"
-            },
-            "tags": {
-              "type": "object"
-            }
-          },
-          "variables": {
-            "$fxv#0": {
-              "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-              "contentVersion": "1.0.0.0",
-              "metadata": {
-                "_generator": {
-                  "name": "bicep",
-                  "version": "0.29.45.22436",
-                  "templateHash": "15758060740360418364"
-                }
-              },
-              "parameters": {
-                "Location": {
-                  "type": "string",
-                  "defaultValue": "[[resourceGroup().location]"
-                },
-                "AvailabilityZones": {
-                  "type": "array",
-                  "defaultValue": []
-                },
-                "VMNames": {
-                  "type": "array"
-                },
-                "VMSize": {
-                  "type": "string"
-                },
-                "SubnetID": {
-                  "type": "string"
-                },
-                "AdminUsername": {
-                  "type": "string"
-                },
-                "AcceleratedNetworking": {
-                  "type": "bool"
-                },
-                "DiskType": {
-                  "type": "string"
-                },
-                "Tags": {
-                  "type": "object",
-                  "defaultValue": {}
-                },
-                "ImageReference": {
-                  "type": "object"
-                },
-                "SecurityProfile": {
-                  "type": "object"
-                },
-                "HostPoolName": {
-                  "type": "string"
-                },
-                "HostPoolToken": {
-                  "type": "securestring"
-                },
-                "WVDArtifactsURL": {
-                  "type": "string",
-                  "defaultValue": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_01-19-2023.zip"
-                },
-                "DomainJoinObject": {
-                  "type": "object",
-                  "defaultValue": {}
-                },
-                "DomainJoinPassword": {
-                  "type": "securestring",
-                  "defaultValue": ""
-                }
-              },
-              "resources": [
-                {
-                  "[string('copy')]": {
-                    "name": "deploySessionHosts",
-                    "count": "[[length(parameters('VMNames'))]"
-                  },
-                  "type": "Microsoft.Resources/deployments",
-                  "apiVersion": "2022-09-01",
-                  "name": "[[format('deploySessionHost-{0}', parameters('VMNames')[copyIndex()])]",
-                  "properties": {
-                    "expressionEvaluationOptions": {
-                      "scope": "inner"
-                    },
-                    "mode": "Incremental",
-                    "parameters": {
-                      "AcceleratedNetworking": {
-                        "value": "[[parameters('AcceleratedNetworking')]"
-                      },
-                      "AdminUsername": {
-                        "value": "[[parameters('AdminUsername')]"
-                      },
-                      "HostPoolName": {
-                        "value": "[[parameters('HostPoolName')]"
-                      },
-                      "HostPoolToken": {
-                        "value": "[[parameters('HostPoolToken')]"
-                      },
-                      "ImageReference": {
-                        "value": "[[parameters('ImageReference')]"
-                      },
-                      "SecurityProfile": {
-                        "value": "[[parameters('SecurityProfile')]"
-                      },
-                      "SubnetID": {
-                        "value": "[[parameters('SubnetID')]"
-                      },
-                      "VMName": {
-                        "value": "[[parameters('VMNames')[copyIndex()]]"
-                      },
-                      "VMSize": {
-                        "value": "[[parameters('VMSize')]"
-                      },
-                      "DiskType": {
-                        "value": "[[parameters('DiskType')]"
-                      },
-                      "WVDArtifactsURL": {
-                        "value": "[[parameters('WVDArtifactsURL')]"
-                      },
-                      "DomainJoinObject": {
-                        "value": "[[parameters('DomainJoinObject')]"
-                      },
-                      "DomainJoinPassword": {
-                        "value": "[[parameters('DomainJoinPassword')]"
-                      },
-                      "Location": {
-                        "value": "[[parameters('Location')]"
-                      },
-                      "AvailabilityZones": {
-                        "value": "[[parameters('AvailabilityZones')]"
-                      },
-                      "Tags": {
-                        "value": "[[parameters('Tags')]"
-                      }
-                    },
-                    "template": {
-                      "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                      "contentVersion": "1.0.0.0",
-                      "metadata": {
-                        "_generator": {
-                          "name": "bicep",
-                          "version": "0.29.45.22436",
-                          "templateHash": "7197712868022024044"
-                        }
-                      },
-                      "parameters": {
-                        "VMName": {
-                          "type": "string"
-                        },
-                        "VMSize": {
-                          "type": "string"
-                        },
-                        "DiskType": {
-                          "type": "string"
-                        },
-                        "Location": {
-                          "type": "string",
-                          "defaultValue": "[[resourceGroup().location]"
-                        },
-                        "AvailabilityZones": {
-                          "type": "array",
-                          "defaultValue": []
-                        },
-                        "SubnetID": {
-                          "type": "string"
-                        },
-                        "AdminUsername": {
-                          "type": "string"
-                        },
-                        "AdminPassword": {
-                          "type": "securestring",
-                          "defaultValue": "[[newGuid()]"
-                        },
-                        "AcceleratedNetworking": {
-                          "type": "bool"
-                        },
-                        "Tags": {
-                          "type": "object",
-                          "defaultValue": {}
-                        },
-                        "ImageReference": {
-                          "type": "object"
-                        },
-                        "SecurityProfile": {
-                          "type": "object"
-                        },
-                        "HostPoolName": {
-                          "type": "string"
-                        },
-                        "HostPoolToken": {
-                          "type": "securestring"
-                        },
-                        "WVDArtifactsURL": {
-                          "type": "string"
-                        },
-                        "DomainJoinObject": {
-                          "type": "object",
-                          "defaultValue": {}
-                        },
-                        "DomainJoinPassword": {
-                          "type": "securestring",
-                          "defaultValue": ""
-                        }
-                      },
-                      "variables": {
-                        "varRequireNvidiaGPU": "[[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
-                        "varVMNumber": "[[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
-                        "varAvailabilityZone": "[[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]"
-                      },
-                      "resources": [
-                        {
-                          "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-09-01",
-                          "name": "[[format('{0}/{1}', parameters('VMName'), 'deployIntegrityMonitoring')]",
-                          "location": "[[parameters('Location')]",
-                          "properties": {
-                            "publisher": "Microsoft.Azure.Security.WindowsAttestation",
-                            "type": "GuestAttestation",
-                            "typeHandlerVersion": "1.0",
-                            "autoUpgradeMinorVersion": true,
-                            "settings": {
-                              "AttestationConfig": {
-                                "MaaSettings": {
-                                  "maaEndpoint": "",
-                                  "maaTenantName": "Guest Attestation"
-                                },
-                                "AscSettings": {
-                                  "ascReportingEndpoint": "",
-                                  "ascReportingFrequency": ""
-                                },
-                                "useCustomToken": "false",
-                                "disableAlerts": "false"
-                              }
-                            }
-                          },
-                          "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
-                          ]
-                        },
-                        {
-                          "condition": "[[variables('varRequireNvidiaGPU')]",
-                          "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-09-01",
-                          "name": "[[format('{0}/{1}', parameters('VMName'), 'deployGPUDriversNvidia')]",
-                          "location": "[[parameters('Location')]",
-                          "properties": {
-                            "publisher": "Microsoft.HpcCompute",
-                            "type": "NvidiaGpuDriverWindows",
-                            "typeHandlerVersion": "1.6",
-                            "autoUpgradeMinorVersion": true
-                          },
-                          "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployIntegrityMonitoring')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
-                          ]
-                        },
-                        {
-                          "condition": "[[not(equals(parameters('HostPoolName'), ''))]",
-                          "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-09-01",
-                          "name": "[[format('{0}/{1}', parameters('VMName'), 'JoinHostPool')]",
-                          "location": "[[parameters('Location')]",
-                          "properties": {
-                            "publisher": "Microsoft.PowerShell",
-                            "type": "DSC",
-                            "typeHandlerVersion": "2.77",
-                            "autoUpgradeMinorVersion": true,
-                            "settings": {
-                              "modulesUrl": "[[parameters('WVDArtifactsURL')]",
-                              "configurationFunction": "Configuration.ps1\\AddSessionHost",
-                              "properties": {
-                                "hostPoolName": "[[parameters('HostPoolName')]",
-                                "registrationInfoToken": "[[parameters('HostPoolToken')]",
-                                "aadJoin": "[[if(equals(parameters('DomainJoinObject').DomainType, 'EntraID'), true(), false())]",
-                                "useAgentDownloadEndpoint": true,
-                                "mdmId": "[[if(contains(parameters('DomainJoinObject'), 'IntuneJoin'), if(parameters('DomainJoinObject').IntuneJoin, '0000000a-0000-0000-c000-000000000000', ''), '')]"
-                              }
-                            }
-                          },
-                          "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
-                          ]
-                        },
-                        {
-                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'EntraID')]",
-                          "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-09-01",
-                          "name": "[[format('{0}/{1}', parameters('VMName'), 'AADLoginForWindows')]",
-                          "location": "[[parameters('Location')]",
-                          "properties": {
-                            "publisher": "Microsoft.Azure.ActiveDirectory",
-                            "type": "AADLoginForWindows",
-                            "typeHandlerVersion": "2.0",
-                            "autoUpgradeMinorVersion": true,
-                            "settings": "[[if(contains(parameters('DomainJoinObject'), 'IntuneJoin'), if(parameters('DomainJoinObject').IntuneJoin, createObject('mdmId', '0000000a-0000-0000-c000-000000000000'), null()), null())]"
-                          },
-                          "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
-                          ]
-                        },
-                        {
-                          "condition": "[[equals(parameters('DomainJoinObject').DomainType, 'ActiveDirectory')]",
-                          "type": "Microsoft.Compute/virtualMachines/extensions",
-                          "apiVersion": "2023-09-01",
-                          "name": "[[format('{0}/{1}', parameters('VMName'), 'DomainJoin')]",
-                          "location": "[[parameters('Location')]",
-                          "properties": {
-                            "publisher": "Microsoft.Compute",
-                            "type": "JSonADDomainExtension",
-                            "typeHandlerVersion": "1.3",
-                            "autoUpgradeMinorVersion": true,
-                            "settings": {
-                              "Name": "[[parameters('DomainJoinObject').DomainName]",
-                              "OUPath": "[[parameters('DomainJoinObject').OUPath]",
-                              "User": "[[format('{0}\\{1}', parameters('DomainJoinObject').DomainName, parameters('DomainJoinObject').UserName)]",
-                              "Restart": "true",
-                              "Options": 3
-                            },
-                            "protectedSettings": {
-                              "Password": "[[parameters('DomainJoinPassword')]"
-                            }
-                          },
-                          "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
-                          ]
-                        },
-                        {
-                          "type": "Microsoft.Network/networkInterfaces",
-                          "apiVersion": "2023-09-01",
-                          "name": "[[format('{0}-vNIC', parameters('VMName'))]",
-                          "location": "[[parameters('Location')]",
-                          "properties": {
-                            "ipConfigurations": [
-                              {
-                                "name": "ipconfig1",
-                                "properties": {
-                                  "subnet": {
-                                    "id": "[[parameters('SubnetID')]"
-                                  }
-                                }
-                              }
-                            ],
-                            "enableAcceleratedNetworking": "[[parameters('AcceleratedNetworking')]"
-                          },
-                          "tags": "[[parameters('Tags')]"
-                        },
-                        {
-                          "type": "Microsoft.Compute/virtualMachines",
-                          "apiVersion": "2023-09-01",
-                          "name": "[[parameters('VMName')]",
-                          "location": "[[parameters('Location')]",
-                          "zones": "[[variables('varAvailabilityZone')]",
-                          "identity": "[[if(equals(parameters('DomainJoinObject').DomainType, 'EntraID'), createObject('type', 'SystemAssigned'), null())]",
-                          "properties": {
-                            "osProfile": {
-                              "computerName": "[[parameters('VMName')]",
-                              "adminUsername": "[[parameters('AdminUsername')]",
-                              "adminPassword": "[[parameters('AdminPassword')]"
-                            },
-                            "hardwareProfile": {
-                              "vmSize": "[[parameters('VMSize')]"
-                            },
-                            "storageProfile": {
-                              "osDisk": {
-                                "name": "[[format('{0}-OSDisk', parameters('VMName'))]",
-                                "createOption": "FromImage",
-                                "deleteOption": "Delete",
-                                "managedDisk": {
-                                  "storageAccountType": "[[parameters('DiskType')]"
-                                }
-                              },
-                              "ImageReference": "[[parameters('ImageReference')]"
-                            },
-                            "securityProfile": "[[parameters('SecurityProfile')]",
-                            "diagnosticsProfile": {
-                              "bootDiagnostics": {
-                                "enabled": true
-                              }
-                            },
-                            "networkProfile": {
-                              "networkInterfaces": [
-                                {
-                                  "id": "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]",
-                                  "properties": {
-                                    "deleteOption": "Delete"
-                                  }
-                                }
-                              ]
-                            },
-                            "licenseType": "Windows_Client"
-                          },
-                          "tags": "[[parameters('Tags')]",
-                          "dependsOn": [
-                            "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]"
-                          ]
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "resources": [
-            {
-              "type": "Microsoft.Resources/templateSpecs/versions",
-              "apiVersion": "2022-02-01",
-              "name": "[format('{0}/{1}', parameters('name'), 'deploymentTemplateSpecVersion')]",
-              "location": "[parameters('location')]",
-              "properties": {
-                "mainTemplate": "[variables('$fxv#0')]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Resources/templateSpecs', parameters('name'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.Resources/templateSpecs",
-              "apiVersion": "2022-02-01",
-              "name": "[parameters('name')]",
-              "location": "[parameters('location')]",
-              "tags": "[coalesce(tryGet(parameters('tags'), 'Microsoft.Resources/templateSpecs'), createObject())]",
-              "properties": {
-                "description": "Template Spec for deploying VMs through the AVD Replacement Plan",
-                "displayName": "AVD Replacement Plan Session Host Template"
-              }
-            }
-          ],
-          "outputs": {
-            "name": {
-              "type": "string",
-              "value": "[parameters('name')]"
-            },
-            "resourceId": {
-              "type": "string",
-              "value": "[resourceId('Microsoft.Resources/templateSpecs', parameters('name'))]"
-            }
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
       "name": "[format('deploy-function-app-{0}', parameters('timeStamp'))]",
       "subscriptionId": "[split(parameters('userAssignedIdentityResourceId'), '/')[2]]",
       "resourceGroup": "[split(parameters('userAssignedIdentityResourceId'), '/')[4]]",
@@ -1785,8 +1133,8 @@
           "delegatedSubnetResourceId": {
             "value": "[parameters('delegatedSubnetResourceId')]"
           },
-          "entraEnvironmentName": {
-            "value": "[parameters('entraEnvironmentName')]"
+          "entraIdEnvironmentName": {
+            "value": "[parameters('entraIdEnvironmentName')]"
           },
           "functionAppName": {
             "value": "[parameters('functionAppName')]"
@@ -1820,20 +1168,12 @@
                 "value": "[split(parameters('hostPoolResourceId'), '/')[8]]"
               },
               {
-                "name": "_TargetSessionHostCount",
-                "value": "[parameters('targetSessionHostCount')]"
-              },
-              {
-                "name": "_SessionHostNamePrefix",
-                "value": "[parameters('sessionHostNamePrefix')]"
-              },
-              {
                 "name": "_SessionHostTemplate",
-                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value]"
+                "value": "[parameters('templateSpecVersionResourceId')]"
               },
               {
-                "name": "_SessionHostParameters",
-                "value": "[string(createObject('AcceleratedNetworking', parameters('acceleratedNetworking'), 'AdminUsername', parameters('localAdminUsername'), 'AvailabilityZones', parameters('availabilityZones'), 'DiskType', parameters('sessionHostDiskType'), 'DomainJoinObject', variables('domainJoinObject'), 'DomainJoinPassword', if(equals(parameters('identityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp'))), '2022-09-01').outputs.resourceId.value), 'secretName', 'DomainJoinPassword'))), 'ImageReference', variables('imageReference'), 'Location', parameters('sessionHostsRegion'), 'SecurityProfile', createObject('securityType', parameters('securityType'), 'uefiSettings', createObject('secureBootEnabled', true(), 'vTpmEnabled', true())), 'SubnetId', parameters('subnetResourceId'), 'tags', parameters('tags'), 'VMSize', parameters('sessionHostSize')))]"
+                "name": "_DeploymentParametersUri",
+                "value": "[parameters('templateParametersUri')]"
               },
               {
                 "name": "_RemoveAzureADDevice",
@@ -1876,14 +1216,6 @@
                 "value": "[parameters('shrDeploymentPrefix')]"
               },
               {
-                "name": "_AllowDownsizing",
-                "value": "[parameters('allowDownsizing')]"
-              },
-              {
-                "name": "_SessionHostInstanceNumberPadding",
-                "value": "[parameters('sessionHostInstanceNumberPadding')]"
-              },
-              {
                 "name": "_ReplaceSessionHostOnNewImageVersion",
                 "value": "[parameters('replaceSessionHostOnNewImageVersion')]"
               },
@@ -1892,12 +1224,8 @@
                 "value": "[parameters('replaceSessionHostOnNewImageVersionDelayDays')]"
               },
               {
-                "name": "_VMNamesTemplateParameterName",
-                "value": "[parameters('vmNamesTemplateParameterName')]"
-              },
-              {
                 "name": "_SessionHostResourceGroupName",
-                "value": "[parameters('sessionHostResourceGroupName')]"
+                "value": "[parameters('sessionHostsResourceGroupName')]"
               }
             ]
           },
@@ -1924,7 +1252,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "9292861880293687659"
+              "templateHash": "17882641290495121580"
             }
           },
           "parameters": {
@@ -1937,7 +1265,7 @@
             "delegatedSubnetResourceId": {
               "type": "string"
             },
-            "entraEnvironmentName": {
+            "entraIdEnvironmentName": {
               "type": "string"
             },
             "functionAppName": {
@@ -2020,7 +1348,7 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "siteConfig": {
                   "alwaysOn": true,
-                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', parameters('entraEnvironmentName')), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'WEBSITE_LOAD_USER_PROFILE', 'value', '1')), parameters('replacementPlanSettings'))]",
+                  "appSettings": "[union(createArray(createObject('name', '_AzureEnvironmentName', 'value', environment().name), createObject('name', '_EntraEnvironmentName', 'value', parameters('entraIdEnvironmentName')), createObject('name', '_SubscriptionId', 'value', subscription().subscriptionId), createObject('name', '_TenantId', 'value', subscription().tenantId), createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference(resourceId('Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString), createObject('name', 'AzureWebJobsStorage__blobServiceUri', 'value', format('https://{0}.blob.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__credential', 'value', 'managedidentity'), createObject('name', 'AzureWebJobsStorage__managedIdentityResourceId', 'value', parameters('userAssignedIdentityResourceId')), createObject('name', 'AzureWebJobsStorage__queueServiceUri', 'value', format('https://{0}.queue.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'AzureWebJobsStorage__tableServiceUri', 'value', format('https://{0}.table.{1}', parameters('storageAccountName'), environment().suffixes.storage)), createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'WEBSITE_LOAD_USER_PROFILE', 'value', '1')), parameters('replacementPlanSettings'))]",
                   "cors": {
                     "allowedOrigins": [
                       "[format('{0}', environment().portal)]",
@@ -2170,9 +1498,7 @@
       },
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-application-insights-{0}', parameters('timeStamp')))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-key-vault-{0}', parameters('timeStamp')))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-storage-account-{0}', parameters('timeStamp')))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp')))]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-storage-account-{0}', parameters('timeStamp')))]"
       ]
     },
     {
@@ -2237,7 +1563,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('assign-rbac-AVD-{0}', parameters('timeStamp'))]",
-      "resourceGroup": "[parameters('sessionHostResourceGroupName')]",
+      "resourceGroup": "[parameters('sessionHostsResourceGroupName')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -2288,8 +1614,8 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('assign-rbac-template-spec-{0}', parameters('timeStamp'))]",
-      "subscriptionId": "[split(parameters('userAssignedIdentityResourceId'), '/')[2]]",
-      "resourceGroup": "[split(parameters('userAssignedIdentityResourceId'), '/')[4]]",
+      "subscriptionId": "[split(parameters('templateSpecVersionResourceId'), '/')[2]]",
+      "resourceGroup": "[split(parameters('templateSpecVersionResourceId'), '/')[4]]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -2297,7 +1623,7 @@
         "mode": "Incremental",
         "parameters": {
           "templateSpecName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp'))), '2022-09-01').outputs.name.value]"
+            "value": "[split(parameters('templateSpecVersionResourceId'), '/')[8]]"
           },
           "userAssignedIdentityPrincipalId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('userAssignedIdentityResourceId'), '/')[8]), '2023-01-31').principalId]"
@@ -2341,10 +1667,7 @@
             }
           ]
         }
-      },
-      "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('userAssignedIdentityResourceId'), '/')[2], split(parameters('userAssignedIdentityResourceId'), '/')[4]), 'Microsoft.Resources/deployments', format('deploy-template-spec-{0}', parameters('timeStamp')))]"
-      ]
+      }
     },
     {
       "type": "Microsoft.Resources/deployments",

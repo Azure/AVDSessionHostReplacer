@@ -1,5 +1,3 @@
-@secure()
-param domainJoinPassword string
 param keyVaultName string
 param keyVaultNetworkInterfaceName string
 param keyVaultPrivateEndpointName string
@@ -11,8 +9,6 @@ param subnetResourceId string
 param tags object
 param userAssignedIdentityResourceId string
 param userAssignedIdentityPrincipalId string
-
-
 
 resource vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: keyVaultName
@@ -131,14 +127,6 @@ resource key 'Microsoft.KeyVault/vaults/keys@2022-07-01' = {
         }
       ]
     }
-  }
-}
-
-resource secret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  parent: vault
-  name: 'DomainJoinPassword'
-  properties: {
-    value: domainJoinPassword
   }
 }
 

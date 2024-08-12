@@ -84,6 +84,9 @@ param SessionHostNamePrefix string
 @description('Required: Yes | Number of session hosts to maintain in the host pool.')
 param TargetSessionHostCount int
 
+@description('Required: No | Switches to using the US Governmment DoD graph endpoints for the Function App. | Default: false')
+param UseGovDodGraph bool = false
+
 @description('Required: No | Resource Id of the User Assigned Managed Identity to use for the Function App. | Default: System Identity')
 param UseUserAssignedManagedIdentity bool = false
 param UserAssignedManagedIdentityResourceId string = ''
@@ -272,7 +275,11 @@ var varAzureEnvironments = [
   'AzureUSGovernment' // USGov
   'AzureChinaCloud' // China
 ]
-var varGraphEnvironmentNames = [
+var varGraphEnvironmentNames = UseGovDodGraph ? [
+  'Global' // AzureCloud
+  'USGovDod' // AzureUSGovernment
+  'China' // AzureChinaCloud
+]: [
   'Global' // AzureCloud
   'USGov' // AzureUSGovernment
   'China' // AzureChinaCloud

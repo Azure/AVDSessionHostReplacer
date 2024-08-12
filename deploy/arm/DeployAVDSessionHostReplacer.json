@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "4739308509710980255"
+      "templateHash": "317213112891022996"
     }
   },
   "parameters": {
@@ -159,6 +159,13 @@
       "type": "int",
       "metadata": {
         "description": "Required: Yes | Number of session hosts to maintain in the host pool."
+      }
+    },
+    "UseGovDodGraph": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required: No | Switches to using the US Governmment DoD graph endpoints for the Function App. | Default: false"
       }
     },
     "UseUserAssignedManagedIdentity": {
@@ -356,11 +363,7 @@
       "AzureUSGovernment",
       "AzureChinaCloud"
     ],
-    "varGraphEnvironmentNames": [
-      "Global",
-      "USGov",
-      "China"
-    ],
+    "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
     "varUniqueString": "[uniqueString(resourceGroup().id, parameters('HostPoolName'))]",
     "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', uniqueString(resourceGroup().id, parameters('HostPoolName')))]",
@@ -515,7 +518,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "10384430072340174888"
+              "templateHash": "10011464455096029148"
             }
           },
           "parameters": {
@@ -549,7 +552,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.4/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.5/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

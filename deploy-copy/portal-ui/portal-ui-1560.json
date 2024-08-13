@@ -48,10 +48,13 @@
             }
         ],
         "outputs": {
-            "storageAccountNamePrefix": "[steps('storageConfig').storageAccounts.prefix]",
-            "storageAccountType": "[steps('storageConfig').storageAccounts.type]",
-            "location": "[location()]",
-            "tagsByResource": "[steps('tags').tagsByResource]"
+            "parameters":{
+                "storageAccountNamePrefix": "[steps('storageConfig').storageAccounts.prefix]",
+                "storageAccountType": "[steps('storageConfig').storageAccounts.type]",
+                "tagsByResource": "[steps('tags').tagsByResource]"
+            },
+            "kind": "ResourceGroup",
+            "location": "[location()]"
         }
     }
 }

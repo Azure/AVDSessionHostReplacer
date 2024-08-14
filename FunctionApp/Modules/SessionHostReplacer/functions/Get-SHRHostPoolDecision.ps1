@@ -70,19 +70,25 @@ function Get-SHRHostPoolDecision {
     Write-PSFMessage -Level Host -Message "We have a buffer of {0} session hosts more than the target." -StringValues $TargetSessionHostBuffer
 
     $weCanDeployUpTo = $TargetSessionHostCount + $TargetSessionHostBuffer - $SessionHosts.count - $RunningDeployments.SessionHostNames.Count
-    if ($weCanDeployUpTo -ge 0) { Write-PSFMessage -Level Host -Message "We can deploy up to {0} session hosts" -StringValues $weCanDeployUpTo }
-    else { Write-PSFMessage -Level Host -Message "Buffer is full. We can not deploy more session hosts" }
+    if ($weCanDeployUpTo -ge 0) {
+        Write-PSFMessage -Level Host -Message "We can deploy up to {0} session hosts" -StringValues $weCanDeployUpTo
 
-    $weNeedToDeploy = $TargetSessionHostCount - $sessionHostsCurrentTotal.Count
-    if ($weNeedToDeploy -gt 0) {
-        Write-PSFMessage -Level Host -Message "We need to deploy {0} new session hosts" -StringValues $weNeedToDeploy
-        $weCanDeploy = if ($weNeedToDeploy -gt $weCanDeployUpTo) { $weCanDeployUpTo } else { $weNeedToDeploy } # If we need to deploy 10 machines, and we can deploy 5, we should only deploy 5.
-        Write-PSFMessage -Level Host -Message "Buffer allows deploying {0} session hosts" -StringValues $weCanDeploy
+        $weNeedToDeploy = $TargetSessionHostCount - $sessionHostsCurrentTotal.Count
+        if ($weNeedToDeploy -gt 0) {
+            Write-PSFMessage -Level Host -Message "We need to deploy {0} new session hosts" -StringValues $weNeedToDeploy
+            $weCanDeploy = if ($weNeedToDeploy -gt $weCanDeployUpTo) { $weCanDeployUpTo } else { $weNeedToDeploy } # If we need to deploy 10 machines, and we can deploy 5, we should only deploy 5.
+            Write-PSFMessage -Level Host -Message "Buffer allows deploying {0} session hosts" -StringValues $weCanDeploy
+        }
+        else {
+            $weCanDeploy = 0
+            Write-PSFMessage -Level Host -Message "We have enough session hosts in good shape."
+        }
     }
     else {
+        Write-PSFMessage -Level Host -Message "Buffer is full. We can not deploy more session hosts"
         $weCanDeploy = 0
-        Write-PSFMessage -Level Host -Message "We have enough session hosts in good shape."
     }
+
 
     $weCanDelete = $SessionHosts.Count - $TargetSessionHostCount
     if ($weCanDelete -gt 0) {

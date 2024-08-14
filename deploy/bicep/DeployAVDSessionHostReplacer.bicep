@@ -82,7 +82,12 @@ param HostPoolName string
 param SessionHostNamePrefix string
 
 @description('Required: Yes | Number of session hosts to maintain in the host pool.')
+@minValue(0)
 param TargetSessionHostCount int
+
+@description('Required: Yes | The maximum number of session hosts to add during a replacement process')
+@minValue(1)
+param TargetSessionHostBuffer int
 
 @description('Required: No | Switches to using the US Governmment DoD graph endpoints for the Function App. | Default: false')
 param UseGovDodGraph bool = false
@@ -115,9 +120,6 @@ param FixSessionHostTags bool = true
 
 @description('Required: No | Prefix used for the deployment name of the session hosts. | Default: AVDSessionHostReplacer')
 param SHRDeploymentPrefix string = 'AVDSessionHostReplacer'
-
-@description('Required: No | Allow deleting session hosts if count exceeds target. | Default: true')
-param AllowDownsizing bool = true
 
 @description('Required: No | Number of digits to use for the instance number of the session hosts (eg. AVDVM-01). | Default: 2')
 param SessionHostInstanceNumberPadding int = 2
@@ -301,6 +303,10 @@ var varReplacementPlanSettings = [
     value: TargetSessionHostCount
   }
   {
+    name: '_TargetSessionHostBuffer'
+    value: TargetSessionHostBuffer
+  }
+  {
     name: '_SessionHostNamePrefix'
     value: SessionHostNamePrefix
   }
@@ -373,10 +379,6 @@ var varReplacementPlanSettings = [
   {
     name: '_SHRDeploymentPrefix'
     value: SHRDeploymentPrefix
-  }
-  {
-    name: '_AllowDownsizing'
-    value: AllowDownsizing
   }
   {
     name: '_SessionHostInstanceNumberPadding'

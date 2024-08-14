@@ -38,15 +38,30 @@
                                     }
                                 },
                                 {
-                                    "name": "sessionHostsCount",
+                                    "name": "TargetSessionHostCount",
                                     "type": "Microsoft.Common.Slider",
                                     "min": 1,
                                     "max": 5000,
-                                    "label": "Session Hosts",
+                                    "label": "Target Number of Session Hosts",
                                     "subLabel": "VMs",
                                     "defaultValue": 2,
                                     "showStepMarkers": false,
                                     "toolTip": "The target number of session hosts in the host pool.",
+                                    "constraints": {
+                                        "required": true
+                                    },
+                                    "visible": true
+                                },
+                                {
+                                    "name": "TargetSessionHostBuffer",
+                                    "type": "Microsoft.Common.Slider",
+                                    "min": 1,
+                                    "max": "[steps('basics').HostPoolSettingsSection.TargetSessionHostCount]",
+                                    "label": "Session Hosts Buffer",
+                                    "subLabel": "VMs",
+                                    "defaultValue": 5,
+                                    "showStepMarkers": false,
+                                    "toolTip": "The maximum number of session hosts to add during a replacement process. For example; if target is 10, buffer is 2, and we need to replace all VMs, then SHR will add 2 new VMs, delete two old ones, and repeat until all hosts are replaced. This is useful to avoid exhausting subnets and reduce costs.",
                                     "constraints": {
                                         "required": true
                                     },
@@ -652,16 +667,6 @@
                             }
                         },
                         {
-                            "name": "_AllowDownsizing",
-                            "type": "Microsoft.Common.CheckBox",
-                            "label": "Allow Downsizing",
-                            "toolTip": "If enabled, the session host replacer will delete older session hosts when the total number of good hosts is higher than target session host number.",
-                            "defaultValue": true,
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
                             "name": "_SessionHostInstanceNumberPadding",
                             "type": "Microsoft.Common.TextBox",
                             "label": "Session Host VM Name Padding",
@@ -717,7 +722,8 @@
                 "SessionHostNamePrefix": "[steps('basics').HostPoolSettingsSection.sessionHostNamePrefix]",
                 "UseUserAssignedManagedIdentity": "[if(steps('basics').IdentitySection.UseUserAssignedManagedIdentity, true, false)]",
                 "UserAssignedManagedIdentityResourceId": "[if(steps('basics').IdentitySection.UseUserAssignedManagedIdentity, steps('basics').IdentitySection.UserAssignedManagedIdentitySelector.id, '')]",
-                "TargetSessionHostCount": "[steps('basics').HostPoolSettingsSection.sessionHostsCount]",
+                "TargetSessionHostCount": "[steps('basics').HostPoolSettingsSection.TargetSessionHostCount]",
+                "TargetSessionHostBuffer": "[steps('basics').HostPoolSettingsSection.TargetSessionHostBuffer]",
                 "EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
                 "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
                 "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
@@ -748,7 +754,6 @@
                 "DrainGracePeriodHours": "[steps('optionalParametersStep')._DrainGracePeriodHours]",
                 "FixSessionHostTags": "[steps('optionalParametersStep')._FixSessionHostTags]",
                 "DeploymentPrefix": "[steps('optionalParametersStep')._SHRDeploymentPrefix]",
-                "AllowDownsizing": "[steps('optionalParametersStep')._AllowDownsizing]",
                 "SessionHostInstanceNumberPadding": "[steps('optionalParametersStep')._SessionHostInstanceNumberPadding]",
                 "ReplaceSessionHostOnNewImageVersion": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
                 "ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",

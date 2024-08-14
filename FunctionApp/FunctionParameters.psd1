@@ -7,7 +7,6 @@
     _DrainGracePeriodHours                        = @{Required = $false ; Type = 'int   '  ; Default = 24                                 ; Description = '' }
     _FixSessionHostTags                           = @{Required = $false ; Type = 'bool  '  ; Default = $true                              ; Description = '' }
     _SHRDeploymentPrefix                          = @{Required = $false ; Type = 'string'  ; Default = 'AVDSessionHostReplacer'           ; Description = '' }
-    _AllowDownsizing                              = @{Required = $false ; Type = 'bool  '  ; Default = $true                              ; Description = '' }
     _SessionHostInstanceNumberPadding             = @{Required = $false ; Type = 'int   '  ; Default = 2                                  ; Description = '' }
     _ReplaceSessionHostOnNewImageVersion          = @{Required = $false ; Type = 'bool  '  ; Default = $true                              ; Description = '' }
     _ReplaceSessionHostOnNewImageVersionDelayDays = @{Required = $false ; Type = 'int   '  ; Default = 0                                  ; Description = '' }
@@ -16,6 +15,7 @@
     _HostPoolResourceGroupName                    = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }
     _HostPoolName                                 = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }
     _TargetSessionHostCount                       = @{Required = $true  ; Type = 'int'                                                    ; Description = '' }
+    _TargetSessionHostBuffer                      = @{Required = $true  ; Type = 'int'                                                    ; Description = 'The maximum number of session hosts to add during a replacement process. For example; if target is 10, buffer is 2, and we need to replace all VMs, then SHR will add 2 new VMs, delete two old ones, and repeat until all hosts are replaced. This is useful to avoid exhausting subnets and reduce costs. Minimum is 1.' }
     _SessionHostNamePrefix                        = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }
     _SessionHostTemplate                          = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }
     _SessionHostParameters                        = @{Required = $true  ; Type = 'hashtable'                                              ; Description = '' }

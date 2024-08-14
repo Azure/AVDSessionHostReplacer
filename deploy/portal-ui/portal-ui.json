@@ -76,6 +76,15 @@
                                         "required": true,
                                         "validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
                                     }
+                                },
+                                {
+                                    "name": "SessionHostExampleNameInfoBox",
+                                    "type": "Microsoft.Common.InfoBox",
+                                    "visible": "[not(empty(steps('basics').HostPoolSettingsSection.sessionHostNamePrefix))]",
+                                    "options": {
+                                        "icon": "Info",
+                                        "text": "[concat('Example Session Host name: ', steps('basics').HostPoolSettingsSection.sessionHostNamePrefix , if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','') , take('00000000', sub(steps('optionalParametersStep')._SessionHostInstanceNumberPadding,1)) ,'1<br>You can customize the separator and padding from Optional Parameters.')  ]"
+                                    }
                                 }
                             ]
                         },
@@ -668,12 +677,34 @@
                         },
                         {
                             "name": "_SessionHostInstanceNumberPadding",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Session Host VM Name Padding",
-                            "toolTip": "The number of digits to pad the session host instance number with. For example, if the value is 3, the session host names will be in the format <prefix>-001.",
+                            "type": "Microsoft.Common.Slider",
+                            "min": 1,
+                            "max": 4,
+                            "label": "Session Host VM Number Padding",
                             "defaultValue": 2,
+                            "showStepMarkers": true,
                             "constraints": {
                                 "required": false
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "_SessionHostNameSeparator",
+                            "type": "Microsoft.Common.CheckBox",
+                            "label": "Use '-' as separator",
+                            "toolTip": "If enabled, the session host replacer will use '-' as a separator between the prefix and the instance number. If disabled, the session host replacer will not use separator.",
+                            "defaultValue": true,
+                            "constraints": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "name": "SessionHostExampleNameInfoBox",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[not(empty(steps('basics').HostPoolSettingsSection.sessionHostNamePrefix))]",
+                            "options": {
+                                "icon": "Info",
+                                "text": "[concat('Example Session Host name: ', steps('basics').HostPoolSettingsSection.sessionHostNamePrefix , if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','') , take('00000000', sub(steps('optionalParametersStep')._SessionHostInstanceNumberPadding,1)) ,'1')  ]"
                             }
                         },
                         {
@@ -755,6 +786,7 @@
                 "FixSessionHostTags": "[steps('optionalParametersStep')._FixSessionHostTags]",
                 "DeploymentPrefix": "[steps('optionalParametersStep')._SHRDeploymentPrefix]",
                 "SessionHostInstanceNumberPadding": "[steps('optionalParametersStep')._SessionHostInstanceNumberPadding]",
+                "SessionHostNameSeparator": "[if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','')]",
                 "ReplaceSessionHostOnNewImageVersion": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
                 "ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",
                 "VMNamesTemplateParameterName": "VMNames",

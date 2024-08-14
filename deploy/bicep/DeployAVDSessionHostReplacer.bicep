@@ -81,6 +81,10 @@ param HostPoolName string
 @maxLength(12)
 param SessionHostNamePrefix string
 
+@description('Required: NO | Separator between prefix and number. | Default: -')
+@maxLength(1)
+param SessionHostNameSeparator string = '-'
+
 @description('Required: Yes | Number of session hosts to maintain in the host pool.')
 @minValue(0)
 param TargetSessionHostCount int
@@ -309,6 +313,10 @@ var varReplacementPlanSettings = [
   {
     name: '_SessionHostNamePrefix'
     value: SessionHostNamePrefix
+  }
+  {
+    name: '_SessionHostNameSeparator'
+    value: SessionHostNameSeparator
   }
   {
     name: '_SessionHostTemplate'

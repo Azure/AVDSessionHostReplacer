@@ -17,6 +17,7 @@
     _TargetSessionHostCount                       = @{Required = $true  ; Type = 'int'                                                    ; Description = '' }
     _TargetSessionHostBuffer                      = @{Required = $true  ; Type = 'int'                                                    ; Description = 'The maximum number of session hosts to add during a replacement process. For example; if target is 10, buffer is 2, and we need to replace all VMs, then SHR will add 2 new VMs, delete two old ones, and repeat until all hosts are replaced. This is useful to avoid exhausting subnets and reduce costs. Minimum is 1.' }
     _SessionHostNamePrefix                        = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }
+    _SessionHostNameSeparator                     = @{Required = $false ; Type = 'string' ; Default = '-'                                 ; Description = 'Separator between prefix and number. By default it is <prefix>-<XX>' }
     _SessionHostTemplate                          = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }
     _SessionHostParameters                        = @{Required = $true  ; Type = 'hashtable'                                              ; Description = '' }
     _SubscriptionId                               = @{Required = $true  ; Type = 'string'                                                 ; Description = '' }

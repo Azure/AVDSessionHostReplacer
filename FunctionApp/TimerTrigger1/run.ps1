@@ -36,7 +36,7 @@ $sessionHostParameters = (Get-FunctionConfig _SessionHostParameters)
 
 # Get latest version of session host image
 Write-PSFMessage -Level Host -Message "Getting latest image version using Image Reference: {0}" -StringValues ($sessionHostParameters.ImageReference | Out-String)
-$latestImageVersion = Get-SHRLatestImageVersion -ImageReference $sessionHostParameters.ImageReference
+$latestImageVersion = Get-SHRLatestImageVersion -ImageReference $sessionHostParameters.ImageReference -Location $sessionHostParameters.Location
 
 # Get number session hosts to deploy
 $hostPoolDecisions = Get-SHRHostPoolDecision -SessionHosts $sessionHostsFiltered -RunningDeployments $runningDeployments -LatestImageVersion $latestImageVersion

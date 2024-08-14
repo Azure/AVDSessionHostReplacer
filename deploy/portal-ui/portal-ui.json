@@ -44,7 +44,7 @@
                                     "max": 5000,
                                     "label": "Target Number of Session Hosts",
                                     "subLabel": "VMs",
-                                    "defaultValue": 2,
+                                    "defaultValue": 10,
                                     "showStepMarkers": false,
                                     "toolTip": "The target number of session hosts in the host pool.",
                                     "constraints": {

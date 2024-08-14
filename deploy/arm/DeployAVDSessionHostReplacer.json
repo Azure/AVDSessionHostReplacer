@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "2639632008673747003"
+      "templateHash": "504091068164114795"
     }
   },
   "parameters": {
@@ -153,6 +153,14 @@
       "maxLength": 12,
       "metadata": {
         "description": "Required: Yes | Prefix used for the name of the session hosts."
+      }
+    },
+    "SessionHostNameSeparator": {
+      "type": "string",
+      "defaultValue": "-",
+      "maxLength": 1,
+      "metadata": {
+        "description": "Required: NO | Separator between prefix and number. | Default: -"
       }
     },
     "TargetSessionHostCount": {
@@ -419,6 +427,10 @@
                 "value": "[parameters('SessionHostNamePrefix')]"
               },
               {
+                "name": "_SessionHostNameSeparator",
+                "value": "[parameters('SessionHostNameSeparator')]"
+              },
+              {
                 "name": "_SessionHostTemplate",
                 "value": "[reference(resourceId('Microsoft.Resources/deployments', 'deployStandardSessionHostTemplate'), '2022-09-01').outputs.TemplateSpecResourceId.value]"
               },
@@ -519,7 +531,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "17647947307315439254"
+              "templateHash": "3794514016630886796"
             }
           },
           "parameters": {
@@ -553,7 +565,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.10/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.11/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

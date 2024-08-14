@@ -21,7 +21,7 @@ param LogAnalyticsWorkspaceId string = 'none'
 param FunctionAppName string
 
 @description('Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code.')
-param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.0/FunctionApp.zip'
+param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.0-beta.0/FunctionApp.zip'
 
 @description('Required: No | App Service Plan Name | Default: Y1 for consumption based plan')
 param AppPlanName string = 'Y1'

@@ -43,6 +43,7 @@ When deleting an old session host, the function will check if it has existing se
 
 ## FAQ
 - **Can I use a custom Template Spec for Session Hosts deployment?**
+
     Yes, you can use a custom Template Spec, right now this is not possible when using the portal UI as you need to customize the ARM template.
     You can base the customization on the [built-in template](StandardSessionHostTemplate/DeploySessionHosts.bicep) making sure of the following,
         - The template must accept an array parameter for the names of VMs to deploy. The default paramter name is `VMNames` and it can be changed using the parameter `VMNamesTemplateParameterName`.
@@ -52,17 +53,20 @@ When deleting an old session host, the function will check if it has existing se
             - `Location`: The region where the session hosts will be deployed. This is used when querying for the latest image version when using marketplace images.
 
 - **What happens to existing session hosts when I deploy the Session Host Replacer?**
+
     Nothing, the Session Host Replacer will ignore the existing session hosts and create new ones to manage. You can include the existing session hosts in automation by setting the tag `IncludeInAutoReplace` to `True`. This tag is added to all VMs during the first run of the Session Host Replacer after deployment.
 
 - **How can I force replace a specific session host?**
+
     On the VM(s) you want to replace, update the the tag `AutoReplaceDeployTimestamp` to any date older that 45 days. The Session Host Replacer will replace the VM on the next run.
 
 - **What about AVD Scaling Plans?**
+
     When the Session Host Replacer needs to delete a session host that has users logged in, it will add a tag `ScalingPlanExclusion` to the VM. The name of the tag is configurable and it should be the same as the tag used in the scaling plan.
 
 - **What happens if a deployment fails?**
-    The Session host Replacer checks for failed deployments, if any are found it will NOT take any actions. You should clean up the failed deployment by deleting any resources created, Entra Devices, etc... and delete the failed deployment from the deployment history.
 
+    The Session host Replacer checks for failed deployments, if any are found it will NOT take any actions. You should clean up the failed deployment by deleting any resources created, Entra Devices, etc... and delete the failed deployment from the deployment history.
 
 ## Contributing
 

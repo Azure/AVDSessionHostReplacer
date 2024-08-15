@@ -84,7 +84,7 @@ jobs:
           # An optional flag which indicates if artifact read or upload errors should fail the build.
           artifactErrorsFailBuild: true # optional, default is
           # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
-          artifacts: ./temp/FunctionApp.zip # optional
+          artifacts: ./temp/FunctionApp.zip , ./deploy/arm/DeployAVDSessionHostReplacer.json , ./deploy/portal-ui/portal-ui.json # optional
           # The content type of the artifact. Defaults to raw
           # generateReleaseNotes: true # optional, default is false
           # Indicates if the release should be the "latest" release or not.

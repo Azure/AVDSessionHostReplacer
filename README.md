@@ -52,9 +52,15 @@ When deleting an old session host, the function will check if it has existing se
             - `ImageReference`: Can be in the Provider/Offer/SKU or Id format for custom images.
             - `Location`: The region where the session hosts will be deployed. This is used when querying for the latest image version when using marketplace images.
 
-- **What happens to existing session hosts when I deploy the Session Host Replacer?**
+- **I just deployed the Session Host Replacer, now what?
 
-    Nothing, the Session Host Replacer will ignore the existing session hosts and create new ones to manage. You can include the existing session hosts in automation by setting the tag `IncludeInAutoReplace` to `True`. This tag is added to all VMs during the first run of the Session Host Replacer after deployment.
+    The Session Host Replacer runs every hour on the hour. You can manually trigger it by going to the FunctionApp > timerTrigger1 > Code+Test.
+
+    During the first run, the Session Host Replacer will download required PowerShell modules from the Internet which can take some time. Subsequent runs will be (much) faster.
+
+- **I changed my mind about some of the settings during deployment or I want to upgrade to the latest version, what should I do?**
+
+    You can simply redeploy the Session Host Replacer with the new settings or version. It will overwrite the existing deployment without any impact.
 
 - **How can I force replace a specific session host?**
 
@@ -67,6 +73,10 @@ When deleting an old session host, the function will check if it has existing se
 - **What happens if a deployment fails?**
 
     The Session host Replacer checks for failed deployments, if any are found it will NOT take any actions. You should clean up the failed deployment by deleting any resources created, Entra Devices, etc... and delete the failed deployment from the deployment history.
+
+- **The Session Host Replacer is failing, how can I get help?**
+
+    While this is a community project and we do not provide direct support, you can open an issue on GitHub and we will do our best to help you. Please make sure to include the logs of failed run by going to FunctionApp > timerTrigger1 > Invocations. Or manually run from Code+Test and copy the logs.
 
 ## Contributing
 

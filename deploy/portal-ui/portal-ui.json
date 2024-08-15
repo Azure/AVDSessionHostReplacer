@@ -61,7 +61,7 @@
                                     "subLabel": "VMs",
                                     "defaultValue": 5,
                                     "showStepMarkers": false,
-                                    "toolTip": "The maximum number of session hosts to add during a replacement process. For example; if target is 10, buffer is 2, and we need to replace all VMs, then SHR will add 2 new VMs, delete two old ones, and repeat until all hosts are replaced. This is useful to avoid exhausting subnets and reduce costs.",
+                                    "toolTip": "<p>The maximum number of session hosts to add during a replacement process.</p><p><strong>Example:</strong></p><p>Target is 10, buffer is 2, and we need to replace all VMs</p><p>Then SHR will add 2 new VMs, delete 2 old ones, and repeat until all hosts are replaced. This is useful to avoid exhausting subnets, capacity limits, and reduce costs.</p>",
                                     "constraints": {
                                         "required": true
                                     },
@@ -71,7 +71,7 @@
                                     "name": "sessionHostNamePrefix",
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "Session Host Name Prefix",
-                                    "toolTip": "The prefix for the session host names. The session host names will be in the format (prefix)-(number). Make sure this produces a unique value across all device names in your environment. Try selecting a prefix that helps you identify the host pool such as AVDHP01 for example so the session hosts will be named AVDHP01-01, AVDHP01-02 and so on.",
+                                    "toolTip": "<p>The prefix for the session host names.</p><p>Make sure this produces a unique value across all device names in your environment.</p><p>Try selecting a prefix that helps you identify the host pool such as AVDHP01</p>",
                                     "constraints": {
                                         "required": true,
                                         "validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
@@ -98,7 +98,7 @@
                                     "name": "UseUserAssignedManagedIdentity",
                                     "type": "Microsoft.Common.CheckBox",
                                     "label": "Use User Assigned Managed Identity",
-                                    "toolTip": "[Recommended] IF enabled, The Session Host Replacer will use the selected Identity to take actions. Otherwise System Identity (MSI) is used.",
+                                    "toolTip": "[Recommended] When enabled, The Session Host Replacer will use the selected Identity to take actions. Otherwise System Identity (MSI) is used.",
                                     "defaultValue": true,
                                     "constraints": {
                                         "required": false
@@ -139,7 +139,7 @@
                                     "name": "EnableMonitoring",
                                     "type": "Microsoft.Common.CheckBox",
                                     "label": "Enable Monitoring",
-                                    "toolTip": "[Recommended] If enabled, the session host replacer will use App Insights and Log Analytics to collect metrics and logs.",
+                                    "toolTip": "[Recommended] When enabled, the session host replacer will use App Insights and Log Analytics to collect metrics and logs.",
                                     "defaultValue": true,
                                     "constraints": {
                                         "required": false
@@ -150,7 +150,7 @@
                                     "visible": "[steps('basics').MonitoringSection.EnableMonitoring]",
                                     "type": "Microsoft.Common.CheckBox",
                                     "label": "Select existing Log Analytics Workspace",
-                                    "toolTip": "If enabled, the session host replacer will use the selected Log Analytics Workspace. If disabled, the session host replacer will create a new Log Analytics Workspace.",
+                                    "toolTip": "When enabled, the session host replacer will use the selected Log Analytics Workspace. If disabled, the session host replacer will create a new Log Analytics Workspace.",
                                     "defaultValue": false,
                                     "constraints": {
                                         "required": false
@@ -426,7 +426,7 @@
                                     "label": "Security type",
                                     "filter": true,
                                     "defaultValue": "Trusted Launch Virtual Machines",
-                                    "toolTip": "Choose a type of security that matches your needs: Standard includes basic protections at no additional cost. Trusted launch virtual machines provide additional security features on Gen2 virtual machines to protect against persistent and advanced attacks.",
+                                    "toolTip": "Choose a type of security that matches your needs: Trusted launch virtual machines provide additional security features on Gen2 virtual machines to protect against persistent and advanced attacks.",
                                     "constraints": {
                                         "required": true,
                                         "allowedValues": [

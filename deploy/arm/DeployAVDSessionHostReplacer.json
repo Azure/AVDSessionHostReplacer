@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "13929410953304822392"
+      "templateHash": "4930868565190323223"
     }
   },
   "parameters": {
@@ -242,6 +242,13 @@
       "defaultValue": true,
       "metadata": {
         "description": "Required: No | If true, will apply tags for Include In Auto Replace and Deployment Timestamp to existing session hosts. This will not enable automatic deletion of existing session hosts. | Default: True."
+      }
+    },
+    "IncludePreExistingSessionHosts": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required: No | When enabled, the Session Host Replacer will automatically consider pre-existing VMs for replacement if they meet the criteria | Default: False."
       }
     },
     "SHRDeploymentPrefix": {
@@ -495,6 +502,10 @@
                 "value": "[parameters('FixSessionHostTags')]"
               },
               {
+                "name": "_IncludePreExistingSessionHosts",
+                "value": "[parameters('IncludePreExistingSessionHosts')]"
+              },
+              {
                 "name": "_SHRDeploymentPrefix",
                 "value": "[parameters('SHRDeploymentPrefix')]"
               },
@@ -531,7 +542,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "12355246586574213324"
+              "templateHash": "18119792725824599595"
             }
           },
           "parameters": {
@@ -565,7 +576,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.16/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.9-beta.17/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

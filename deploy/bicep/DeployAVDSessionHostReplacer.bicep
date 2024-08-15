@@ -122,6 +122,9 @@ param DrainGracePeriodHours int = 24
 @description('Required: No | If true, will apply tags for Include In Auto Replace and Deployment Timestamp to existing session hosts. This will not enable automatic deletion of existing session hosts. | Default: True.')
 param FixSessionHostTags bool = true
 
+@description('Required: No | When enabled, the Session Host Replacer will automatically consider pre-existing VMs for replacement if they meet the criteria | Default: False.')
+param IncludePreExistingSessionHosts bool = false
+
 @description('Required: No | Prefix used for the deployment name of the session hosts. | Default: AVDSessionHostReplacer')
 param SHRDeploymentPrefix string = 'AVDSessionHostReplacer'
 
@@ -383,6 +386,10 @@ var varReplacementPlanSettings = [
   {
     name: '_FixSessionHostTags'
     value: FixSessionHostTags
+  }
+  {
+    name: '_IncludePreExistingSessionHosts'
+    value: IncludePreExistingSessionHosts
   }
   {
     name: '_SHRDeploymentPrefix'

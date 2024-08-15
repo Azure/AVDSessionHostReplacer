@@ -24,10 +24,10 @@ function Get-SHRSessionHost {
         [string] $TagDeployTimestamp = (Get-FunctionConfig _Tag_DeployTimestamp),
         [Parameter()]
         [string] $TagPendingDrainTimeStamp = (Get-FunctionConfig _Tag_PendingDrainTimestamp),
-
-
         [Parameter()]
-        [switch] $FixSessionHostTags
+        [switch] $FixSessionHostTags,
+        [Parameter()]
+        [bool] $IncludePreExistingSessionHosts = (Get-FunctionConfig _IncludePreExistingSessionHosts)
 
     )
 
@@ -78,10 +78,10 @@ function Get-SHRSessionHost {
             Write-PSFMessage -Level Host -Message 'VM tag {0} with value {1} is not set to True/False' -StringValues $TagIncludeInAutomation, $value
             if ($FixSessionHostTags) {
                 Write-PSFMessage -Level Host -Message 'Setting tag {0} to False' -StringValues $TagIncludeInAutomation
-                Update-AzTag -ResourceId $item.ResourceId -Tag @{ $TagIncludeInAutomation = 'False' } -Operation Merge
+                Update-AzTag -ResourceId $item.ResourceId -Tag @{ $TagIncludeInAutomation = "$IncludePreExistingSessionHosts" } -Operation Merge
             }
 
-            $vmIncludeInAutomation = $false
+            $vmIncludeInAutomation = $IncludePreExistingSessionHosts
         }
         #endregion: Tag IncludeInAutomation
 

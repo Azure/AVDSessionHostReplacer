@@ -1,797 +1,806 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2021-09-09/uiFormDefinition.schema.json",
-    "view": {
-        "kind": "Form",
-        "properties": {
-            "title": "Azure Virtual Desktop - Session Host Replacer Deployment",
-            "steps": [
-                {
-                    "name": "basics",
-                    "label": "Basics",
-                    "elements": [
-                        {
-                            "name": "resourceScope",
-                            "type": "Microsoft.Common.ResourceScope",
-                            "location": {
-                                "resourceTypes": []
-                            }
-                        },
-                        {
-                            "name": "HostPoolSettingsSection",
-                            "type": "Microsoft.Common.Section",
-                            "label": "Host Pool Settings",
-                            "visible": true,
-                            "elements": [
+	"$schema": "https://schema.management.azure.com/schemas/2021-09-09/uiFormDefinition.schema.json",
+	"view": {
+		"kind": "Form",
+		"properties": {
+			"title": "Azure Virtual Desktop - Session Host Replacer Deployment",
+			"steps": [
+				{
+					"name": "basics",
+					"label": "Basics",
+					"elements": [
+						{
+							"name": "resourceScope",
+							"type": "Microsoft.Common.ResourceScope",
+							"location": {
+								"resourceTypes": []
+							}
+						},
+						{
+							"name": "HostPoolSettingsSection",
+							"type": "Microsoft.Common.Section",
+							"label": "Host Pool Settings",
+							"visible": true,
+							"elements": [
+								{
+									"name": "HostPoolSelector",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"label": "Select target Host Pool",
+									"resourceType": "Microsoft.DesktopVirtualization/HostPools",
+									"constraints": {
+										"required": true
+									},
+									"options": {
+										"filter": {
+											"subscription": "onBasics",
+											"location": "onBasics"
+										}
+									}
+								},
+								{
+									"name": "TargetSessionHostCount",
+									"type": "Microsoft.Common.Slider",
+									"min": 1,
+									"max": 5000,
+									"label": "Target Number of Session Hosts",
+									"subLabel": "VMs",
+									"defaultValue": 10,
+									"showStepMarkers": false,
+									"toolTip": "The target number of session hosts in the host pool.",
+									"constraints": {
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "TargetSessionHostBuffer",
+									"type": "Microsoft.Common.Slider",
+									"min": 1,
+									"max": "[steps('basics').HostPoolSettingsSection.TargetSessionHostCount]",
+									"label": "Session Hosts Buffer",
+									"subLabel": "VMs",
+									"defaultValue": 5,
+									"showStepMarkers": false,
+									"toolTip": "<p>The maximum number of session hosts to add during a replacement process.</p><p><strong>Example:</strong></p><p>Target is 10, buffer is 2, and we need to replace all VMs</p><p>Then SHR will add 2 new VMs, delete 2 old ones, and repeat until all hosts are replaced. This is useful to avoid exhausting subnets, capacity limits, and reduce costs.</p>",
+									"constraints": {
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "IncludePreExistingSessionHosts",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Include pre-existing session hosts",
+									"toolTip": "<div><div>When enabled, the Session Host Replacer will automatically consider pre-existing VMs for replacement if they meet the criteria by setting the IncludeInAutomation tag to True during the first run.</div><div>&nbsp;</div><div>When disabled, the session hosts are not counted as part of the target number of VMs.</div><div>&nbsp;</div><div>You can manually include a VM after deployment by updating its tag.</div></div>",
+									"constraints": {
+										"required": false
+									}
+								},
                                 {
-                                    "name": "HostPoolSelector",
-                                    "type": "Microsoft.Solutions.ResourceSelector",
-                                    "label": "Select target Host Pool",
-                                    "resourceType": "Microsoft.DesktopVirtualization/HostPools",
-                                    "constraints": {
-                                        "required": true
-                                    },
-                                    "options": {
-                                        "filter": {
-                                            "subscription": "onBasics",
-                                            "location": "onBasics"
-                                        }
-                                    }
-                                },
-                                {
-                                    "name": "TargetSessionHostCount",
-                                    "type": "Microsoft.Common.Slider",
-                                    "min": 1,
-                                    "max": 5000,
-                                    "label": "Target Number of Session Hosts",
-                                    "subLabel": "VMs",
-                                    "defaultValue": 10,
-                                    "showStepMarkers": false,
-                                    "toolTip": "The target number of session hosts in the host pool.",
-                                    "constraints": {
-                                        "required": true
-                                    },
-                                    "visible": true
-                                },
-                                {
-                                    "name": "TargetSessionHostBuffer",
-                                    "type": "Microsoft.Common.Slider",
-                                    "min": 1,
-                                    "max": "[steps('basics').HostPoolSettingsSection.TargetSessionHostCount]",
-                                    "label": "Session Hosts Buffer",
-                                    "subLabel": "VMs",
-                                    "defaultValue": 5,
-                                    "showStepMarkers": false,
-                                    "toolTip": "<p>The maximum number of session hosts to add during a replacement process.</p><p><strong>Example:</strong></p><p>Target is 10, buffer is 2, and we need to replace all VMs</p><p>Then SHR will add 2 new VMs, delete 2 old ones, and repeat until all hosts are replaced. This is useful to avoid exhausting subnets, capacity limits, and reduce costs.</p>",
-                                    "constraints": {
-                                        "required": true
-                                    },
-                                    "visible": true
-                                },
-                                {
-                                    "name": "sessionHostNamePrefix",
-                                    "type": "Microsoft.Common.TextBox",
-                                    "label": "Session Host Name Prefix",
-                                    "toolTip": "<p>The prefix for the session host names.</p><p>Make sure this produces a unique value across all device names in your environment.</p><p>Try selecting a prefix that helps you identify the host pool such as AVDHP01</p>",
-                                    "constraints": {
-                                        "required": true,
-                                        "validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
-                                    }
-                                },
-                                {
-                                    "name": "SessionHostExampleNameInfoBox",
-                                    "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[not(empty(steps('basics').HostPoolSettingsSection.sessionHostNamePrefix))]",
-                                    "options": {
-                                        "icon": "Info",
-                                        "text": "[concat('Example Session Host name: ', steps('basics').HostPoolSettingsSection.sessionHostNamePrefix , if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','') , take('00000000', sub(steps('optionalParametersStep')._SessionHostInstanceNumberPadding,1)) ,'1<br>You can customize the separator and padding from Optional Parameters.')  ]"
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "name": "IdentitySection",
-                            "type": "Microsoft.Common.Section",
-                            "label": "Identity",
-                            "visible": true,
-                            "elements": [
-                                {
-                                    "name": "UseUserAssignedManagedIdentity",
-                                    "type": "Microsoft.Common.CheckBox",
-                                    "label": "Use User Assigned Managed Identity",
-                                    "toolTip": "[Recommended] When enabled, The Session Host Replacer will use the selected Identity to take actions. Otherwise System Identity (MSI) is used.",
-                                    "defaultValue": true,
-                                    "constraints": {
-                                        "required": false
-                                    }
-                                },
-                                {
-                                    "name": "UserAssignedManagedIdentitySelector",
-                                    "type": "Microsoft.Solutions.ResourceSelector",
-                                    "visible": "[steps('basics').IdentitySection.UseUserAssignedManagedIdentity]",
-                                    "label": "Select User Assigned Managed Identity",
-                                    "resourceType": "Microsoft.ManagedIdentity/userAssignedIdentities",
-                                    "constraints": {
-                                        "required": true
-                                    },
-                                    "options": {
-                                        "filter": {}
-                                    }
-                                },
-                                {
-                                    "name": "UserAssignedManagedIdentityInfoBox",
-                                    "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[steps('basics').IdentitySection.UseUserAssignedManagedIdentity]",
-                                    "options": {
-                                        "icon": "Info",
-                                        "text": "When using a User Assigned Managed Identity, make sure the identity has the needed permissions in Azure and Entra. Follow the link for more info.",
-                                        "uri": "https://github.com/Azure/AVDReplacementPlans/blob/v0.2.9-beta.16/docs/Permissions.md"
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "name": "MonitoringSection",
-                            "type": "Microsoft.Common.Section",
-                            "label": "Monitoring",
-                            "visible": true,
-                            "elements": [
-                                {
-                                    "name": "EnableMonitoring",
-                                    "type": "Microsoft.Common.CheckBox",
-                                    "label": "Enable Monitoring",
-                                    "toolTip": "[Recommended] When enabled, the session host replacer will use App Insights and Log Analytics to collect metrics and logs.",
-                                    "defaultValue": true,
-                                    "constraints": {
-                                        "required": false
-                                    }
-                                },
-                                {
-                                    "name": "UseExistingLAW",
-                                    "visible": "[steps('basics').MonitoringSection.EnableMonitoring]",
-                                    "type": "Microsoft.Common.CheckBox",
-                                    "label": "Select existing Log Analytics Workspace",
-                                    "toolTip": "When enabled, the session host replacer will use the selected Log Analytics Workspace. If disabled, the session host replacer will create a new Log Analytics Workspace.",
-                                    "defaultValue": false,
-                                    "constraints": {
-                                        "required": false
-                                    }
-                                },
-                                {
-                                    "name": "LAWSelector",
-                                    "type": "Microsoft.Solutions.ResourceSelector",
-                                    "visible": "[and(steps('basics').MonitoringSection.EnableMonitoring, steps('basics').MonitoringSection.UseExistingLAW)]",
-                                    "label": "Log Analytics Workspace",
-                                    "resourceType": "Microsoft.OperationalInsights/workspaces",
-                                    "constraints": {
-                                        "required": true
-                                    },
-                                    "options": {
-                                        "filter": {}
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "name": "computeApi",
-                            "type": "Microsoft.Solutions.ArmApiControl",
-                            "request": {
-                                "method": "GET",
-                                "path": "[concat(steps('basics').resourceScope.subscription.id,'/providers/Microsoft.Compute/resourceTypes?api-version=2022-01-01')]"
-                            }
-                        },
-                        {
-                            "name": "VersionInfo",
-                            "type": "Microsoft.Common.TextBlock",
-                            "visible": true,
-                            "options": {
-                                "text": "AVD session host replacer Portal UI Version: v0.2.9-beta.16",
-                                "link": {
-                                    "label": "GitHub Repository",
-                                    "uri": "https://github.com/Azure/AVDSessionHostReplacer"
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "SessionHostsTemplate",
-                    "label": "Session Hosts Template",
-                    "elements": [
-                        {
-                            "name": "SessionHostsRegion",
-                            "type": "Microsoft.Common.DropDown",
-                            "label": "Session Hosts Region",
-                            "visible": true,
-                            "filter": true,
-                            "multiselect": false,
-                            "selectAll": false,
-                            "toolTip": "Select region to deploy session hosts.",
-                            "constraints": {
-                                "required": true,
-                                "allowedValues": "[map( first( map( filter( steps('basics').computeApi.value, (resourceTypes) => equals(resourceTypes.resourceType, 'virtualMachines') ), (item) => item.locations) ), (item) => parse(concat('{\"label\":\"', item, '\",\"value\":\"', toLower(replace(item, ' ', '')), '\"}')) )]"
-                            }
-                        },
-                        {
-                            "name": "AvailabilityZones",
-                            "type": "Microsoft.Common.DropDown",
-                            "label": "Availability Zones",
-                            "visible": true,
-                            "filter": false,
-                            "defaultValue": [],
-                            "multiselect": true,
-                            "selectAll": false,
-                            "toolTip": "Select Availability Zones for the session hosts. Make sure the selected size is available in the selected zones. Session hosts will be deployed across the zones.",
-                            "constraints": {
-                                "required": false,
-                                "allowedValues": [
-                                    {
-                                        "label": "Zone 1",
-                                        "value": "1"
-                                    },
-                                    {
-                                        "label": "Zone 2",
-                                        "value": "2"
-                                    },
-                                    {
-                                        "label": "Zone 3",
-                                        "value": "3"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "name": "SessionHostSize",
-                            "type": "Microsoft.Compute.SizeSelector",
-                            "label": "VM Size",
-                            "toolTip": "",
-                            "recommendedSizes": [
-                                "Standard_D4ads_v5"
-                            ],
-                            "constraints": {
-                                "allowedSizes": [],
-                                "excludedSizes": [],
-                                "required": true
-                            },
-                            "options": {
-                                "hideDiskTypeFilter": true
-                            },
-                            "osPlatform": "Windows",
-                            "imageReference": {
-                                "publisher": "MicrosoftWindowsDesktop",
-                                "offer": "Windows-11",
-                                "sku": "win11-23h2-avd"
-                            }
-                        },
-                        {
-                            "name": "AcceleratedNetworking",
-                            "type": "Microsoft.Common.CheckBox",
-                            "label": "Enable accelerated networking",
-                            "defaultValue": true,
-                            "toolTip": "Enables low latency and high throughput on the network interface."
-                        },
-                        {
-                            "name": "SessionHostDiskType",
-                            "type": "Microsoft.Common.DropDown",
-                            "label": "OS Disk type",
-                            "filter": false,
-                            "defaultValue": "Premium SSD",
-                            "toolTip": "Select session host disk type to host the OS.",
-                            "constraints": {
-                                "required": true,
-                                "allowedValues": [
-                                    {
-                                        "label": "Standard HDD",
-                                        "value": "Standard_LRS"
-                                    },
-                                    {
-                                        "label": "Standard SSD",
-                                        "value": "StandardSSD_LRS"
-                                    },
-                                    {
-                                        "label": "Premium SSD",
-                                        "value": "Premium_LRS"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "name": "optionMarketPlaceOrCustomImage",
-                            "type": "Microsoft.Common.OptionsGroup",
-                            "label": "Image Source",
-                            "defaultValue": "Marketplace",
-                            "toolTip": "",
-                            "constraints": {
-                                "allowedValues": [
-                                    {
-                                        "label": "Marketplace",
-                                        "value": "Marketplace"
-                                    },
-                                    {
-                                        "label": "Gallery Image",
-                                        "value": "Gallery"
-                                    }
-                                ],
-                                "required": true
-                            },
-                            "visible": true
-                        },
-                        {
-                            "name": "dropDownMarketPlaceImage",
-                            "type": "Microsoft.Common.DropDown",
-                            "label": "Select a Marketplace Image",
-                            "placeholder": "",
-                            "defaultValue": [
-                                "Windows 11 23H2 multi-session"
-                            ],
-                            "toolTip": "Marketplace images are updated on monthly basis. The Session Host Replacer will replace the session hosts when a new image is available.",
-                            "multiselect": false,
-                            "selectAll": false,
-                            "filter": true,
-                            "filterPlaceholder": "Filter items ...",
-                            "multiLine": true,
-                            "constraints": {
-                                "allowedValues": [
-                                    {
-                                        "label": "Windows 10 Enterprise 21h2 multi-session",
-                                        "value": "win10-21h2-avd"
-                                    },
-                                    {
-                                        "label": "Windows 10 Enterprise 21h2 multi-session (Gen 2)",
-                                        "value": "win10-21h2-avd-g2"
-                                    },
-                                    {
-                                        "label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps",
-                                        "value": "win10-21h2-avd-m365"
-                                    },
-                                    {
-                                        "label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps (Gen 2)",
-                                        "value": "win10-21h2-avd-m365-g2"
-                                    },
-                                    {
-                                        "label": "Windows 10 Enterprise 22h2 multi-session",
-                                        "value": "win10-22h2-avd"
-                                    },
-                                    {
-                                        "label": "Windows 10 Enterprise 22h2 multi-session (Gen 2)",
-                                        "value": "win10-22h2-avd-g2"
-                                    },
-                                    {
-                                        "label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps",
-                                        "value": "win10-22h2-avd-m365"
-                                    },
-                                    {
-                                        "label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps (Gen 2)",
-                                        "value": "win10-22h2-avd-m365-g2"
-                                    },
-                                    {
-                                        "label": "Windows 11 Enterprise 21h2 multi-session",
-                                        "value": "win11-21h2-avd"
-                                    },
-                                    {
-                                        "label": "Windows 11 Enterprise 21h2 multi-session + Microsoft 365 Apps",
-                                        "value": "win11-21h2-avd-m365"
-                                    },
-                                    {
-                                        "label": "Windows 11 Enterprise 22h2 multi-session",
-                                        "value": "win11-22h2-avd"
-                                    },
-                                    {
-                                        "label": "Windows 11 Enterprise 22h2 multi-session + Microsoft 365 Apps",
-                                        "value": "win11-22h2-avd-m365"
-                                    },
-                                    {
-                                        "label": "Windows 11 Enterprise 23h2 multi-session",
-                                        "value": "win11-23h2-avd"
-                                    },
-                                    {
-                                        "label": "Windows 11 Enterprise 23h2 multi-session + Microsoft 365 Apps",
-                                        "value": "win11-23h2-avd-m365"
-                                    }
-                                ],
-                                "required": true
-                            },
-                            "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Marketplace')]"
-                        },
-                        {
-                            "name": "GalleryImageInfoBox",
-                            "type": "Microsoft.Common.InfoBox",
-                            "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]",
-                            "options": {
-                                "icon": "Warning",
-                                "text": "The system identity of the Session Host Replacer function is assigned the 'Desktop Virtualization Virtual Machine Contributor' role against the subscription. If the Image Definition is in a different subscription, please make sure you manually assign the permission post deployment."
-                            }
-                        },
-                        {
-                            "name": "resourceSelectorSessionHostGalleryImageId",
-                            "type": "Microsoft.Solutions.ResourceSelector",
-                            "label": "Select Gallery Image",
-                            "resourceType": "Microsoft.Compute/galleries/images",
-                            "constraints": {
-                                "required": true
-                            },
-                            "options": {
-                                "filter": {}
-                            },
-                            "visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]"
-                        },
-                        {
-                            "name": "sessionHostsSecuritySection",
-                            "type": "Microsoft.Common.Section",
-                            "visible": true,
-                            "label": "Security profile",
-                            "elements": [
-                                {
-                                    "name": "SecurityType",
-                                    "type": "Microsoft.Common.DropDown",
-                                    "label": "Security type",
-                                    "filter": true,
-                                    "defaultValue": "Trusted Launch Virtual Machines",
-                                    "toolTip": "Choose a type of security that matches your needs: Trusted launch virtual machines provide additional security features on Gen2 virtual machines to protect against persistent and advanced attacks.",
-                                    "constraints": {
-                                        "required": true,
-                                        "allowedValues": [
-                                            {
-                                                "label": "Standard",
-                                                "value": "Standard"
-                                            },
-                                            {
-                                                "label": "Trusted Launch Virtual Machines",
-                                                "value": "TrustedLaunch"
-                                            },
-                                            {
-                                                "label": "Confidential Virtual Machines",
-                                                "value": "ConfidentialVM"
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    "name": "SecureBootEnabled",
-                                    "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'ConfidentialVM'))]",
-                                    "label": "Enable secure boot",
-                                    "defaultValue": true,
-                                    "toolTip": "Secure boot helps protect your VMs against boot kits, rootkits, and kernel-level malware."
-                                },
-                                {
-                                    "name": "TpmEnabled",
-                                    "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'ConfidentialVM'))]",
-                                    "label": "Enable vTPM",
-                                    "defaultValue": true,
-                                    "toolTip": "Virtual Trusted Platform Module (vTPM) is TPM2.0 compliant and validates your VM boot integrity apart from securely storing keys and secrets."
-                                }
-                            ]
-                        },
-                        {
-                            "name": "SubnetId",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Subnet ID",
-                            "visible": true,
-                            "placeholder": "Add resource id of subnet in the same region as the Session Hosts",
-                            "constraints": {
-                                "required": true,
-                                "validations": [
-                                    {
-                                        "regex": ".*/subnets/[A-Za-z0-9_\\.-]+$",
-                                        "message": "Invalid Subnet Resource ID. Make sure it ends with /subnets/SubnetName"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "name": "DomainJoinSection",
-                            "type": "Microsoft.Common.Section",
-                            "visible": true,
-                            "label": "Domain Join",
-                            "elements": [
-                                {
-                                    "name": "IdentityServiceProvider",
-                                    "type": "Microsoft.Common.OptionsGroup",
-                                    "visible": true,
-                                    "label": "Identity service provider",
-                                    "defaultValue": "Microsoft Entra ID",
-                                    "toolTip": "Identity service provider (Active Directory or EntraDS) that already exist and will be used for Azure Virtual Desktop.",
-                                    "constraints": {
-                                        "required": true,
-                                        "allowedValues": [
-                                            {
-                                                "label": "Microsoft Entra ID",
-                                                "value": "EntraID"
-                                            },
-                                            {
-                                                "label": "Active Directory (AD DS)",
-                                                "value": "ActiveDirectory"
-                                            },
-                                            {
-                                                "label": "Microsoft Entra Domain Services",
-                                                "value": "EntraDS"
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    "name": "EntraJoinedInfoBox",
-                                    "type": "Microsoft.Common.InfoBox",
-                                    "visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID')]",
-                                    "options": {
-                                        "icon": "Warning",
-                                        "text": "When the VMs are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
-                                        "uri": "https://github.com/Azure/AVDSessionHostReplacer/blob/main/docs/Permissions.md"
-                                    }
-                                },
-                                {
-                                    "name": "IntuneEnrollment",
-                                    "type": "Microsoft.Common.CheckBox",
-                                    "visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID')]",
-                                    "label": "Intune enrollment",
-                                    "defaultValue": false,
-                                    "toolTip": "If Intune is configured in your Microsoft Entra ID tenant, you can choose to have the VM automatically enrolled during the deployment by selecting this box. Session Host Replacer will delete the device from Intune during replacement."
-                                },
-                                {
-                                    "name": "ADDomainName",
-                                    "type": "Microsoft.Common.TextBox",
-                                    "label": "AD Domain name",
-                                    "visible": "[or(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'ActiveDirectory'), equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraDS'))]",
-                                    "placeholder": "Example: contoso.com",
-                                    "constraints": {
-                                        "required": true
-                                    }
-                                },
-                                {
-                                    "name": "ADDomainJoinUserName",
-                                    "type": "Microsoft.Common.TextBox",
-                                    "label": "User principal name",
-                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
-                                    "toolTip": "Provide username with permissions to join session host to the domain.",
-                                    "placeholder": "Example: avdadmin@contoso.com",
-                                    "defaultValue": "",
-                                    "constraints": {
-                                        "required": true
-                                    }
-                                },
-                                {
-                                    "name": "ADJoinUserPassword",
-                                    "type": "Microsoft.Common.PasswordBox",
-                                    "label": {
-                                        "password": "Password"
-                                    },
-                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
-                                    "toolTip": "Provide password for domain join account. This will be stored in a new Azure Key Vault.",
-                                    "constraints": {
-                                        "required": true
-                                    },
-                                    "options": {
-                                        "hideConfirmation": true
-                                    }
-                                },
-                                {
-                                    "name": "ADOUPath",
-                                    "type": "Microsoft.Common.TextBox",
-                                    "visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
-                                    "label": "Custom OU path (Optional)",
-                                    "toolTip": "Provide OU where to locate session hosts, if not provided session hosts will be placed on the default (computers) OU.",
-                                    "placeholder": "Example: OU=session-hosts,OU=avd,DC=contoso,DC=com",
-                                    "constraints": {}
-                                }
-                            ]
-                        },
-                        {
-                            "name": "LocalAdminUsername",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Local Administrator Username",
-                            "toolTip": "Provide username for session host local admin account. Administrator can't be used as username, it is reserved by the system. The password is randomly generated at deployment time.",
-                            "placeholder": "Example: avdadmin",
-                            "defaultValue": "",
-                            "constraints": {
-                                "regex": "^(?!.*[aA]dministrator).*$",
-                                "validationMessage": "This username can't be used, it is a reserved word.",
-                                "required": true
-                            }
-                        }
-                    ]
-                },
-                {
-                    "name": "optionalParametersStep",
-                    "label": "Optional Parameters",
-                    "elements": [
-                        {
-                            "name": "_Tag_IncludeInAutomation",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Include in Automation Tag Name",
-                            "toolTip": "The name of the tag to use to determine if an existing session host should be included in the automation. After deployment, if the tag is present and set to 'true', the session host will be included. If the tag is not present or set to 'false', the session host will be excluded.",
-                            "defaultValue": "IncludeInAutoReplace",
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_Tag_DeployTimestamp",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Deploy Timestamp Tag Name",
-                            "toolTip": "The name of the tag to use to determine when the session host was deployed. This is updated by the session host replacer function on new session hosts. After deployment, you can edit the value of this tag to force replace a VM.",
-                            "defaultValue": "AutoReplaceDeployTimestamp",
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_Tag_PendingDrainTimestamp",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Pending Drain Timestamp Tag Name",
-                            "toolTip": "The name of the tag to use to determine when the session host was marked for drain. This is updated by the session host replacer function on hosts pending deletion.",
-                            "defaultValue": "AutoReplacePendingDrainTimestamp",
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_Tag_ScalingPlanExclusionTag",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Scaling Plan Exclusion Tag Name",
-                            "toolTip": "The name of the tag session host replacer will set to exclude a session host from scaling plans actions.",
-                            "defaultValue": "ScalingPlanExclusion",
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_TargetVMAgeDays",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Target VM Age (Days)",
-                            "toolTip": "The maximum age of a VM in days before it is replaced. This is compared to the value of the Deploy Timestamp Tag.",
-                            "defaultValue": 45,
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_DrainGracePeriodHours",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Drain Grace Period (Hours)",
-                            "toolTip": "The number of hours to wait after marking a VM for drain before deleting it. This is to allow users to finish their sessions before the VM is deleted.",
-                            "defaultValue": 24,
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_FixSessionHostTags",
-                            "type": "Microsoft.Common.CheckBox",
-                            "label": "Fix Existing Session Host Tags",
-                            "toolTip": "If enabled, the session host replacer will fix the tags on existing session hosts or if tags are mistakenly deleted. The tag values will NOT allow deletion of existing session hosts and must be changed post deployment. This is useful if you are deploying a new session host replacer to an existing host pool.",
-                            "defaultValue": true,
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_SHRDeploymentPrefix",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Deployment Prefix",
-                            "toolTip": "The prefix of the deployment created in the session hosts resource group when replacement VMs are deploying. This is used to track running and failed deployments.",
-                            "defaultValue": "AVDSessionHostReplacer",
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_SessionHostInstanceNumberPadding",
-                            "type": "Microsoft.Common.Slider",
-                            "min": 1,
-                            "max": 4,
-                            "label": "Session Host VM Number Padding",
-                            "defaultValue": 2,
-                            "showStepMarkers": true,
-                            "constraints": {
-                                "required": false
-                            },
-                            "visible": true
-                        },
-                        {
-                            "name": "_SessionHostNameSeparator",
-                            "type": "Microsoft.Common.CheckBox",
-                            "label": "Use '-' as separator",
-                            "toolTip": "If enabled, the session host replacer will use '-' as a separator between the prefix and the instance number. If disabled, the session host replacer will not use separator.",
-                            "defaultValue": true,
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "SessionHostExampleNameInfoBox",
-                            "type": "Microsoft.Common.InfoBox",
-                            "visible": "[not(empty(steps('basics').HostPoolSettingsSection.sessionHostNamePrefix))]",
-                            "options": {
-                                "icon": "Info",
-                                "text": "[concat('Example Session Host name: ', steps('basics').HostPoolSettingsSection.sessionHostNamePrefix , if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','') , take('00000000', sub(steps('optionalParametersStep')._SessionHostInstanceNumberPadding,1)) ,'1')  ]"
-                            }
-                        },
-                        {
-                            "name": "_ReplaceSessionHostOnNewImageVersion",
-                            "type": "Microsoft.Common.CheckBox",
-                            "label": "Replace Session Hosts On New Image Version",
-                            "toolTip": "(Recommended) If enabled, the session host replacer will replace session hosts when a new image version is available. This works for both marketplace and custom images. If disabled, the session host replacer will only replace session hosts when the VM age is greater than the target VM age.",
-                            "defaultValue": true,
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_ReplaceSessionHostOnNewImageVersionDelayDays",
-                            "type": "Microsoft.Common.TextBox",
-                            "visible": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
-                            "label": "Replace on New Image Version Delay (Days)",
-                            "toolTip": "The number of days to wait after a new image is available before replacing session hosts. This is to allow time for the image to be tested before replacing session hosts.",
-                            "defaultValue": "0",
-                            "constraints": {
-                                "required": false
-                            }
-                        },
-                        {
-                            "name": "_SessionHostResourceGroupName",
-                            "type": "Microsoft.Common.TextBox",
-                            "label": "Session Hosts Resource Group Name",
-                            "placeholder": "Same As Host Pool Resource Group",
-                            "toolTip": "Leave this empty to deploy to same resource group as the host pool.",
-                            "defaultValue": "",
-                            "constraints": {
-                                "required": false
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        "outputs": {
-            "kind": "ResourceGroup",
-            "resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]",
-            "location": "[steps('basics').resourceScope.location.name]",
-            "parameters": {
-                "HostPoolResourceGroupName": "[steps('basics').HostPoolSettingsSection.HostPoolSelector.resourceGroup]",
-                "HostPoolName": "[steps('basics').HostPoolSettingsSection.HostPoolSelector.name]",
-                "SessionHostNamePrefix": "[steps('basics').HostPoolSettingsSection.sessionHostNamePrefix]",
-                "UseUserAssignedManagedIdentity": "[if(steps('basics').IdentitySection.UseUserAssignedManagedIdentity, true, false)]",
-                "UserAssignedManagedIdentityResourceId": "[if(steps('basics').IdentitySection.UseUserAssignedManagedIdentity, steps('basics').IdentitySection.UserAssignedManagedIdentitySelector.id, '')]",
-                "TargetSessionHostCount": "[steps('basics').HostPoolSettingsSection.TargetSessionHostCount]",
-                "TargetSessionHostBuffer": "[steps('basics').HostPoolSettingsSection.TargetSessionHostBuffer]",
-                "EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
-                "UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
-                "LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
-                "SessionHostsRegion": "[steps('SessionHostsTemplate').SessionHostsRegion]",
-                "AvailabilityZones": "[steps('SessionHostsTemplate').AvailabilityZones]",
-                "SessionHostSize": "[steps('SessionHostsTemplate').SessionHostSize]",
-                "AcceleratedNetworking": "[steps('SessionHostsTemplate').AcceleratedNetworking]",
-                "SessionHostDiskType": "[steps('SessionHostsTemplate').SessionHostDiskType]",
-                "MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage]",
-                "MarketPlaceImage": "[steps('SessionHostsTemplate').dropDownMarketPlaceImage]",
-                "GalleryImageId": "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId.id]",
-                "SecurityType": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType]",
-                "SecureBootEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecureBootEnabled]",
-                "TpmEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled]",
-                "IdentityServiceProvider": "[steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider]",
-                "IntuneEnrollment": "[steps('SessionHostsTemplate').DomainJoinSection.IntuneEnrollment]",
-                "SubnetId": "[steps('SessionHostsTemplate').SubnetId]",
-                "ADDomainName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainName]",
-                "ADDomainJoinUserName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainJoinUserName]",
-                "ADJoinUserPassword": "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",
-                "ADOUPath": "[steps('SessionHostsTemplate').DomainJoinSection.ADOUPath]",
-                "LocalAdminUsername": "[steps('SessionHostsTemplate').LocalAdminUsername]",
-                "TagIncludeInAutomation": "[steps('optionalParametersStep')._Tag_IncludeInAutomation]",
-                "TagDeployTimestamp": "[steps('optionalParametersStep')._Tag_DeployTimestamp]",
-                "TagPendingDrainTimestamp": "[steps('optionalParametersStep')._Tag_PendingDrainTimestamp]",
-                "TagScalingPlanExclusionTag": "[steps('optionalParametersStep')._Tag_ScalingPlanExclusionTag]",
-                "TargetVMAgeDays": "[steps('optionalParametersStep')._TargetVMAgeDays]",
-                "DrainGracePeriodHours": "[steps('optionalParametersStep')._DrainGracePeriodHours]",
-                "FixSessionHostTags": "[steps('optionalParametersStep')._FixSessionHostTags]",
-                "DeploymentPrefix": "[steps('optionalParametersStep')._SHRDeploymentPrefix]",
-                "SessionHostInstanceNumberPadding": "[steps('optionalParametersStep')._SessionHostInstanceNumberPadding]",
-                "SessionHostNameSeparator": "[if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','')]",
-                "ReplaceSessionHostOnNewImageVersion": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
-                "ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",
-                "VMNamesTemplateParameterName": "VMNames",
-                "SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]"
-            }
-        }
-    }
+									"name": "sessionHostNamePrefix",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Session Host Name Prefix",
+									"toolTip": "<p>The prefix for the session host names.</p><p>Make sure this produces a unique value across all device names in your environment.</p><p>Try selecting a prefix that helps you identify the host pool such as AVDHP01</p>",
+									"constraints": {
+										"required": true,
+										"validationMessage": "Must be a valid name less than 12 characters long to allow for the 3 character suffix (eg. prefix-01)."
+									}
+								},
+								{
+									"name": "SessionHostExampleNameInfoBox",
+									"type": "Microsoft.Common.InfoBox",
+									"visible": "[not(empty(steps('basics').HostPoolSettingsSection.sessionHostNamePrefix))]",
+									"options": {
+										"icon": "Info",
+										"text": "[concat('Example Session Host name: ', steps('basics').HostPoolSettingsSection.sessionHostNamePrefix , if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','') , take('00000000', sub(steps('optionalParametersStep')._SessionHostInstanceNumberPadding,1)) ,'1<br>You can customize the separator and padding from Optional Parameters.')  ]"
+									}
+								}
+							]
+						},
+						{
+							"name": "IdentitySection",
+							"type": "Microsoft.Common.Section",
+							"label": "Identity",
+							"visible": true,
+							"elements": [
+								{
+									"name": "UseUserAssignedManagedIdentity",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Use User Assigned Managed Identity",
+									"toolTip": "[Recommended] When enabled, The Session Host Replacer will use the selected Identity to take actions. Otherwise System Identity (MSI) is used.",
+									"defaultValue": true,
+									"constraints": {
+										"required": false
+									}
+								},
+								{
+									"name": "UserAssignedManagedIdentitySelector",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"visible": "[steps('basics').IdentitySection.UseUserAssignedManagedIdentity]",
+									"label": "Select User Assigned Managed Identity",
+									"resourceType": "Microsoft.ManagedIdentity/userAssignedIdentities",
+									"constraints": {
+										"required": true
+									},
+									"options": {
+										"filter": {}
+									}
+								},
+								{
+									"name": "UserAssignedManagedIdentityInfoBox",
+									"type": "Microsoft.Common.InfoBox",
+									"visible": "[steps('basics').IdentitySection.UseUserAssignedManagedIdentity]",
+									"options": {
+										"icon": "Info",
+										"text": "When using a User Assigned Managed Identity, make sure the identity has the needed permissions in Azure and Entra. Follow the link for more info.",
+										"uri": "https://github.com/Azure/AVDReplacementPlans/blob/v0.2.9-beta.16/docs/Permissions.md"
+									}
+								}
+							]
+						},
+						{
+							"name": "MonitoringSection",
+							"type": "Microsoft.Common.Section",
+							"label": "Monitoring",
+							"visible": true,
+							"elements": [
+								{
+									"name": "EnableMonitoring",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Enable Monitoring",
+									"toolTip": "[Recommended] When enabled, the session host replacer will use App Insights and Log Analytics to collect metrics and logs.",
+									"defaultValue": true,
+									"constraints": {
+										"required": false
+									}
+								},
+								{
+									"name": "UseExistingLAW",
+									"visible": "[steps('basics').MonitoringSection.EnableMonitoring]",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Select existing Log Analytics Workspace",
+									"toolTip": "When enabled, the session host replacer will use the selected Log Analytics Workspace. If disabled, the session host replacer will create a new Log Analytics Workspace.",
+									"defaultValue": false,
+									"constraints": {
+										"required": false
+									}
+								},
+								{
+									"name": "LAWSelector",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"visible": "[and(steps('basics').MonitoringSection.EnableMonitoring, steps('basics').MonitoringSection.UseExistingLAW)]",
+									"label": "Log Analytics Workspace",
+									"resourceType": "Microsoft.OperationalInsights/workspaces",
+									"constraints": {
+										"required": true
+									},
+									"options": {
+										"filter": {}
+									}
+								}
+							]
+						},
+						{
+							"name": "computeApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id,'/providers/Microsoft.Compute/resourceTypes?api-version=2022-01-01')]"
+							}
+						},
+						{
+							"name": "VersionInfo",
+							"type": "Microsoft.Common.TextBlock",
+							"visible": true,
+							"options": {
+								"text": "AVD session host replacer Portal UI Version: v0.2.9-beta.16",
+								"link": {
+									"label": "GitHub Repository",
+									"uri": "https://github.com/Azure/AVDSessionHostReplacer"
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "SessionHostsTemplate",
+					"label": "Session Hosts Template",
+					"elements": [
+						{
+							"name": "SessionHostsRegion",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Session Hosts Region",
+							"visible": true,
+							"filter": true,
+							"multiselect": false,
+							"selectAll": false,
+							"toolTip": "Select region to deploy session hosts.",
+							"constraints": {
+								"required": true,
+								"allowedValues": "[map( first( map( filter( steps('basics').computeApi.value, (resourceTypes) => equals(resourceTypes.resourceType, 'virtualMachines') ), (item) => item.locations) ), (item) => parse(concat('{\"label\":\"', item, '\",\"value\":\"', toLower(replace(item, ' ', '')), '\"}')) )]"
+							}
+						},
+						{
+							"name": "AvailabilityZones",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Availability Zones",
+							"visible": true,
+							"filter": false,
+							"defaultValue": [],
+							"multiselect": true,
+							"selectAll": false,
+							"toolTip": "Select Availability Zones for the session hosts. Make sure the selected size is available in the selected zones. Session hosts will be deployed across the zones.",
+							"constraints": {
+								"required": false,
+								"allowedValues": [
+									{
+										"label": "Zone 1",
+										"value": "1"
+									},
+									{
+										"label": "Zone 2",
+										"value": "2"
+									},
+									{
+										"label": "Zone 3",
+										"value": "3"
+									}
+								]
+							}
+						},
+						{
+							"name": "SessionHostSize",
+							"type": "Microsoft.Compute.SizeSelector",
+							"label": "VM Size",
+							"toolTip": "",
+							"recommendedSizes": [
+								"Standard_D4ads_v5"
+							],
+							"constraints": {
+								"allowedSizes": [],
+								"excludedSizes": [],
+								"required": true
+							},
+							"options": {
+								"hideDiskTypeFilter": true
+							},
+							"osPlatform": "Windows",
+							"imageReference": {
+								"publisher": "MicrosoftWindowsDesktop",
+								"offer": "Windows-11",
+								"sku": "win11-23h2-avd"
+							}
+						},
+						{
+							"name": "AcceleratedNetworking",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Enable accelerated networking",
+							"defaultValue": true,
+							"toolTip": "Enables low latency and high throughput on the network interface."
+						},
+						{
+							"name": "SessionHostDiskType",
+							"type": "Microsoft.Common.DropDown",
+							"label": "OS Disk type",
+							"filter": false,
+							"defaultValue": "Premium SSD",
+							"toolTip": "Select session host disk type to host the OS.",
+							"constraints": {
+								"required": true,
+								"allowedValues": [
+									{
+										"label": "Standard HDD",
+										"value": "Standard_LRS"
+									},
+									{
+										"label": "Standard SSD",
+										"value": "StandardSSD_LRS"
+									},
+									{
+										"label": "Premium SSD",
+										"value": "Premium_LRS"
+									}
+								]
+							}
+						},
+						{
+							"name": "optionMarketPlaceOrCustomImage",
+							"type": "Microsoft.Common.OptionsGroup",
+							"label": "Image Source",
+							"defaultValue": "Marketplace",
+							"toolTip": "",
+							"constraints": {
+								"allowedValues": [
+									{
+										"label": "Marketplace",
+										"value": "Marketplace"
+									},
+									{
+										"label": "Gallery Image",
+										"value": "Gallery"
+									}
+								],
+								"required": true
+							},
+							"visible": true
+						},
+						{
+							"name": "dropDownMarketPlaceImage",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Select a Marketplace Image",
+							"placeholder": "",
+							"defaultValue": "Windows 11 Enterprise 23h2 multi-session + Microsoft 365 Apps",
+							"toolTip": "Marketplace images are updated on monthly basis. The Session Host Replacer will replace the session hosts when a new image is available.",
+							"multiselect": false,
+							"selectAll": false,
+							"filter": true,
+							"filterPlaceholder": "Filter items ...",
+							"multiLine": true,
+							"constraints": {
+								"allowedValues": [
+									{
+										"label": "Windows 10 Enterprise 21h2 multi-session",
+										"value": "win10-21h2-avd"
+									},
+									{
+										"label": "Windows 10 Enterprise 21h2 multi-session (Gen 2)",
+										"value": "win10-21h2-avd-g2"
+									},
+									{
+										"label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps",
+										"value": "win10-21h2-avd-m365"
+									},
+									{
+										"label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps (Gen 2)",
+										"value": "win10-21h2-avd-m365-g2"
+									},
+									{
+										"label": "Windows 10 Enterprise 22h2 multi-session",
+										"value": "win10-22h2-avd"
+									},
+									{
+										"label": "Windows 10 Enterprise 22h2 multi-session (Gen 2)",
+										"value": "win10-22h2-avd-g2"
+									},
+									{
+										"label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps",
+										"value": "win10-22h2-avd-m365"
+									},
+									{
+										"label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps (Gen 2)",
+										"value": "win10-22h2-avd-m365-g2"
+									},
+									{
+										"label": "Windows 11 Enterprise 21h2 multi-session",
+										"value": "win11-21h2-avd"
+									},
+									{
+										"label": "Windows 11 Enterprise 21h2 multi-session + Microsoft 365 Apps",
+										"value": "win11-21h2-avd-m365"
+									},
+									{
+										"label": "Windows 11 Enterprise 22h2 multi-session",
+										"value": "win11-22h2-avd"
+									},
+									{
+										"label": "Windows 11 Enterprise 22h2 multi-session + Microsoft 365 Apps",
+										"value": "win11-22h2-avd-m365"
+									},
+									{
+										"label": "Windows 11 Enterprise 23h2 multi-session",
+										"value": "win11-23h2-avd"
+									},
+									{
+										"label": "Windows 11 Enterprise 23h2 multi-session + Microsoft 365 Apps",
+										"value": "win11-23h2-avd-m365"
+									}
+								],
+								"required": true
+							},
+							"visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Marketplace')]"
+						},
+						{
+							"name": "GalleryImageInfoBox",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]",
+							"options": {
+								"icon": "Warning",
+								"text": "The system identity of the Session Host Replacer function is assigned the 'Desktop Virtualization Virtual Machine Contributor' role against the subscription. If the Image Definition is in a different subscription, please make sure you manually assign the permission post deployment."
+							}
+						},
+						{
+							"name": "resourceSelectorSessionHostGalleryImageId",
+							"type": "Microsoft.Solutions.ResourceSelector",
+							"label": "Select Gallery Image",
+							"resourceType": "Microsoft.Compute/galleries/images",
+							"constraints": {
+								"required": true
+							},
+							"options": {
+								"filter": {}
+							},
+							"visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]"
+						},
+						{
+							"name": "sessionHostsSecuritySection",
+							"type": "Microsoft.Common.Section",
+							"visible": true,
+							"label": "Security profile",
+							"elements": [
+								{
+									"name": "SecurityType",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Security type",
+									"filter": true,
+									"defaultValue": "Trusted Launch Virtual Machines",
+									"toolTip": "Choose a type of security that matches your needs: Trusted launch virtual machines provide additional security features on Gen2 virtual machines to protect against persistent and advanced attacks.",
+									"constraints": {
+										"required": true,
+										"allowedValues": [
+											{
+												"label": "Standard",
+												"value": "Standard"
+											},
+											{
+												"label": "Trusted Launch Virtual Machines",
+												"value": "TrustedLaunch"
+											},
+											{
+												"label": "Confidential Virtual Machines",
+												"value": "ConfidentialVM"
+											}
+										]
+									}
+								},
+								{
+									"name": "SecureBootEnabled",
+									"type": "Microsoft.Common.CheckBox",
+									"visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'ConfidentialVM'))]",
+									"label": "Enable secure boot",
+									"defaultValue": true,
+									"toolTip": "Secure boot helps protect your VMs against boot kits, rootkits, and kernel-level malware."
+								},
+								{
+									"name": "TpmEnabled",
+									"type": "Microsoft.Common.CheckBox",
+									"visible": "[or(equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'TrustedLaunch'), equals(steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType, 'ConfidentialVM'))]",
+									"label": "Enable vTPM",
+									"defaultValue": true,
+									"toolTip": "Virtual Trusted Platform Module (vTPM) is TPM2.0 compliant and validates your VM boot integrity apart from securely storing keys and secrets."
+								}
+							]
+						},
+						{
+							"name": "SubnetId",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Subnet ID",
+							"visible": true,
+							"placeholder": "Add resource id of subnet in the same region as the Session Hosts",
+							"constraints": {
+								"required": true,
+								"validations": [
+									{
+										"regex": ".*/subnets/[A-Za-z0-9_\\.-]+$",
+										"message": "Invalid Subnet Resource ID. Make sure it ends with /subnets/SubnetName"
+									}
+								]
+							}
+						},
+						{
+							"name": "DomainJoinSection",
+							"type": "Microsoft.Common.Section",
+							"visible": true,
+							"label": "Domain Join",
+							"elements": [
+								{
+									"name": "IdentityServiceProvider",
+									"type": "Microsoft.Common.OptionsGroup",
+									"visible": true,
+									"label": "Identity service provider",
+									"defaultValue": "Microsoft Entra ID",
+									"toolTip": "Identity service provider (Active Directory or EntraDS) that already exist and will be used for Azure Virtual Desktop.",
+									"constraints": {
+										"required": true,
+										"allowedValues": [
+											{
+												"label": "Microsoft Entra ID",
+												"value": "EntraID"
+											},
+											{
+												"label": "Active Directory (AD DS)",
+												"value": "ActiveDirectory"
+											},
+											{
+												"label": "Microsoft Entra Domain Services",
+												"value": "EntraDS"
+											}
+										]
+									}
+								},
+								{
+									"name": "EntraJoinedInfoBox",
+									"type": "Microsoft.Common.InfoBox",
+									"visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID')]",
+									"options": {
+										"icon": "Warning",
+										"text": "When the VMs are Entra Joined, session host replacer will attempt to delete its device object from Entra ID. This requires additional permissions to be granted to the service principal used by session host replacer. Please refer to the documentation for more information.",
+										"uri": "https://github.com/Azure/AVDSessionHostReplacer/blob/main/docs/Permissions.md"
+									}
+								},
+								{
+									"name": "IntuneEnrollment",
+									"type": "Microsoft.Common.CheckBox",
+									"visible": "[equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID')]",
+									"label": "Intune enrollment",
+									"defaultValue": false,
+									"toolTip": "If Intune is configured in your Microsoft Entra ID tenant, you can choose to have the VM automatically enrolled during the deployment by selecting this box. Session Host Replacer will delete the device from Intune during replacement."
+								},
+								{
+									"name": "ADDomainName",
+									"type": "Microsoft.Common.TextBox",
+									"label": "AD Domain name",
+									"visible": "[or(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'ActiveDirectory'), equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraDS'))]",
+									"placeholder": "Example: contoso.com",
+									"constraints": {
+										"required": true
+									}
+								},
+								{
+									"name": "ADDomainJoinUserName",
+									"type": "Microsoft.Common.TextBox",
+									"label": "User principal name",
+									"visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
+									"toolTip": "Provide username with permissions to join session host to the domain.",
+									"placeholder": "Example: avdadmin@contoso.com",
+									"defaultValue": "",
+									"constraints": {
+										"required": true
+									}
+								},
+								{
+									"name": "ADJoinUserPassword",
+									"type": "Microsoft.Common.PasswordBox",
+									"label": {
+										"password": "Password"
+									},
+									"visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
+									"toolTip": "Provide password for domain join account. This will be stored in a new Azure Key Vault.",
+									"constraints": {
+										"required": true
+									},
+									"options": {
+										"hideConfirmation": true
+									}
+								},
+								{
+									"name": "ADOUPath",
+									"type": "Microsoft.Common.TextBox",
+									"visible": "[not(equals(steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider, 'EntraID'))]",
+									"label": "Custom OU path (Optional)",
+									"toolTip": "Provide OU where to locate session hosts, if not provided session hosts will be placed on the default (computers) OU.",
+									"placeholder": "Example: OU=session-hosts,OU=avd,DC=contoso,DC=com",
+									"constraints": {}
+								}
+							]
+						},
+						{
+							"name": "LocalAdminUsername",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Local Administrator Username",
+							"toolTip": "Provide username for session host local admin account. Administrator can't be used as username, it is reserved by the system. The password is randomly generated at deployment time.",
+							"placeholder": "Example: avdadmin",
+							"defaultValue": "",
+							"constraints": {
+								"regex": "^(?!.*[aA]dministrator).*$",
+								"validationMessage": "This username can't be used, it is a reserved word.",
+								"required": true
+							}
+						}
+					]
+				},
+				{
+					"name": "optionalParametersStep",
+					"label": "Optional Parameters",
+					"elements": [
+						{
+							"name": "_Tag_IncludeInAutomation",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Include in Automation Tag Name",
+							"toolTip": "The name of the tag to use to determine if an existing session host should be included in the automation. After deployment, if the tag is present and set to 'true', the session host will be included. If the tag is not present or set to 'false', the session host will be excluded.",
+							"defaultValue": "IncludeInAutoReplace",
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "_Tag_DeployTimestamp",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Deploy Timestamp Tag Name",
+							"toolTip": "The name of the tag to use to determine when the session host was deployed. This is updated by the session host replacer function on new session hosts. After deployment, you can edit the value of this tag to force replace a VM.",
+							"defaultValue": "AutoReplaceDeployTimestamp",
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "_Tag_PendingDrainTimestamp",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Pending Drain Timestamp Tag Name",
+							"toolTip": "The name of the tag to use to determine when the session host was marked for drain. This is updated by the session host replacer function on hosts pending deletion.",
+							"defaultValue": "AutoReplacePendingDrainTimestamp",
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "_Tag_ScalingPlanExclusionTag",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Scaling Plan Exclusion Tag Name",
+							"toolTip": "The name of the tag session host replacer will set to exclude a session host from scaling plans actions.",
+							"defaultValue": "ScalingPlanExclusion",
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "_TargetVMAgeDays",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Target VM Age (Days)",
+							"toolTip": "The maximum age of a VM in days before it is replaced. This is compared to the value of the Deploy Timestamp Tag.",
+							"defaultValue": 45,
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "_DrainGracePeriodHours",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Drain Grace Period (Hours)",
+							"toolTip": "The number of hours to wait after marking a VM for drain before deleting it. This is to allow users to finish their sessions before the VM is deleted.",
+							"defaultValue": 24,
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "_FixSessionHostTags",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Fix Existing Session Host Tags",
+							"toolTip": "If enabled, the session host replacer will fix the tags on existing session hosts or if tags are mistakenly deleted. The tag values will NOT allow deletion of existing session hosts and must be changed post deployment. This is useful if you are deploying a new session host replacer to an existing host pool.",
+							"defaultValue": true,
+							"constraints": {
+								"required": "[steps('basics').HostPoolSettingsSection.IncludePreExistingSessionHosts]",
+								"validationMessage": "This is required if Include pre-existing session hosts is selected."
+							}
+						},
+						{
+							"name": "_SHRDeploymentPrefix",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Deployment Prefix",
+							"toolTip": "The prefix of the deployment created in the session hosts resource group when replacement VMs are deploying. This is used to track running and failed deployments.",
+							"defaultValue": "AVDSessionHostReplacer",
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "_SessionHostInstanceNumberPadding",
+							"type": "Microsoft.Common.Slider",
+							"min": 1,
+							"max": 4,
+							"label": "Session Host VM Number Padding",
+							"defaultValue": 2,
+							"showStepMarkers": true,
+							"constraints": {
+								"required": false
+							},
+							"visible": true
+						},
+						{
+							"name": "_SessionHostNameSeparator",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Use '-' as separator",
+							"toolTip": "If enabled, the session host replacer will use '-' as a separator between the prefix and the instance number. If disabled, the session host replacer will not use separator.",
+							"defaultValue": true,
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "SessionHostExampleNameInfoBox",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": "[not(empty(steps('basics').HostPoolSettingsSection.sessionHostNamePrefix))]",
+							"options": {
+								"icon": "Info",
+								"text": "[concat('Example Session Host name: ', steps('basics').HostPoolSettingsSection.sessionHostNamePrefix , if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','') , take('00000000', sub(steps('optionalParametersStep')._SessionHostInstanceNumberPadding,1)) ,'1')  ]"
+							}
+						},
+						{
+							"name": "_ReplaceSessionHostOnNewImageVersion",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Replace Session Hosts On New Image Version",
+							"toolTip": "(Recommended) If enabled, the session host replacer will replace session hosts when a new image version is available. This works for both marketplace and custom images. If disabled, the session host replacer will only replace session hosts when the VM age is greater than the target VM age.",
+							"defaultValue": true,
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "_ReplaceSessionHostOnNewImageVersionDelayDays",
+							"type": "Microsoft.Common.TextBox",
+							"visible": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
+							"label": "Replace on New Image Version Delay (Days)",
+							"toolTip": "The number of days to wait after a new image is available before replacing session hosts. This is to allow time for the image to be tested before replacing session hosts.",
+							"defaultValue": "0",
+							"constraints": {
+								"required": false
+							}
+						},
+						{
+							"name": "_SessionHostResourceGroupName",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Session Hosts Resource Group Name",
+							"placeholder": "Same As Host Pool Resource Group",
+							"toolTip": "Leave this empty to deploy to same resource group as the host pool.",
+							"defaultValue": "",
+							"constraints": {
+								"required": false
+							}
+						}
+					]
+				}
+			]
+		},
+		"outputs": {
+			"kind": "ResourceGroup",
+			"resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]",
+			"location": "[steps('basics').resourceScope.location.name]",
+			"parameters": {
+				"HostPoolResourceGroupName": "[steps('basics').HostPoolSettingsSection.HostPoolSelector.resourceGroup]",
+				"HostPoolName": "[steps('basics').HostPoolSettingsSection.HostPoolSelector.name]",
+				"SessionHostNamePrefix": "[steps('basics').HostPoolSettingsSection.sessionHostNamePrefix]",
+				"UseUserAssignedManagedIdentity": "[if(steps('basics').IdentitySection.UseUserAssignedManagedIdentity, true, false)]",
+				"UserAssignedManagedIdentityResourceId": "[if(steps('basics').IdentitySection.UseUserAssignedManagedIdentity, steps('basics').IdentitySection.UserAssignedManagedIdentitySelector.id, '')]",
+				"TargetSessionHostCount": "[steps('basics').HostPoolSettingsSection.TargetSessionHostCount]",
+				"TargetSessionHostBuffer": "[steps('basics').HostPoolSettingsSection.TargetSessionHostBuffer]",
+				"EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
+				"UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
+				"LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
+				"SessionHostsRegion": "[steps('SessionHostsTemplate').SessionHostsRegion]",
+				"AvailabilityZones": "[steps('SessionHostsTemplate').AvailabilityZones]",
+				"SessionHostSize": "[steps('SessionHostsTemplate').SessionHostSize]",
+				"AcceleratedNetworking": "[steps('SessionHostsTemplate').AcceleratedNetworking]",
+				"SessionHostDiskType": "[steps('SessionHostsTemplate').SessionHostDiskType]",
+				"MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage]",
+				"MarketPlaceImage": "[steps('SessionHostsTemplate').dropDownMarketPlaceImage]",
+				"GalleryImageId": "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId.id]",
+				"SecurityType": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType]",
+				"SecureBootEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecureBootEnabled]",
+				"TpmEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled]",
+				"IdentityServiceProvider": "[steps('SessionHostsTemplate').DomainJoinSection.IdentityServiceProvider]",
+				"IntuneEnrollment": "[steps('SessionHostsTemplate').DomainJoinSection.IntuneEnrollment]",
+				"SubnetId": "[steps('SessionHostsTemplate').SubnetId]",
+				"ADDomainName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainName]",
+				"ADDomainJoinUserName": "[steps('SessionHostsTemplate').DomainJoinSection.ADDomainJoinUserName]",
+				"ADJoinUserPassword": "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",
+				"ADOUPath": "[steps('SessionHostsTemplate').DomainJoinSection.ADOUPath]",
+				"LocalAdminUsername": "[steps('SessionHostsTemplate').LocalAdminUsername]",
+				"TagIncludeInAutomation": "[steps('optionalParametersStep')._Tag_IncludeInAutomation]",
+				"TagDeployTimestamp": "[steps('optionalParametersStep')._Tag_DeployTimestamp]",
+				"TagPendingDrainTimestamp": "[steps('optionalParametersStep')._Tag_PendingDrainTimestamp]",
+				"TagScalingPlanExclusionTag": "[steps('optionalParametersStep')._Tag_ScalingPlanExclusionTag]",
+				"TargetVMAgeDays": "[steps('optionalParametersStep')._TargetVMAgeDays]",
+				"DrainGracePeriodHours": "[steps('optionalParametersStep')._DrainGracePeriodHours]",
+				"FixSessionHostTags": "[steps('optionalParametersStep')._FixSessionHostTags]",
+				"IncludePreExistingSessionHosts": "[steps('basics').HostPoolSettingsSection.IncludePreExistingSessionHosts]",
+				"DeploymentPrefix": "[steps('optionalParametersStep')._SHRDeploymentPrefix]",
+				"SessionHostInstanceNumberPadding": "[steps('optionalParametersStep')._SessionHostInstanceNumberPadding]",
+				"SessionHostNameSeparator": "[if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','')]",
+				"ReplaceSessionHostOnNewImageVersion": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
+				"ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",
+				"VMNamesTemplateParameterName": "VMNames",
+				"SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]"
+			}
+		}
+	}
 }

@@ -9,21 +9,21 @@
 # You can define helper functions, run commands, or specify environment variables
 # NOTE: any variables defined that are not environment variables will get reset after the first execution
 
-Import-Module 'PSFrameWork' ,'Az.Resources' ,'Az.Compute' ,'Az.DesktopVirtualization', 'SessionHostReplacer', 'AzureFunctionConfiguration' -ErrorAction Stop
+Import-Module 'PSFrameWork' , 'Az.Resources' , 'Az.Compute' , 'Az.DesktopVirtualization', 'SessionHostReplacer', 'AzureFunctionConfiguration' -ErrorAction Stop
 
 # Configure PSFramework settings
 Set-PSFConfig -FullName PSFramework.Message.style.NoColor -Value $true #This is required for logs to look good in FunctionApp Logs
 
 ## Version Banner ## Updated by Build\Build-Zip-File.ps1
 
-Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}" -StringValues 'v0.2.8'
+Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}" -StringValues 'v0.3.0-beta.0'
 
 
 # Import Function Parameters
-try{
+try {
     Import-FunctionConfig -FunctionParametersFilePath '.\FunctionParameters.psd1' -ErrorAction Stop
 }
-catch{
+catch {
     Write-PSFMessage -Level Error -Message "Failed to import Function Parameters. Error: {0}" -StringValues $_.Exception.Message
     throw $_
 }
@@ -32,29 +32,26 @@ catch{
 
 if ($env:MSI_SECRET) {
     Disable-AzContextAutosave -Scope Process | Out-Null
-    if([string]::IsNullOrEmpty($env:_ClientResourceId)){
+    if ([string]::IsNullOrEmpty( (Get-FunctionConfig _ClientId) ) ) {
         Write-PSFMessage -Level Host -Message "Authenticating with system assigned identity"
         Connect-AzAccount -Identity -SubscriptionId (Get-FunctionConfig _SubscriptionId) -ErrorAction Stop
-        if(Get-FunctionConfig _RemoveEntraDevice){
+        if (Get-FunctionConfig _RemoveEntraDevice) {
             Write-PSFMessage -Level Host -Message "Connecting to Graph API"
-            Connect-MGGraph -Identity
+            Connect-MgGraph -Identity
         }
     }
-    else{
-        Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Resource ID: $env:_ClientResourceId"
+    else {
+        Write-PSFMessage -Level Host -Message "Connecting to Azure using User Managed Identity with Client ID: {0}" -StringValues (Get-FunctionConfig _ClientId)
 
-        $entraAzureConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Azure -PassThru
-        Connect-AzAccount -AccessToken $entraAzureConnection.AccessToken  -ErrorAction Stop -AccountId $env:_ClientResourceId -Subscription (Get-FunctionConfig _SubscriptionId)
+        Connect-AzAccount -Identity -ErrorAction Stop -AccountId (Get-FunctionConfig _ClientId) -Tenant (Get-FunctionConfig _TenantId) -Subscription (Get-FunctionConfig _SubscriptionId) -Environment (Get-FunctionConfig _AzureEnvironmentName)
 
-
-        if((Get-FunctionConfig _RemoveEntraDevice) -or (Get-FunctionConfig _RemoveIntuneDevice) ){
-            Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID and/or Intune. Connecting to Graph API using User Managed Identity with Resource ID: $env:_ClientResourceId"
-            $entraGraphConnection = Connect-EntraService -Identity -IdentityType ResourceID -IdentityID $env:_ClientResourceId -Service Graph -PassThru
-            Connect-MGGraph -AccessToken (ConvertTo-SecureString $entraGraphConnection.AccessToken -AsPlainText -Force)  -ErrorAction Stop
+        if ((Get-FunctionConfig _RemoveEntraDevice) -or (Get-FunctionConfig _RemoveIntuneDevice) ) {
+            Write-PSFMessage -Level Host -Message "Configured to remove devices from Entra ID and/or Intune. Connecting to Graph API using User Managed Identity with Client ID: {0}" -StringValues (Get-FunctionConfig _ClientId)
+            Connect-MgGraph -Identity -ClientId (Get-FunctionConfig _ClientId) -ErrorAction Stop -NoWelcome -Environment (Get-FunctionConfig _GraphEnvironmentName)
         }
     }
 }
-else{
+else {
     # This is for testing locally
     Write-PSFMessage "MSI_Secret environment variable not found. This should only happen when testing locally. Otherwise confirm that a System or User Managed Identity is defined."
     Set-AzContext -SubscriptionId (Get-FunctionConfig _SubscriptionId)

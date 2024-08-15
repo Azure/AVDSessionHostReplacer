@@ -81,8 +81,20 @@ param HostPoolName string
 @maxLength(12)
 param SessionHostNamePrefix string
 
+@description('Required: NO | Separator between prefix and number. | Default: -')
+@maxLength(1)
+param SessionHostNameSeparator string = '-'
+
 @description('Required: Yes | Number of session hosts to maintain in the host pool.')
+@minValue(0)
 param TargetSessionHostCount int
+
+@description('Required: Yes | The maximum number of session hosts to add during a replacement process')
+@minValue(1)
+param TargetSessionHostBuffer int
+
+@description('Required: No | Switches to using the US Governmment DoD graph endpoints for the Function App. | Default: false')
+param UseGovDodGraph bool = false
 
 @description('Required: No | Resource Id of the User Assigned Managed Identity to use for the Function App. | Default: System Identity')
 param UseUserAssignedManagedIdentity bool = false
@@ -110,11 +122,11 @@ param DrainGracePeriodHours int = 24
 @description('Required: No | If true, will apply tags for Include In Auto Replace and Deployment Timestamp to existing session hosts. This will not enable automatic deletion of existing session hosts. | Default: True.')
 param FixSessionHostTags bool = true
 
+@description('Required: No | When enabled, the Session Host Replacer will automatically consider pre-existing VMs for replacement if they meet the criteria | Default: False.')
+param IncludePreExistingSessionHosts bool = false
+
 @description('Required: No | Prefix used for the deployment name of the session hosts. | Default: AVDSessionHostReplacer')
 param SHRDeploymentPrefix string = 'AVDSessionHostReplacer'
-
-@description('Required: No | Allow deleting session hosts if count exceeds target. | Default: true')
-param AllowDownsizing bool = true
 
 @description('Required: No | Number of digits to use for the instance number of the session hosts (eg. AVDVM-01). | Default: 2')
 param SessionHostInstanceNumberPadding int = 2
@@ -265,6 +277,24 @@ var varSessionHostTemplateParameters = {
   AdminUsername: LocalAdminUsername
   tags: {}
 }
+// This variable calculates the Entra Environment Name based on the Azure Environment Name in environment()
+// Define  mapping arrays for environment names and their corresponding Graph name
+var varAzureEnvironments = [
+  'AzureCloud' // Global
+  'AzureUSGovernment' // USGov
+  'AzureChinaCloud' // China
+]
+var varGraphEnvironmentNames = UseGovDodGraph ? [
+  'Global' // AzureCloud
+  'USGovDod' // AzureUSGovernment
+  'China' // AzureChinaCloud
+]: [
+  'Global' // AzureCloud
+  'USGov' // AzureUSGovernment
+  'China' // AzureChinaCloud
+]
+var varGraphEnvironmentName = varGraphEnvironmentNames[indexOf(varAzureEnvironments, environment().name)]
+
 var varReplacementPlanSettings = [
   // Required Parameters //
   {
@@ -280,8 +310,16 @@ var varReplacementPlanSettings = [
     value: TargetSessionHostCount
   }
   {
+    name: '_TargetSessionHostBuffer'
+    value: TargetSessionHostBuffer
+  }
+  {
     name: '_SessionHostNamePrefix'
     value: SessionHostNamePrefix
+  }
+  {
+    name: '_SessionHostNameSeparator'
+    value: SessionHostNameSeparator
   }
   {
     name: '_SessionHostTemplate'
@@ -304,8 +342,20 @@ var varReplacementPlanSettings = [
     value: IntuneEnrollment
   }
   {
-    name: '_ClientResourceId'
-    value: UserAssignedManagedIdentityResourceId
+    name: '_ClientId'
+    value: userAssignedIdentity.properties.clientId
+  }
+  {
+    name: '_TenantId'
+    value: userAssignedIdentity.properties.tenantId
+  }
+  {
+    name: '_GraphEnvironmentName'
+    value: varGraphEnvironmentName
+  }
+  {
+    name: '_AzureEnvironmentName'
+    value: environment().name
   }
 
   // Optional Parameters //
@@ -338,12 +388,12 @@ var varReplacementPlanSettings = [
     value: FixSessionHostTags
   }
   {
-    name: '_SHRDeploymentPrefix'
-    value: SHRDeploymentPrefix
+    name: '_IncludePreExistingSessionHosts'
+    value: IncludePreExistingSessionHosts
   }
   {
-    name: '_AllowDownsizing'
-    value: AllowDownsizing
+    name: '_SHRDeploymentPrefix'
+    value: SHRDeploymentPrefix
   }
   {
     name: '_SessionHostInstanceNumberPadding'
@@ -384,6 +434,14 @@ var varFunctionAppIdentity = UseUserAssignedManagedIdentity
 // Outputs for verification
 
 //---- Resources ----//
+
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (!empty(UserAssignedManagedIdentityResourceId)) {
+  scope: resourceGroup(
+    split(UserAssignedManagedIdentityResourceId, '/')[2],
+    split(UserAssignedManagedIdentityResourceId, '/')[4]
+  ) //
+  name: split(UserAssignedManagedIdentityResourceId, '/')[8]
+}
 
 module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'

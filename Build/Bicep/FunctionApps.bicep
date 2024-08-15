@@ -94,9 +94,6 @@ param AppPlanName string = 'Y1'
 @description('Required: No | App Service Plan Tier | Default: Dynamic for consumption based plan')
 param AppPlanTier string = 'Dynamic'
 
-@description('Required: No | Allow deleting session hosts if count exceeds target. | Default: true')
-param AllowDownsizing bool = true
-
 //-------//
 
 //------ Variables ------//
@@ -220,10 +217,6 @@ var varFunctionAppSettings = [
   {
     name: '_ReplaceSessionHostOnNewImageVersionDelayDays'
     value: ReplaceSessionHostOnNewImageVersionDelayDays
-  }
-  {
-    name: '_AllowDownsizing'
-    value: AllowDownsizing
   }
 ]
 

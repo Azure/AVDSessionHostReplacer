@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "6964609305299878672"
+      "templateHash": "11540931381211957708"
     }
   },
   "parameters": {
@@ -155,10 +155,33 @@
         "description": "Required: Yes | Prefix used for the name of the session hosts."
       }
     },
+    "SessionHostNameSeparator": {
+      "type": "string",
+      "defaultValue": "-",
+      "maxLength": 1,
+      "metadata": {
+        "description": "Required: NO | Separator between prefix and number. | Default: -"
+      }
+    },
     "TargetSessionHostCount": {
       "type": "int",
+      "minValue": 0,
       "metadata": {
         "description": "Required: Yes | Number of session hosts to maintain in the host pool."
+      }
+    },
+    "TargetSessionHostBuffer": {
+      "type": "int",
+      "minValue": 1,
+      "metadata": {
+        "description": "Required: Yes | The maximum number of session hosts to add during a replacement process"
+      }
+    },
+    "UseGovDodGraph": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required: No | Switches to using the US Governmment DoD graph endpoints for the Function App. | Default: false"
       }
     },
     "UseUserAssignedManagedIdentity": {
@@ -221,18 +244,18 @@
         "description": "Required: No | If true, will apply tags for Include In Auto Replace and Deployment Timestamp to existing session hosts. This will not enable automatic deletion of existing session hosts. | Default: True."
       }
     },
+    "IncludePreExistingSessionHosts": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required: No | When enabled, the Session Host Replacer will automatically consider pre-existing VMs for replacement if they meet the criteria | Default: False."
+      }
+    },
     "SHRDeploymentPrefix": {
       "type": "string",
       "defaultValue": "AVDSessionHostReplacer",
       "metadata": {
         "description": "Required: No | Prefix used for the deployment name of the session hosts. | Default: AVDSessionHostReplacer"
-      }
-    },
-    "AllowDownsizing": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Required: No | Allow deleting session hosts if count exceeds target. | Default: true"
       }
     },
     "SessionHostInstanceNumberPadding": {
@@ -351,6 +374,13 @@
     "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'Marketplace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
     "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('securityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled'))))]",
     "varDomainJoinObject": "[if(equals(parameters('IdentityServiceProvider'), 'EntraID'), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('IntuneEnrollment')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')))]",
+    "varAzureEnvironments": [
+      "AzureCloud",
+      "AzureUSGovernment",
+      "AzureChinaCloud"
+    ],
+    "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
+    "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
     "varUniqueString": "[uniqueString(resourceGroup().id, parameters('HostPoolName'))]",
     "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', uniqueString(resourceGroup().id, parameters('HostPoolName')))]",
     "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
@@ -396,8 +426,16 @@
                 "value": "[parameters('TargetSessionHostCount')]"
               },
               {
+                "name": "_TargetSessionHostBuffer",
+                "value": "[parameters('TargetSessionHostBuffer')]"
+              },
+              {
                 "name": "_SessionHostNamePrefix",
                 "value": "[parameters('SessionHostNamePrefix')]"
+              },
+              {
+                "name": "_SessionHostNameSeparator",
+                "value": "[parameters('SessionHostNameSeparator')]"
               },
               {
                 "name": "_SessionHostTemplate",
@@ -420,8 +458,20 @@
                 "value": "[parameters('IntuneEnrollment')]"
               },
               {
-                "name": "_ClientResourceId",
-                "value": "[parameters('UserAssignedManagedIdentityResourceId')]"
+                "name": "_ClientId",
+                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId]"
+              },
+              {
+                "name": "_TenantId",
+                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId]"
+              },
+              {
+                "name": "_GraphEnvironmentName",
+                "value": "[variables('varGraphEnvironmentName')]"
+              },
+              {
+                "name": "_AzureEnvironmentName",
+                "value": "[environment().name]"
               },
               {
                 "name": "_Tag_IncludeInAutomation",
@@ -452,12 +502,12 @@
                 "value": "[parameters('FixSessionHostTags')]"
               },
               {
-                "name": "_SHRDeploymentPrefix",
-                "value": "[parameters('SHRDeploymentPrefix')]"
+                "name": "_IncludePreExistingSessionHosts",
+                "value": "[parameters('IncludePreExistingSessionHosts')]"
               },
               {
-                "name": "_AllowDownsizing",
-                "value": "[parameters('AllowDownsizing')]"
+                "name": "_SHRDeploymentPrefix",
+                "value": "[parameters('SHRDeploymentPrefix')]"
               },
               {
                 "name": "_SessionHostInstanceNumberPadding",
@@ -492,7 +542,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "12011592686602955586"
+              "templateHash": "1856983614997218668"
             }
           },
           "parameters": {
@@ -526,7 +576,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.2.8/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.0-beta.0/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

@@ -7,12 +7,19 @@ This tool automates the deployment and replacement of session hosts in an Azure 
 The best practice for AVD recommends replacing the session hosts instead of maintaining them,
 the AVD Session Host Replacer helps you manage the task of replacing old session hosts with new ones automatically.
 
-# Getting started
+## Getting started
 
 | Deployment Type           | Link                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Azure Portal UI           | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.2.7%2Fdeploy%2Farm%2FDeployAVDSessionHostReplacer.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.2.7%2Fdeploy%2Fportal-ui%2Fportal-ui.json) |
+| Azure Portal UI           | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.0-beta.0%2Fdeploy%2Farm%2FDeployAVDSessionHostReplacer.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.0-beta.0%2Fdeploy%2Fportal-ui%2Fportal-ui.json)  [![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.0-beta.0%2Fdeploy%2Farm%2FDeployAVDSessionHostReplacer.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.0-beta.0%2Fdeploy%2Fportal-ui%2Fportal-ui.json)  [![Deploy to Azure China](https://aka.ms/deploytoazurechinabutton)](https://portal.azure.cn/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.0-beta.0%2Fdeploy%2Farm%2FDeployAVDSessionHostReplacer.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.0-beta.0%2Fdeploy%2Fportal-ui%2Fportal-ui.json) |
 | Command line (Bicep/ARM)  | [![Powershell/Azure CLI](./docs/icons/powershell.png)](./docs/CodeDeploy.md)
+
+## Pre-requisites
+The Session Host Replacer requires permissions to manage resources in Azure and, if the session hosts are Entra joined, permissions in Entra. The recommended approach is to create a User Managed Identity, assign the necessary permissions to it, and use it for all instances of the Session Host Replacer.
+
+If you do not select a User Managed Identity, the deployment will create a System Managed Identity and assign permissions to it. However, some additional permissions may need to be assigned manually after deployment. This is not recommended if you have more than one instance of the Session Host Replacer.
+
+Detailed instructions on the required permissions and how to assign them are available [here](docs/Permissions.md).
 
 ## How it works?
 
@@ -34,6 +41,42 @@ When deleting an old session host, the function will check if it has existing se
     - Remove from Host Pool
     - (If Entra Joined) Delete device from Entra ID
 
+## FAQ
+- **Can I use a custom Template Spec for Session Hosts deployment?**
+
+    Yes, you can use a custom Template Spec, right now this is not possible when using the portal UI as you need to customize the ARM template.
+    You can base the customization on the [built-in template](StandardSessionHostTemplate/DeploySessionHosts.bicep) making sure of the following,
+        - The template must accept an array parameter for the names of VMs to deploy. The default paramter name is `VMNames` and it can be changed using the parameter `VMNamesTemplateParameterName`.
+        - To ensure proper cleanup, the template spec should be configured to delete disk and NICs when deleting the VM.
+        - The parameter `SessionHostParameters` is a JSON object that will be passed to the template spec when deploying. The VMNames array will be added to this object. Moreover, it must contain the following properties (case sensitive),
+            - `ImageReference`: Can be in the Provider/Offer/SKU or Id format for custom images.
+            - `Location`: The region where the session hosts will be deployed. This is used when querying for the latest image version when using marketplace images.
+
+- **I just deployed the Session Host Replacer, now what?
+
+    The Session Host Replacer runs every hour on the hour. You can manually trigger it by going to the FunctionApp > timerTrigger1 > Code+Test.
+
+    During the first run, the Session Host Replacer will download required PowerShell modules from the Internet which can take some time. Subsequent runs will be (much) faster.
+
+- **I changed my mind about some of the settings during deployment or I want to upgrade to the latest version, what should I do?**
+
+    You can simply redeploy the Session Host Replacer with the new settings or version. It will overwrite the existing deployment without any impact.
+
+- **How can I force replace a specific session host?**
+
+    On the VM(s) you want to replace, update the the tag `AutoReplaceDeployTimestamp` to any date older that 45 days. The Session Host Replacer will replace the VM on the next run.
+
+- **What about AVD Scaling Plans?**
+
+    When the Session Host Replacer needs to delete a session host that has users logged in, it will add a tag `ScalingPlanExclusion` to the VM. The name of the tag is configurable and it should be the same as the tag used in the scaling plan.
+
+- **What happens if a deployment fails?**
+
+    The Session host Replacer checks for failed deployments, if any are found it will NOT take any actions. You should clean up the failed deployment by deleting any resources created, Entra Devices, etc... and delete the failed deployment from the deployment history.
+
+- **The Session Host Replacer is failing, how can I get help?**
+
+    While this is a community project and we do not provide direct support, you can open an issue on GitHub and we will do our best to help you. Please make sure to include the logs of failed run by going to FunctionApp > timerTrigger1 > Invocations. Or manually run from Code+Test and copy the logs.
 
 ## Contributing
 

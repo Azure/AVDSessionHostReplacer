@@ -14,7 +14,9 @@ $TemplateParameters = @{
     HostPoolName                                 = '<Target Host Pool Name>'
     HostPoolResourceGroupName                    = $ResourceGroupName
     SessionHostNamePrefix                        = 'avdshr' # Will be appended by '-XX'
-    TargetSessionHostCount                       = 2 # How many session hosts to maintain in the Host Pool
+    TargetSessionHostCount                       = 10 # How many session hosts to maintain in the Host Pool
+    TargetSessionHostBuffer                      = 5 # The maximum number of session hosts to add during a replacement process
+    IncludePreExistingSessionHosts               = $false # Include existing session hosts in automation
 
     # Identity
     # Using a User Managed Identity is recommended. You can assign the same identity to different instances of session host replacer instances. The identity should have the proper permissions in Azure and Entra.
@@ -62,7 +64,6 @@ $TemplateParameters = @{
     DrainGracePeriodHours                        = 24
     FixSessionHostTags                           = $true
     SHRDeploymentPrefix                          = 'AVDSessionHostReplacer'
-    AllowDownsizing                              = $true
     SessionHostInstanceNumberPadding             = 2 # this controls the name, 2=> -01 or 3=> -001
     ReplaceSessionHostOnNewImageVersion          = $true #Set this to false when you only want to replace when the hosts are old (see TargetVMAgeDays)
     ReplaceSessionHostOnNewImageVersionDelayDays = 0
@@ -73,7 +74,7 @@ $TemplateParameters = @{
 $paramNewAzResourceGroupDeployment = @{
     Name = 'AVDSessionHostReplacer'
     ResourceGroupName = $ResourceGroupName
-    TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.2.8/deploy/arm/DeployAVDSessionHostReplacer.json'
+    TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.3.0-beta.0/deploy/arm/DeployAVDSessionHostReplacer.json'
 
     # If you cloned the repo and want to deploy using the bicep file use this instead of the above line
     #TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer.bicep'

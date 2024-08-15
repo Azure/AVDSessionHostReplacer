@@ -20,10 +20,14 @@ function Deploy-SHRSessionHost {
         [string] $SessionHostNamePrefix = (Get-FunctionConfig _SessionHostNamePrefix),
 
         [Parameter()]
+        [string] $SessionHostNameSeparator = (Get-FunctionConfig _SessionHostNameSeparator),
+
+        [Parameter()]
         [int] $SessionHostInstanceNumberPadding = (Get-FunctionConfig _SessionHostInstanceNumberPadding),
 
         [Parameter()]
         [string] $DeploymentPrefix = (Get-FunctionConfig _SHRDeploymentPrefix),
+
 
         [Parameter()]
         [string] $SessionHostTemplate = (Get-FunctionConfig _SessionHostTemplate),
@@ -49,10 +53,10 @@ function Deploy-SHRSessionHost {
     Write-PSFMessage -Level Host -Message "Existing session host VM names: {0}" -StringValues ($ExistingSessionHostVMNames -join ',')
     [array] $sessionHostNames = for ($i = 0; $i -lt $NewSessionHostsCount; $i++) {
         $vmNumber = 1
-        While (("$SessionHostNamePrefix-{0:d$SessionHostInstanceNumberPadding}" -f $vmNumber) -in $ExistingSessionHostVMNames) {
+        While (("$SessionHostNamePrefix$SessionHostNameSeparator{0:d$SessionHostInstanceNumberPadding}" -f $vmNumber) -in $ExistingSessionHostVMNames) {
             $vmNumber++
         }
-        $vmName = "$SessionHostNamePrefix-{0:d$SessionHostInstanceNumberPadding}" -f $vmNumber
+        $vmName = "$SessionHostNamePrefix$SessionHostNameSeparator{0:d$SessionHostInstanceNumberPadding}" -f $vmNumber
         $ExistingSessionHostVMNames += $vmName
         $vmName
     }

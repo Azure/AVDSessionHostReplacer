@@ -36,7 +36,7 @@ $sessionHostParameters = (Get-FunctionConfig _SessionHostParameters)
 
 # Get latest version of session host image
 Write-PSFMessage -Level Host -Message "Getting latest image version using Image Reference: {0}" -StringValues ($sessionHostParameters.ImageReference | Out-String)
-$latestImageVersion = Get-SHRLatestImageVersion -ImageReference $sessionHostParameters.ImageReference
+$latestImageVersion = Get-SHRLatestImageVersion -ImageReference $sessionHostParameters.ImageReference -Location $sessionHostParameters.Location
 
 # Get number session hosts to deploy
 $hostPoolDecisions = Get-SHRHostPoolDecision -SessionHosts $sessionHostsFiltered -RunningDeployments $runningDeployments -LatestImageVersion $latestImageVersion
@@ -50,9 +50,9 @@ if ($hostPoolDecisions.PossibleDeploymentsCount -gt 0) {
     Deploy-SHRSessionHost -SessionHostResourceGroupName $sessionHostResourceGroupName -NewSessionHostsCount $hostPoolDecisions.PossibleDeploymentsCount -ExistingSessionHostVMNames $existingSessionHostVMNames
 }
 
-# Delete expired session hosts
-if ($hostPoolDecisions.AllowSessionHostDelete -and $hostPoolDecisions.SessionHostsPendingDelete.Count -gt 0) {
-    Write-PSFMessage -Level Host -Message "We will decommission {0} session hosts: {1}" -StringValues $hostPoolDecisions.SessionHostsPendingDelete.Count, ($hostPoolDecisions.SessionHostsPendingDelete.VMName -join ',')
+# Delete session hosts
+if ($hostPoolDecisions.PossibleSessionHostDeleteCount -gt 0 -and $hostPoolDecisions.SessionHostsPendingDelete.Count -gt 0) {
+    Write-PSFMessage -Level Host -Message "We will decommission {0} session hosts from this list: {1}" -StringValues $hostPoolDecisions.SessionHostsPendingDelete.Count, ($hostPoolDecisions.SessionHostsPendingDelete.VMName -join ',')
     # Decommission session hosts
     $removeEntraDevice = Get-FunctionConfig _RemoveEntraDevice
     $removeIntuneDevice = Get-FunctionConfig _RemoveIntuneDevice

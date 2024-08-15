@@ -33,6 +33,7 @@ $filesToUpdate = @(
         BannerPattern = "(TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/)(.+)(/deploy/arm/DeployAVDSessionHostReplacer.json')"
     }
 )
+
 foreach($file in $filesToUpdate){
     $fileContent = Get-Content -Path $file.Path
     $bannerLine = $fileContent | Where-Object { $_ -match $file.BannerPattern } # This is the line that contains the version banner
@@ -44,6 +45,18 @@ foreach($file in $filesToUpdate){
 
     Write-Host "Updated version in $($file.Path) to: $bannerLine"
 }
+
+# Update Readme File
+$readmePath = '.\README.md'
+$readmeContent = Get-Content -Path $readmePath
+$urlDeployAVDSessionHostReplacer = "https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/$Tag/deploy/arm/DeployAVDSessionHostReplacer.json" -replace ":", "%3A" -replace "/", "%2F"
+$urlPortalUiUrl = "https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/$Tag/deploy/portal-ui/portal-ui.json" -replace ":", "%3A" -replace "/", "%2F"
+
+$readmePortalUiLineIndex = $readmeContent.IndexOf( ($readmeContent | Where-Object {$_ -like "| Azure Portal UI           |*"}) )
+$readmeContent[$readmePortalUiLineIndex] = "| Azure Portal UI           | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/$urlDeployAVDSessionHostReplacer/uiFormDefinitionUri/$urlPortalUiUrl)  [![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/$urlDeployAVDSessionHostReplacer/uiFormDefinitionUri/$urlPortalUiUrl)  [![Deploy to Azure China](https://aka.ms/deploytoazurechinabutton)](https://portal.azure.cn/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/$urlDeployAVDSessionHostReplacer/uiFormDefinitionUri/$urlPortalUiUrl) |"
+
+$readmeContent | Set-Content -Path $readmePath
+
 
 # Create the zip file
 $folder = New-Item -Path $Path -ItemType Directory -Force

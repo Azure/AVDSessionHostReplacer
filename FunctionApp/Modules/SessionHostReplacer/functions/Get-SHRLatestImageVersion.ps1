@@ -3,7 +3,10 @@ function Get-SHRLatestImageVersion {
     param (
         # An Image reference object. Can be from Marketplace or Shared Image Gallery.
         [Parameter()]
-        [hashtable] $ImageReference
+        [hashtable] $ImageReference,
+
+        [Parameter()]
+        [string] $Location
     )
 
     # Marketplace image
@@ -16,7 +19,7 @@ function Get-SHRLatestImageVersion {
         else {
             # Get the Images and select the latest version.
             $paramGetAzVMImage = @{
-                Location      = 'WestEurope'
+                Location      = $Location
                 PublisherName = $ImageReference.publisher
                 Offer         = $ImageReference.offer
                 Skus          = $ImageReference.sku

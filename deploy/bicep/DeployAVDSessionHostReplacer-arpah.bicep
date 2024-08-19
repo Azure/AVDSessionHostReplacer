@@ -464,7 +464,7 @@ module deployKeyVault 'modules/deployKeyVault.bicep' = if (IdentityServiceProvid
     DomainJoinPassword: ADJoinUserPassword
   }
 }
-module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec.bicep' = {
+module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec-arpah.bicep' = {
   name: 'deployStandardSessionHostTemplate'
   params: {
     Location: Location

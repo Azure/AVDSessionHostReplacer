@@ -1,3 +1,8 @@
+param (
+    [string]$DomJoinUserName,
+    [securestring]$DomJoinUserPassword
+)
+
 $ResourceGroupName = 'avd-nih-arpah-test-use2-service-objects' # Same as the Host Pool RG
 
 $TemplateParameters = @{
@@ -42,10 +47,10 @@ $TemplateParameters = @{
     IntuneEnrollment                             = $false # This is only used when IdentityServiceProvider is EntraID
 
     # Only used when IdentityServiceProvider is ActiveDirectory or EntraDS
-    ADDomainName = 'contoso.com'
-    ADDomainJoinUserName = 'DomainJoin'
-    ADJoinUserPassword = 'P@ssw0rd' # We will store this password in a key vault
-    ADOUPath = '' # OU DN where the session hosts will be joined
+    ADDomainName = 'nih.gov'
+    ADDomainJoinUserName = $DomJoinUserName
+    ADJoinUserPassword = $DomJoinUserPassword # We will store this password in a key vault
+    ADOUPath = 'OU=Test,OU=Azure Virtual Desktop,OU=Windows,OU=Computers,OU=ARPAH,OU=CIT Managed,OU=OD,OU=NIH,OU=AD,DC=nih,DC=gov' # OU DN where the session hosts will be joined
 
     LocalAdminUserName                           = 'AVDAdmin' # The password is randomly generated. Please use LAPS or reset from Azure Portal.
 

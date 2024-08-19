@@ -85,4 +85,10 @@ $paramNewAzResourceGroupDeployment = @{
     TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer-arpah.bicep'
     TemplateParameterObject = $TemplateParameters
 }
+
 New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
+
+#Write-Output $paramNewAzResourceGroupDeployment
+
+#$output = 'DomJoinUserName={0}, DomJoinUserPassword={1}, OUName={2}, SubnetId={3}, LogAnalyticsWorkspaceId={4}, IdentityDomainName{5}' -f $DomJoinUserName, $DomJoinUserPassword, $OUName, $SubnetId, $LogAnalyticsWorkspaceId, $IdentityDomainName
+#Write-Output $output

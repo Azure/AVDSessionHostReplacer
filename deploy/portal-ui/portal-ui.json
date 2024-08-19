@@ -13,7 +13,8 @@
 							"name": "resourceScope",
 							"type": "Microsoft.Common.ResourceScope",
 							"location": {
-								"resourceTypes": []
+								"resourceTypes": ["Microsoft.DesktopVirtualization/HostPools"
+								]
 							}
 						},
 						{

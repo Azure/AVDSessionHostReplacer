@@ -1,6 +1,10 @@
 param (
     [string]$DomJoinUserName,
-    [securestring]$DomJoinUserPassword
+    [securestring]$DomJoinUserPassword,
+    [string]$OUName,
+    [string]$SubnetId,
+    [string]$LogAnalyticsWorkspaceId,
+    [string]$IdentityDomainName
 )
 
 $ResourceGroupName = 'avd-nih-arpah-test-use2-service-objects' # Same as the Host Pool RG
@@ -8,7 +12,7 @@ $ResourceGroupName = 'avd-nih-arpah-test-use2-service-objects' # Same as the Hos
 $TemplateParameters = @{
     EnableMonitoring                             = $true
     UseExistingLAW                               = $true
-    LogAnalyticsWorkspaceId = '/subscriptions/87a23dae-87b7-4372-b94f-92e72de0705e/resourceGroups/avd-nih-arpah-test-use2-monitoring/providers/Microsoft.OperationalInsights/workspaces/avd-nih-arpah-test-use2-log' # Only required if UseExistingLAW is $true. Use ResourceID
+    LogAnalyticsWorkspaceId = $LogAnalyticsWorkspaceId # Only required if UseExistingLAW is $true. Use ResourceID
 
     ## Required Parameters ##
     HostPoolName                                 = 'vdpool-app1-test-use2-001'
@@ -41,16 +45,16 @@ $TemplateParameters = @{
     SecureBootEnabled                            = $true
     TpmEnabled                                   = $true
 
-    SubnetId                                     = '/subscriptions/87a23dae-87b7-4372-b94f-92e72de0705e/resourceGroups/nih-arpa-h-it-vdi-nih-test-rg-admin-az/providers/Microsoft.Network/virtualNetworks/nih-arpa-h-it-vdi-nih-test-vnet-spoke-az/subnets/nih-arpa-h-it-vdi-nih-test-sub'
+    SubnetId                                     = $SubnetId
 
     IdentityServiceProvider                      = 'ActiveDirectory' # EntraID / ActiveDirectory / EntraDS
     IntuneEnrollment                             = $false # This is only used when IdentityServiceProvider is EntraID
 
     # Only used when IdentityServiceProvider is ActiveDirectory or EntraDS
-    ADDomainName = 'nih.gov'
+    ADDomainName = $IdentityDomainName
     ADDomainJoinUserName = $DomJoinUserName
     ADJoinUserPassword = $DomJoinUserPassword # We will store this password in a key vault
-    ADOUPath = 'OU=Test,OU=Azure Virtual Desktop,OU=Windows,OU=Computers,OU=ARPAH,OU=CIT Managed,OU=OD,OU=NIH,OU=AD,DC=nih,DC=gov' # OU DN where the session hosts will be joined
+    ADOUPath = $OUName  # OU DN where the session hosts will be joined
 
     LocalAdminUserName                           = 'AVDAdmin' # The password is randomly generated. Please use LAPS or reset from Azure Portal.
 

@@ -30,6 +30,6 @@ jobs:
     - name: Run Azure PowerShell Script File
       uses: azure/powershell@v2
       with:
-        inlineScript: ./.github/workflows/scripts/Deploy-To-Test.ps1 -ADDomainJoinUserName '${{ env.test_parameters_avdServiceObjectsRgCustomName_value }}' -ADJoinUserPassword '${{ env.test_parameters_avdApplicationGroupCustomName_value }}'
+        inlineScript: ./.github/workflows/scripts/Deploy-To-Test.ps1 -DomJoinUserName '${{ secrets.AD_JOIN_USER }}' -DomJoinUserPassword '${{ secrets.AD_JOIN_PASS }}' -OUName '${{ secrets.AD_OU_TEST }}' -SubnetId '${{ secrets.AZURE_SUBNET_ID }}' -LogAnalyticsWorkspaceId '${{ secrets.AZURE_LOGANALYTICS_WORKSPACE_ID }}' -IdentityDomainName '${{ secrets.AD_NAME}}''
         azPSVersion: "latest"
         errorActionPreference: continue

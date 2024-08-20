@@ -8,8 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Checkout code
-      uses: actions/checkout@main
+    # - name: Checkout code
+    #   uses: actions/checkout@main
+
+    - uses: actions/checkout@v4
+      with:
+        ref: init-changes
 
     - name: Log into Azure
       uses: azure/login@v1

@@ -4,10 +4,14 @@ param (
     [string]$OUName,
     [string]$SubnetId,
     [string]$LogAnalyticsWorkspaceId,
-    [string]$IdentityDomainName
+    [string]$IdentityDomainName,
+    [string]$ResourceGroupName,
+    [string]$SessionHostResourceGroupName,
+    [string]$HostPoolName,
+    [string]$LocalAdminUserName
 )
 
-$ResourceGroupName = 'avd-nih-arpah-test-use2-service-objects' # Same as the Host Pool RG
+#$ResourceGroupName = '' # Same as the Host Pool RG
 
 $TemplateParameters = @{
     EnableMonitoring                             = $true
@@ -15,7 +19,7 @@ $TemplateParameters = @{
     LogAnalyticsWorkspaceId = $LogAnalyticsWorkspaceId # Only required if UseExistingLAW is $true. Use ResourceID
 
     ## Required Parameters ##
-    HostPoolName                                 = 'vdpool-app1-test-use2-001'
+    HostPoolName                                 = $HostPoolName
     HostPoolResourceGroupName                    = $ResourceGroupName
     #SessionHostNamePrefix                        = 'avdshr' # Will be appended by '-XX'
     SessionHostNamePrefix                        = 'arpah' # Will be appended by '-XX'
@@ -56,7 +60,7 @@ $TemplateParameters = @{
     ADJoinUserPassword = $DomJoinUserPassword # We will store this password in a key vault
     ADOUPath = $OUName  # OU DN where the session hosts will be joined
 
-    LocalAdminUserName                           = 'AVDAdmin' # The password is randomly generated. Please use LAPS or reset from Azure Portal.
+    LocalAdminUserName                           = $LocalAdminUserName # The password is randomly generated. Please use LAPS or reset from Azure Portal.
 
 
     ## Optional Parameters ##
@@ -73,7 +77,7 @@ $TemplateParameters = @{
     ReplaceSessionHostOnNewImageVersion          = $true #Set this to false when you only want to replace when the hosts are old (see TargetVMAgeDays)
     ReplaceSessionHostOnNewImageVersionDelayDays = 0
     VMNamesTemplateParameterName                 = 'VMNames' # Do not change this unless using a custom Template to deploy
-    SessionHostResourceGroupName                 = 'avd-nih-arpah-test-use2-pool-compute' # Leave empty if same as HostPoolResourceGroupName
+    SessionHostResourceGroupName                 = $SessionHostResourceGroupName # Leave empty if same as HostPoolResourceGroupName
 }
 
 $paramNewAzResourceGroupDeployment = @{
@@ -86,9 +90,10 @@ $paramNewAzResourceGroupDeployment = @{
     TemplateParameterObject = $TemplateParameters
 }
 
-New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
+#New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
 
-#Write-Output $paramNewAzResourceGroupDeployment
+Write-Output $paramNewAzResourceGroupDeployment
+Write-Output $TemplateParameters
 
 #$output = 'DomJoinUserName={0}, DomJoinUserPassword={1}, OUName={2}, SubnetId={3}, LogAnalyticsWorkspaceId={4}, IdentityDomainName{5}' -f $DomJoinUserName, $DomJoinUserPassword, $OUName, $SubnetId, $LogAnalyticsWorkspaceId, $IdentityDomainName
 #Write-Output $output

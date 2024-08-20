@@ -435,7 +435,7 @@ var varFunctionAppIdentity = UseUserAssignedManagedIdentity
 
 //---- Resources ----//
 
-resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (!empty(UserAssignedManagedIdentityResourceId)) {
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (UseUserAssignedManagedIdentity) {
   scope: resourceGroup(
     split(UserAssignedManagedIdentityResourceId, '/')[2],
     split(UserAssignedManagedIdentityResourceId, '/')[4]

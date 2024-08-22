@@ -343,11 +343,11 @@ var varReplacementPlanSettings = [
   }
   {
     name: '_ClientId'
-    value: userAssignedIdentity.properties.clientId
+    value: UseUserAssignedManagedIdentity ? userAssignedIdentity.properties.clientId : ''
   }
   {
     name: '_TenantId'
-    value: userAssignedIdentity.properties.tenantId
+    value: UseUserAssignedManagedIdentity ?  userAssignedIdentity.properties.tenantId : ''
   }
   {
     name: '_GraphEnvironmentName'
@@ -439,7 +439,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   scope: resourceGroup(
     split(UserAssignedManagedIdentityResourceId, '/')[2],
     split(UserAssignedManagedIdentityResourceId, '/')[4]
-  ) //
+  )
   name: split(UserAssignedManagedIdentityResourceId, '/')[8]
 }
 

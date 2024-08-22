@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "3789996891403905640"
+      "templateHash": "11247209521106147862"
     }
   },
   "parameters": {
@@ -459,11 +459,11 @@
               },
               {
                 "name": "_ClientId",
-                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId]"
+                "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId, '')]"
               },
               {
                 "name": "_TenantId",
-                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId]"
+                "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId, '')]"
               },
               {
                 "name": "_GraphEnvironmentName",
@@ -542,7 +542,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "8905469844686530970"
+              "templateHash": "7969194481035008910"
             }
           },
           "parameters": {
@@ -576,7 +576,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1-beta.0/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1-beta.1/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }

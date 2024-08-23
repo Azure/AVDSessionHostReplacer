@@ -11,7 +11,7 @@
   "parameters": {
     "Location": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group."
       }

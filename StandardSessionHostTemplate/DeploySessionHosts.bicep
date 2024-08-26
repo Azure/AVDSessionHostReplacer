@@ -4,6 +4,8 @@
 param Location string = resourceGroup().location
 param AvailabilityZones array = []
 param VMNames array
+param VMNamePrefixLength int
+
 param VMSize string
 
 param SubnetID string
@@ -41,6 +43,7 @@ module deploySessionHosts 'modules/AVDStandardSessionHost.bicep' = [for vm in VM
     SecurityProfile: SecurityProfile
     SubnetID: SubnetID
     VMName: vm
+    VMNamePrefixLength: VMNamePrefixLength
     VMSize: VMSize
     DiskType: DiskType
     WVDArtifactsURL:  WVDArtifactsURL

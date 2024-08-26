@@ -275,6 +275,7 @@ var varSessionHostTemplateParameters = {
   DomainJoinObject: varDomainJoinObject
   DomainJoinPassword: varDomainJoinPasswordReference
   AdminUsername: LocalAdminUsername
+  VMNamePrefixLength: length(SessionHostNamePrefix)+length(SessionHostNameSeparator) //This is used when deploying in multiple availability zones.
   tags: {}
 }
 // This variable calculates the Entra Environment Name based on the Azure Environment Name in environment()

@@ -1,6 +1,7 @@
 // This is a sample bicep file //
 
 param VMName string
+param VMNamePrefixLength int
 param VMSize string
 param DiskType string
 param Location string = resourceGroup().location
@@ -36,8 +37,8 @@ var varRequireNvidiaGPU = startsWith(VMSize, 'Standard_NC') || contains(VMSize, 
 var varVMNumber = int(
   substring(
     VMName,
-    (lastIndexOf(VMName, '-') + 1),
-    (length(VMName) - lastIndexOf(VMName, '-') - 1)
+    VMNamePrefixLength,
+    (length(VMName) - VMNamePrefixLength)
   )
 )
 

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "11247209521106147862"
+      "templateHash": "6788038213530918807"
     }
   },
   "parameters": {
@@ -443,7 +443,7 @@
               },
               {
                 "name": "_SessionHostParameters",
-                "value": "[string(createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'tags', createObject()))]"
+                "value": "[string(createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'VMNamePrefixLength', add(length(parameters('SessionHostNamePrefix')), length(parameters('SessionHostNameSeparator'))), 'tags', createObject()))]"
               },
               {
                 "name": "_SubscriptionId",
@@ -542,7 +542,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "7969194481035008910"
+              "templateHash": "5507182976962004057"
             }
           },
           "parameters": {
@@ -576,7 +576,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1-beta.1/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1-beta.2/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }
@@ -823,7 +823,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "8573904393442968176"
+              "templateHash": "10208603161915711494"
             }
           },
           "parameters": {
@@ -843,7 +843,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.29.47.4906",
-                  "templateHash": "11784787085459809456"
+                  "templateHash": "8994538122455151797"
                 }
               },
               "parameters": {
@@ -857,6 +857,9 @@
                 },
                 "VMNames": {
                   "type": "array"
+                },
+                "VMNamePrefixLength": {
+                  "type": "int"
                 },
                 "VMSize": {
                   "type": "string"
@@ -942,6 +945,9 @@
                       "VMName": {
                         "value": "[[parameters('VMNames')[copyIndex()]]"
                       },
+                      "VMNamePrefixLength": {
+                        "value": "[[parameters('VMNamePrefixLength')]"
+                      },
                       "VMSize": {
                         "value": "[[parameters('VMSize')]"
                       },
@@ -974,12 +980,15 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.29.47.4906",
-                          "templateHash": "10911582647457079552"
+                          "templateHash": "7267962610869920549"
                         }
                       },
                       "parameters": {
                         "VMName": {
                           "type": "string"
+                        },
+                        "VMNamePrefixLength": {
+                          "type": "int"
                         },
                         "VMSize": {
                           "type": "string"
@@ -1038,7 +1047,7 @@
                       },
                       "variables": {
                         "varRequireNvidiaGPU": "[[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
-                        "varVMNumber": "[[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
+                        "varVMNumber": "[[int(substring(parameters('VMName'), parameters('VMNamePrefixLength'), sub(length(parameters('VMName')), parameters('VMNamePrefixLength'))))]",
                         "varAvailabilityZone": "[[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]"
                       },
                       "resources": [

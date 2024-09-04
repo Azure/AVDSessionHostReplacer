@@ -8,11 +8,14 @@ param UseExistingLAW bool = false
 @description('Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights.')
 param LogAnalyticsWorkspaceId string = 'none'
 
-// Session Host Template
-param SessionHostsRegion string
+// Template
+param UseStandardTemplate bool = true
+
+// Standard Session Host Template
+param SessionHostsRegion string = ''
 param AvailabilityZones array = []
-param SessionHostSize string
-param AcceleratedNetworking bool
+param SessionHostSize string = ''
+param AcceleratedNetworking bool = false
 
 @allowed([
   'Standard_LRS' // Standard HDD
@@ -25,7 +28,7 @@ param SessionHostDiskType string = 'Premium_LRS'
   'Marketplace'
   'Gallery'
 ])
-param MarketPlaceOrCustomImage string
+param MarketPlaceOrCustomImage string = 'Marketplace'
 
 @allowed([
   '2022-datacenter-smalldisk-g2'
@@ -54,21 +57,29 @@ param GalleryImageId string = ''
 param SecurityType string = 'TrustedLaunch'
 param SecureBootEnabled bool = true
 param TpmEnabled bool = true
-param SubnetId string
+param SubnetId string = ''
 
 @allowed([
   'EntraID'
   'ActiveDirectory'
   'EntraDS'
 ])
-param IdentityServiceProvider string
+param IdentityServiceProvider string  = 'EntraID'
 param IntuneEnrollment bool = false
 param ADDomainName string = ''
 param ADDomainJoinUserName string = ''
 @secure()
 param ADJoinUserPassword string = ''
 param ADOUPath string = ''
-param LocalAdminUsername string
+param LocalAdminUsername string = ''
+
+// Custom Session Host Template
+param CustomTemplateSpecResourceId string = ''
+
+@description('Required: No | The name of the parameter in the template that specifies the VM Names array.')
+param VMNamesTemplateParameterName string = 'VMNames'
+
+param CustomTemplateSpecParameters object = {}
 
 //Required Parameters
 @description('Required: No | Name of the resource group containing the Azure Virtual Desktop Host Pool. | Default: The resource group of the Function App.')
@@ -137,8 +148,7 @@ param ReplaceSessionHostOnNewImageVersion bool = true
 @description('Required: No | Delay in days before replacing session hosts when a new image version is detected. | Default: 0 (no delay).')
 param ReplaceSessionHostOnNewImageVersionDelayDays int = 0
 
-@description('Required: No | The name of the parameter in the template that specifies the VM Names array.')
-param VMNamesTemplateParameterName string = 'VMNames'
+
 
 @description('Required: No | Leave this empty to deploy to same resource group as the host pool.')
 param SessionHostResourceGroupName string = ''

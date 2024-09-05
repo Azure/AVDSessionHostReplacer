@@ -400,7 +400,7 @@
     ],
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
-    "varUniqueString": "[substring(resourceGroup().name, lastIndexOf(resourceGroup().name, '-') + 3)]",
+    "varUniqueString": "[substring(resourceGroup().name, 14,11)]",
     "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', '-', variables('varUniqueString'))]",
     "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
   },
@@ -628,8 +628,8 @@
             }
           },
           "variables": {
-            "rgpattern": "[substring(resourceGroup().name, lastIndexOf(resourceGroup().name, '-') + 3)]",
-            "varStorageAccountName": "[format('stavdrpfunc{0}','-', variables('rgpattern')]",
+            "rgpattern": "[substring(resourceGroup().name, 14,11)]",
+            "varStorageAccountName": "[format('stavdrpfunc{0}','-', variables('rgpattern'))]",
             "varLogAnalyticsWorkspaceName": "[format('{0}-law', parameters('FunctionAppName'))]",
             "varAppServicePlanName": "[format('{0}-asp', parameters('FunctionAppName'))]"
           },

@@ -403,7 +403,7 @@
     "varUniqueString": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
-    "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', '-', variables('varUniqueString'))]",
+    "varFunctionAppName": "[format('AVDSessionHostReplacer', variables('varUniqueString'))]",
     "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
   },
   "resources": [
@@ -758,7 +758,7 @@
             "value": "[parameters('Location')]"
           },
           "KeyVaultName": {
-            "value": "[format('kv-AVDSHR-{0}', variables('varUniqueString'))]"
+            "value": "[format('kv-AVDSHR', variables('varUniqueString'))]"
           },
           "DomainJoinPassword": {
             "value": "[parameters('ADJoinUserPassword')]"

@@ -400,7 +400,7 @@
     ],
     "resourceGroupName": "[resourceGroup().name]",
     "splitParts": "[split(variables('resourceGroupName'), '-')]",
-    "varUniqueString": "[concat(variables('splitParts'), '-', variables('splitParts'), '-', variables('splitParts'))]",
+    "varUniqueString": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
     "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', '-', variables('varUniqueString'))]",
@@ -632,7 +632,7 @@
           "variables": {
            "resourceGroupName": "[resourceGroup().name]",
            "splitParts": "[split(variables('resourceGroupName'), '-')]",
-           "rgpattern": "[concat(variables('splitParts'), '-', variables('splitParts'), '-', variables('splitParts'))]",
+           "rgpattern": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
             "varStorageAccountName": "[format('stavdrpfunc{0}','-', variables('rgpattern'))]",
             "varLogAnalyticsWorkspaceName": "[format('{0}-law', parameters('FunctionAppName'))]",
             "varAppServicePlanName": "[format('{0}-asp', parameters('FunctionAppName'))]"

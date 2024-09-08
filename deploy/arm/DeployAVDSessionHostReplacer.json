@@ -400,7 +400,6 @@
     ],
     "splitParts": "[split(parameters('HostPoolResourceGroupName'), '-')]",
     "rgpattern": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
-    "varUniqueString": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
     "varFunctionAppName": "[concat('AVDSessionHostReplacer', variables('rgpattern'))]",
@@ -630,9 +629,6 @@
             }
           },
           "variables": {
-            "resourceGroupName": "[resourceGroup().name]",
-            "splitParts": "[split(variables('resourceGroupName'), '-')]",
-            "varUniqueString": "[concat('-',parameters('FunctionAppName'))]",
             "varStorageAccountName": "[format('stavdrpfunc', parameters('FunctionAppName'))]",
             "varLogAnalyticsWorkspaceName": "[concat('law-', parameters('FunctionAppName'))]",
             "varAppServicePlanName": "[concat('Asp-', parameters('FunctionAppName'))]",
@@ -735,10 +731,6 @@
             "functionAppPrincipalId": {
               "type": "string",
               "value": "[if(equals(parameters('FunctionAppIdentity').type, 'SystemAssigned'), reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2023-01-01', 'full').identity.principalId, '')]"
-            },
-            "varUniqueString": {
-              "type": "string",
-              "value": "[variables('varUniqueString')]"
             }
           }
         }
@@ -763,7 +755,7 @@
             "value": "[parameters('Location')]"
           },
           "KeyVaultName": {
-            "value": "[format('kv-AVDSHR', variables('varUniqueString'))]"
+            "value": "[concat('kv-AVDSHR', variables('rgpattern'))]"
           },
           "DomainJoinPassword": {
             "value": "[parameters('ADJoinUserPassword')]"

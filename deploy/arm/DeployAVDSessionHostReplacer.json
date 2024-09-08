@@ -398,12 +398,11 @@
       "AzureUSGovernment",
       "AzureChinaCloud"
     ],
-    "resourceGroupName": "[resourceGroup().name]",
-    "splitParts": "[split(variables('resourceGroupName'), '-')]",
-    "varUniqueString": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
+    "splitParts": "[split(parameters('HostPoolResourceGroupName'), '-')]",
+    "rgpattern": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
-    "varFunctionAppName": "[format('AVDSessionHostReplacer', variables('varUniqueString'))]",
+    "varFunctionAppName": "[concat('AVDSessionHostReplacer', variables('rgpattern'))]",
     "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
   },
   "resources": [
@@ -630,12 +629,13 @@
             }
           },
           "variables": {
-           "resourceGroupName": "[resourceGroup().name]",
-           "splitParts": "[split(variables('resourceGroupName'), '-')]",
-           "rgpattern": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
-            "varStorageAccountName": "[format('stavdrpfunc{0}','-', variables('rgpattern'))]",
-            "varLogAnalyticsWorkspaceName": "[format('{0}-law', parameters('FunctionAppName'))]",
-            "varAppServicePlanName": "[format('{0}-asp', parameters('FunctionAppName'))]"
+            "resourceGroupName": "[resourceGroup().name]",
+            "splitParts": "[split(variables('resourceGroupName'), '-')]",
+            "varUniqueString": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
+            "varStorageAccountName": "[format('stavdrpfunc', parameters('FunctionAppName'))]",
+            "varLogAnalyticsWorkspaceName": "[concat('law-', parameters('FunctionAppName'))]",
+            "varAppServicePlanName": "[concat('Asp-', parameters('FunctionAppName'))]",
+            "varGraphEnvironmentName": "your_value_here"
           },
           "resources": [
             {
@@ -734,6 +734,10 @@
             "functionAppPrincipalId": {
               "type": "string",
               "value": "[if(equals(parameters('FunctionAppIdentity').type, 'SystemAssigned'), reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2023-01-01', 'full').identity.principalId, '')]"
+            },
+            "varUniqueString": {
+              "type": "string",
+              "value": "[variables('varUniqueString')]"
             }
           }
         }

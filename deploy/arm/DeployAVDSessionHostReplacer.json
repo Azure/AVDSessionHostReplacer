@@ -629,7 +629,8 @@
             }
           },
           "variables": {
-            "splitParts": "[split(resourceGroup().name, '-')]",
+            "rgname": "[toLower(resourceGroup().name)]",
+            "splitParts": "[split(variables('rgname'), '-')]",
             "rgpattern2": "[concat(variables('splitParts')[2],variables('splitParts')[3],variables('splitParts')[4],variables('splitParts')[5])]",
             "varStorageAccountName": "[concat('stavdrpfunc', variables('rgpattern2'))]",
             "varLogAnalyticsWorkspaceName": "[concat('law-', parameters('FunctionAppName'))]",
@@ -651,7 +652,7 @@
             {
               "type": "Microsoft.Storage/storageAccounts",
               "apiVersion": "2022-05-01",
-              "name": "[toLower(variables('varStorageAccountName'))]",
+              "name": "[variables('varStorageAccountName')]",
               "location": "[parameters('Location')]",
               "kind": "StorageV2",
               "sku": {

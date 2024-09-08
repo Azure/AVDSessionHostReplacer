@@ -400,6 +400,7 @@
     ],
     "splitParts": "[split(parameters('HostPoolResourceGroupName'), '-')]",
     "rgpattern": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
+    "varUniqueString": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
     "varFunctionAppName": "[concat('AVDSessionHostReplacer', variables('rgpattern'))]",

@@ -399,7 +399,7 @@
       "AzureChinaCloud"
     ],
     "splitParts": "[split(parameters('HostPoolResourceGroupName'), '-')]",
-    "rgpattern": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4], variables('splitParts')[5])]",
+    "rgpattern": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4], '-', variables('splitParts')[5])]",
     "rgpattern2": "[concat(variables('splitParts')[2],variables('splitParts')[3],variables('splitParts')[4])]",
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
@@ -759,7 +759,7 @@
             "value": "[parameters('Location')]"
           },
           "KeyVaultName": {
-            "value": "[concat('kv-AVDSHR', variables('rgpattern'))]"
+            "value": "[concat('kv-SHR', variables('rgpattern'))]"
           },
           "DomainJoinPassword": {
             "value": "[parameters('ADJoinUserPassword')]"

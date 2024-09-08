@@ -632,7 +632,7 @@
           "variables": {
             "resourceGroupName": "[resourceGroup().name]",
             "splitParts": "[split(variables('resourceGroupName'), '-')]",
-            "varUniqueString": "[concat('-',variables('splitParts')[2], '-', variables('splitParts')[3], '-', variables('splitParts')[4])]",
+            "varUniqueString": "[concat('-',parameters('FunctionAppName'))]",
             "varStorageAccountName": "[format('stavdrpfunc', parameters('FunctionAppName'))]",
             "varLogAnalyticsWorkspaceName": "[concat('law-', parameters('FunctionAppName'))]",
             "varAppServicePlanName": "[concat('Asp-', parameters('FunctionAppName'))]",

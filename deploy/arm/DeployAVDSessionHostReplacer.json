@@ -633,7 +633,7 @@
             "rgname": "[toLower(resourceGroup().name)]",
             "splitParts": "[split(variables('rgname'), '-')]",
             "rgpattern2": "[concat(variables('splitParts')[2],variables('splitParts')[3],variables('splitParts')[4],variables('splitParts')[5])]",
-            "varStorageAccountName": "[concat('stavdrpfunc', variables('rgpattern2'))]",
+            "varStorageAccountName": "[concat('st', variables('rgpattern2'))]",
             "varLogAnalyticsWorkspaceName": "[concat('law-', parameters('FunctionAppName'))]",
             "varAppServicePlanName": "[concat('Asp-', parameters('FunctionAppName'))]",
             "varGraphEnvironmentName": "your_value_here"

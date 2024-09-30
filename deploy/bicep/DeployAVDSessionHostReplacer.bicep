@@ -64,7 +64,7 @@ param SubnetId string = ''
   'ActiveDirectory'
   'EntraDS'
 ])
-param IdentityServiceProvider string  = 'EntraID'
+param IdentityServiceProvider string = 'EntraID'
 param IntuneEnrollment bool = false
 param ADDomainName string = ''
 param ADDomainJoinUserName string = ''
@@ -79,7 +79,7 @@ param CustomTemplateSpecResourceId string = ''
 @description('Required: No | The name of the parameter in the template that specifies the VM Names array.')
 param VMNamesTemplateParameterName string = 'VMNames'
 
-param CustomTemplateSpecParameters object = {}
+param CustomTemplateSpecParameters string = '{}' // This is a JSON string
 
 //Required Parameters
 @description('Required: No | Name of the resource group containing the Azure Virtual Desktop Host Pool. | Default: The resource group of the Function App.')
@@ -147,8 +147,6 @@ param ReplaceSessionHostOnNewImageVersion bool = true
 
 @description('Required: No | Delay in days before replacing session hosts when a new image version is detected. | Default: 0 (no delay).')
 param ReplaceSessionHostOnNewImageVersionDelayDays int = 0
-
-
 
 @description('Required: No | Leave this empty to deploy to same resource group as the host pool.')
 param SessionHostResourceGroupName string = ''
@@ -273,21 +271,23 @@ var varDomainJoinPasswordReference = IdentityServiceProvider == 'EntraID'
         secretName: 'DomainJoinPassword'
       }
     }
-var varSessionHostTemplateParameters = {
-  Location: SessionHostsRegion
-  AvailabilityZones: AvailabilityZones
-  VMSize: SessionHostSize
-  AcceleratedNetworking: AcceleratedNetworking
-  DiskType: SessionHostDiskType
-  ImageReference: varImageReference
-  SecurityProfile: varSecurityProfile
-  SubnetId: SubnetId
-  DomainJoinObject: varDomainJoinObject
-  DomainJoinPassword: varDomainJoinPasswordReference
-  AdminUsername: LocalAdminUsername
-  VMNamePrefixLength: length(SessionHostNamePrefix)+length(SessionHostNameSeparator) //This is used when deploying in multiple availability zones.
-  tags: {}
-}
+var varSessionHostTemplateParameters = UseStandardTemplate
+  ? {
+      Location: SessionHostsRegion
+      AvailabilityZones: AvailabilityZones
+      VMSize: SessionHostSize
+      AcceleratedNetworking: AcceleratedNetworking
+      DiskType: SessionHostDiskType
+      ImageReference: varImageReference
+      SecurityProfile: varSecurityProfile
+      SubnetId: SubnetId
+      DomainJoinObject: varDomainJoinObject
+      DomainJoinPassword: varDomainJoinPasswordReference
+      AdminUsername: LocalAdminUsername
+      VMNamePrefixLength: length(SessionHostNamePrefix) + length(SessionHostNameSeparator) //This is used when deploying in multiple availability zones.
+      tags: {}
+    }
+  : CustomTemplateSpecParameters
 // This variable calculates the Entra Environment Name based on the Azure Environment Name in environment()
 // Define  mapping arrays for environment names and their corresponding Graph name
 var varAzureEnvironments = [
@@ -295,15 +295,17 @@ var varAzureEnvironments = [
   'AzureUSGovernment' // USGov
   'AzureChinaCloud' // China
 ]
-var varGraphEnvironmentNames = UseGovDodGraph ? [
-  'Global' // AzureCloud
-  'USGovDod' // AzureUSGovernment
-  'China' // AzureChinaCloud
-]: [
-  'Global' // AzureCloud
-  'USGov' // AzureUSGovernment
-  'China' // AzureChinaCloud
-]
+var varGraphEnvironmentNames = UseGovDodGraph
+  ? [
+      'Global' // AzureCloud
+      'USGovDod' // AzureUSGovernment
+      'China' // AzureChinaCloud
+    ]
+  : [
+      'Global' // AzureCloud
+      'USGov' // AzureUSGovernment
+      'China' // AzureChinaCloud
+    ]
 var varGraphEnvironmentName = varGraphEnvironmentNames[indexOf(varAzureEnvironments, environment().name)]
 
 var varReplacementPlanSettings = [
@@ -358,7 +360,7 @@ var varReplacementPlanSettings = [
   }
   {
     name: '_TenantId'
-    value: UseUserAssignedManagedIdentity ?  userAssignedIdentity.properties.tenantId : ''
+    value: UseUserAssignedManagedIdentity ? userAssignedIdentity.properties.tenantId : ''
   }
   {
     name: '_GraphEnvironmentName'

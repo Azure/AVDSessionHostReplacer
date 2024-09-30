@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.29.47.4906",
-      "templateHash": "16749693425937561368"
+      "version": "0.30.3.12046",
+      "templateHash": "7401845003796559721"
     }
   },
   "parameters": {
@@ -158,8 +158,8 @@
       }
     },
     "CustomTemplateSpecParameters": {
-      "type": "object",
-      "defaultValue": {}
+      "type": "string",
+      "defaultValue": "{}"
     },
     "HostPoolResourceGroupName": {
       "type": "string",
@@ -462,7 +462,7 @@
               },
               {
                 "name": "_SessionHostParameters",
-                "value": "[string(createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'VMNamePrefixLength', add(length(parameters('SessionHostNamePrefix')), length(parameters('SessionHostNameSeparator'))), 'tags', createObject()))]"
+                "value": "[string(if(parameters('UseStandardTemplate'), createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'VMNamePrefixLength', add(length(parameters('SessionHostNamePrefix')), length(parameters('SessionHostNameSeparator'))), 'tags', createObject()), parameters('CustomTemplateSpecParameters')))]"
               },
               {
                 "name": "_SubscriptionId",
@@ -560,8 +560,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "3734734378229800954"
+              "version": "0.30.3.12046",
+              "templateHash": "10162341526983144146"
             }
           },
           "parameters": {
@@ -595,7 +595,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1-beta.3/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1-beta.4/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }
@@ -707,8 +707,7 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('varAppServicePlanName'))]",
                 "siteConfig": {
                   "use32BitWorkerProcess": false,
-                  "powerShellVersion": "7.2",
-                  "netFrameworkVersion": "v6.0",
+                  "powerShellVersion": "7.4",
                   "appSettings": "[union(createArray(createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'AzureWebJobsStorage', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey), createObject('name', 'WEBSITE_CONTENTSHARE', 'value', toLower(parameters('FunctionAppName')))), if(parameters('EnableMonitoring'), createArray(createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey)), createArray()), parameters('ReplacementPlanSettings'))]",
                   "ftpsState": "Disabled",
                   "cors": {
@@ -765,8 +764,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "17584014780822218958"
+              "version": "0.30.3.12046",
+              "templateHash": "449843248600234261"
             }
           },
           "parameters": {
@@ -841,8 +840,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "10208603161915711494"
+              "version": "0.30.3.12046",
+              "templateHash": "743817319637196406"
             }
           },
           "parameters": {
@@ -861,8 +860,8 @@
               "metadata": {
                 "_generator": {
                   "name": "bicep",
-                  "version": "0.29.47.4906",
-                  "templateHash": "8994538122455151797"
+                  "version": "0.30.3.12046",
+                  "templateHash": "13503649100220987206"
                 }
               },
               "parameters": {
@@ -998,8 +997,8 @@
                       "metadata": {
                         "_generator": {
                           "name": "bicep",
-                          "version": "0.29.47.4906",
-                          "templateHash": "7267962610869920549"
+                          "version": "0.30.3.12046",
+                          "templateHash": "14751347001653086681"
                         }
                       },
                       "parameters": {
@@ -1328,8 +1327,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "852792330190262115"
+              "version": "0.30.3.12046",
+              "templateHash": "16413053653091747423"
             }
           },
           "parameters": {
@@ -1389,8 +1388,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "852792330190262115"
+              "version": "0.30.3.12046",
+              "templateHash": "16413053653091747423"
             }
           },
           "parameters": {

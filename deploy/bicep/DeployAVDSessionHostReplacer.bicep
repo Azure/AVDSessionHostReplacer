@@ -343,11 +343,11 @@ var varReplacementPlanSettings = [
   }
   {
     name: '_ClientId'
-    value: userAssignedIdentity.properties.clientId
+    value: (!empty(UserAssignedManagedIdentityResourceId)) ? userAssignedIdentity.properties.clientId : null
   }
   {
     name: '_TenantId'
-    value: userAssignedIdentity.properties.tenantId
+    value: (!empty(UserAssignedManagedIdentityResourceId)) ? userAssignedIdentity.properties.tenantId : null
   }
   {
     name: '_GraphEnvironmentName'

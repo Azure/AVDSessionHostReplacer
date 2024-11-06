@@ -16,7 +16,7 @@ Set-PSFConfig -FullName PSFramework.Message.style.NoColor -Value $true #This is 
 
 ## Version Banner ## Updated by Build\Build-Zip-File.ps1
 
-Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}" -StringValues 'v0.3.1-beta.6'
+Write-PSFMessage -Level Host -Message "This is SessionHostReplacer version {0}" -StringValues 'v0.3.1'
 
 
 # Import Function Parameters

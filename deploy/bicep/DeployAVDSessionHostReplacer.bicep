@@ -2,6 +2,13 @@
 @description('Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group.')
 param Location string = resourceGroup().location
 
+// FunctionApp
+@description('Required: No | Boolean to enable offline deployment of the Function App. | Default: false')
+param OfflineDeploy bool = false
+
+@description('Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. Must be provided when OfflineDeploy is set to false | Default: The latest release of the Function App code.')
+param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.0/FunctionApp.zip'
+
 //Monitoring
 param EnableMonitoring bool = true
 param UseExistingLAW bool = false
@@ -447,6 +454,8 @@ module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   name: 'deployFunctionApp'
   params: {
     Location: Location
+    OfflineDeploy: OfflineDeploy
+    FunctionAppZipUrl: FunctionAppZipUrl
     FunctionAppName: varFunctionAppName
     EnableMonitoring: EnableMonitoring
     UseExistingLAW: UseExistingLAW
@@ -491,3 +500,6 @@ module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssigne
     Scope: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
   }
 }
+
+//---- Outputs ----//
+output functionAppName string = varFunctionAppName

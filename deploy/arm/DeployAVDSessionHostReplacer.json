@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "7279464651230281485"
+      "templateHash": "5693223200706414848"
     }
   },
   "parameters": {
@@ -25,7 +25,7 @@
     },
     "FunctionAppZipUrl": {
       "type": "string",
-      "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1/FunctionApp.zip",
+      "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2-beta.0/FunctionApp.zip",
       "metadata": {
         "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. Must be provided when OfflineDeploy is set to false | Default: The latest release of the Function App code."
       }
@@ -581,7 +581,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "10735572881969364545"
+              "templateHash": "14614504622325227119"
             }
           },
           "parameters": {
@@ -869,7 +869,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "11915211720288470111"
+              "templateHash": "12635068526585988455"
             }
           },
           "parameters": {
@@ -889,7 +889,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.30.23.60470",
-                  "templateHash": "18178878272492658007"
+                  "templateHash": "14473546331683394413"
                 }
               },
               "parameters": {
@@ -1026,7 +1026,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.30.23.60470",
-                          "templateHash": "18423800479986568485"
+                          "templateHash": "7484271327926153268"
                         }
                       },
                       "parameters": {

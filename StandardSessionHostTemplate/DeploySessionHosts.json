@@ -20,6 +20,9 @@
     "VMNames": {
       "type": "array"
     },
+    "VMNamePrefixLength": {
+      "type": "int"
+    },
     "VMSize": {
       "type": "string"
     },
@@ -104,6 +107,9 @@
           "VMName": {
             "value": "[parameters('VMNames')[copyIndex()]]"
           },
+          "VMNamePrefixLength": {
+            "value": "[parameters('VMNamePrefixLength')]"
+          },
           "VMSize": {
             "value": "[parameters('VMSize')]"
           },
@@ -142,6 +148,9 @@
           "parameters": {
             "VMName": {
               "type": "string"
+            },
+            "VMNamePrefixLength": {
+              "type": "int"
             },
             "VMSize": {
               "type": "string"
@@ -200,7 +209,7 @@
           },
           "variables": {
             "varRequireNvidiaGPU": "[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
-            "varVMNumber": "[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
+            "varVMNumber": "[int(substring(parameters('VMName'), parameters('VMNamePrefixLength'), sub(length(parameters('VMName')), parameters('VMNamePrefixLength'))))]",
             "varAvailabilityZone": "[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]"
           },
           "resources": [

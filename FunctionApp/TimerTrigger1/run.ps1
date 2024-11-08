@@ -32,7 +32,8 @@ $runningDeployments = Get-SHRRunningDeployment -ResourceGroupName $sessionHostRe
 Write-PSFMessage -Level Host -Message "Found {0} running deployments" -StringValues $runningDeployments.Count
 
 # load session host parameters
-$sessionHostParameters = (Get-FunctionConfig _SessionHostParameters)
+$sessionHostParameters = [hashtable]::new([System.StringComparer]::InvariantCultureIgnoreCase)
+$sessionHostParameters += (Get-FunctionConfig _SessionHostParameters)
 
 # Get latest version of session host image
 Write-PSFMessage -Level Host -Message "Getting latest image version using Image Reference: {0}" -StringValues ($sessionHostParameters.ImageReference | Out-String)

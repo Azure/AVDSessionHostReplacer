@@ -1,11 +1,18 @@
 # Code Deployment
 ## AVD Session Host Replacer with all parameters
-This code deploys the AVD Session Host Replacer with all the available parameters. Remember to assign the [needed permissions](Permissions.md).
+This code deploys the AVD Session Host Replacer without dependency on GitHub. Remember to assign the [needed permissions](Permissions.md).
+
+Required Files:
+* [DeployAVDSessionHostReplacer.json](https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2-beta.0/DeployAVDSessionHostReplacer.json)
+* [FunctionApp.zip](https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2-beta.0/FunctionApp.zip)
+
 ### PowerShell
 ```PowerShell
 $ResourceGroupName = '<Target Resource Group Name>' # Same as the Host Pool RG
 
 $TemplateParameters = @{
+    OfflineDeploy = $true
+
     EnableMonitoring                             = $true
     UseExistingLAW                               = $false
     # LogAnalyticsWorkspaceId = '' # Only required if UseExistingLAW is $true. Use ResourceID
@@ -74,13 +81,13 @@ $TemplateParameters = @{
 $paramNewAzResourceGroupDeployment = @{
     Name = 'AVDSessionHostReplacer'
     ResourceGroupName = $ResourceGroupName
-    TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.3.2-beta.0/deploy/arm/DeployAVDSessionHostReplacer.json'
+    TemplateFile = '<Path_TO_DeployAVDSessionHostReplacer.json>'
 
-
-    # If you cloned the repo and want to deploy using the bicep file use this instead of the above line
-    #TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer.bicep'
     TemplateParameterObject = $TemplateParameters
 }
-New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
+$deploy = New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
+
+$null = Publish-AzWebapp -ResourceGroupName $ResourceGroupName -Name $deploy.Outputs.functionAppName.Value -ArchivePath "<PATH_TO_FunctionApp.zip>" -Force
+
 
 ```

@@ -20,8 +20,11 @@ param LogAnalyticsWorkspaceId string = 'none'
 @description('Required: Yes | Name of the Function App.')
 param FunctionAppName string
 
-@description('Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code.')
-param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1-beta.5/FunctionApp.zip'
+@description('Required: No | Boolean to enable offline deployment of the Function App. | Default: false')
+param OfflineDeploy bool = false
+
+@description('Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. Must be provided when OfflineDeploy is set to false | Default: Empty')
+param FunctionAppZipUrl string = ''
 
 @description('Required: No | App Service Plan Name | Default: Y1 for consumption based plan')
 param AppPlanName string = 'Y1'
@@ -181,7 +184,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       }
     }
   }
-  resource deployFromZip 'extensions@2023-01-01' = {
+  resource deployFromZip 'extensions@2023-12-01' = if (!OfflineDeploy) {
     name: 'MSDeploy'
     properties: {
       packageUri: FunctionAppZipUrl

@@ -25,12 +25,20 @@ $filesToUpdate = @(
         BannerPattern = '("uri": "https://github.com/Azure/AVDReplacementPlans/blob/)(.*)(/docs/Permissions.md")'
     }
     @{
-        Path = '.\deploy\bicep\modules\deployFunctionApp.bicep'
+        Path = '.\deploy\bicep\DeployAVDSessionHostReplacer.bicep'
         BannerPattern = "(param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/)(.*)(/FunctionApp.zip')"
     }
     @{
         Path = '.\docs\CodeDeploy.md'
         BannerPattern = "(TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/)(.+)(/deploy/arm/DeployAVDSessionHostReplacer.json')"
+    }
+    @{
+        Path = '.\docs\CodeDeploy-offline.md'
+        BannerPattern = "(\* \[DeployAVDSessionHostReplacer.json\]\(https://github.com/Azure/AVDSessionHostReplacer/releases/download/)(.+)(/DeployAVDSessionHostReplacer.json\))"
+    }
+    @{
+        Path = '.\docs\CodeDeploy-offline.md'
+        BannerPattern = "(\* \[FunctionApp.zip\]\(https://github.com/Azure/AVDSessionHostReplacer/releases/download/)(.+)(/FunctionApp.zip\))"
     }
 )
 

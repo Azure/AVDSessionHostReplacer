@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.30.3.12046",
-      "templateHash": "17085386773946595128"
+      "version": "0.30.23.60470",
+      "templateHash": "5693223200706414848"
     }
   },
   "parameters": {
@@ -14,6 +14,20 @@
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group."
+      }
+    },
+    "OfflineDeploy": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Required: No | Boolean to enable offline deployment of the Function App. | Default: false"
+      }
+    },
+    "FunctionAppZipUrl": {
+      "type": "string",
+      "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2-beta.0/FunctionApp.zip",
+      "metadata": {
+        "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. Must be provided when OfflineDeploy is set to false | Default: The latest release of the Function App code."
       }
     },
     "EnableMonitoring": {
@@ -418,6 +432,12 @@
           "Location": {
             "value": "[parameters('Location')]"
           },
+          "OfflineDeploy": {
+            "value": "[parameters('OfflineDeploy')]"
+          },
+          "FunctionAppZipUrl": {
+            "value": "[parameters('FunctionAppZipUrl')]"
+          },
           "FunctionAppName": {
             "value": "[variables('varFunctionAppName')]"
           },
@@ -560,8 +580,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.30.3.12046",
-              "templateHash": "17098687505089542648"
+              "version": "0.30.23.60470",
+              "templateHash": "14614504622325227119"
             }
           },
           "parameters": {
@@ -593,11 +613,18 @@
                 "description": "Required: Yes | Name of the Function App."
               }
             },
+            "OfflineDeploy": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Required: No | Boolean to enable offline deployment of the Function App. | Default: false"
+              }
+            },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1-beta.5/FunctionApp.zip",
+              "defaultValue": "",
               "metadata": {
-                "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
+                "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. Must be provided when OfflineDeploy is set to false | Default: Empty"
               }
             },
             "AppPlanName": {
@@ -634,8 +661,9 @@
           },
           "resources": [
             {
+              "condition": "[not(parameters('OfflineDeploy'))]",
               "type": "Microsoft.Web/sites/extensions",
-              "apiVersion": "2023-01-01",
+              "apiVersion": "2023-12-01",
               "name": "[format('{0}/{1}', parameters('FunctionAppName'), 'MSDeploy')]",
               "properties": {
                 "packageUri": "[parameters('FunctionAppZipUrl')]"
@@ -764,8 +792,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.30.3.12046",
-              "templateHash": "449843248600234261"
+              "version": "0.30.23.60470",
+              "templateHash": "1855754008854946998"
             }
           },
           "parameters": {
@@ -840,8 +868,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.30.3.12046",
-              "templateHash": "743817319637196406"
+              "version": "0.30.23.60470",
+              "templateHash": "12635068526585988455"
             }
           },
           "parameters": {
@@ -860,8 +888,8 @@
               "metadata": {
                 "_generator": {
                   "name": "bicep",
-                  "version": "0.30.3.12046",
-                  "templateHash": "13503649100220987206"
+                  "version": "0.30.23.60470",
+                  "templateHash": "14473546331683394413"
                 }
               },
               "parameters": {
@@ -997,8 +1025,8 @@
                       "metadata": {
                         "_generator": {
                           "name": "bicep",
-                          "version": "0.30.3.12046",
-                          "templateHash": "14751347001653086681"
+                          "version": "0.30.23.60470",
+                          "templateHash": "7484271327926153268"
                         }
                       },
                       "parameters": {
@@ -1327,8 +1355,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.30.3.12046",
-              "templateHash": "16413053653091747423"
+              "version": "0.30.23.60470",
+              "templateHash": "2574188172202499390"
             }
           },
           "parameters": {
@@ -1388,8 +1416,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.30.3.12046",
-              "templateHash": "16413053653091747423"
+              "version": "0.30.23.60470",
+              "templateHash": "2574188172202499390"
             }
           },
           "parameters": {
@@ -1421,5 +1449,11 @@
         "[resourceId('Microsoft.Resources/deployments', 'deployStandardSessionHostTemplate')]"
       ]
     }
-  ]
+  ],
+  "outputs": {
+    "functionAppName": {
+      "type": "string",
+      "value": "[variables('varFunctionAppName')]"
+    }
+  }
 }

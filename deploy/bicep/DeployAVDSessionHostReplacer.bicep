@@ -7,7 +7,7 @@ param Location string = resourceGroup().location
 param OfflineDeploy bool = false
 
 @description('Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. Must be provided when OfflineDeploy is set to false | Default: The latest release of the Function App code.')
-param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2-beta.2/FunctionApp.zip'
+param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2/FunctionApp.zip'
 
 //Monitoring
 param EnableMonitoring bool = true

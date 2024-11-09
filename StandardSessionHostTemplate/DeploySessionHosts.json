@@ -5,7 +5,8 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "18178878272492658007"
+      "templateHash": "14473546331683394413"
+
     }
   },
   "parameters": {
@@ -19,6 +20,9 @@
     },
     "VMNames": {
       "type": "array"
+    },
+    "VMNamePrefixLength": {
+      "type": "int"
     },
     "VMSize": {
       "type": "string"
@@ -104,6 +108,9 @@
           "VMName": {
             "value": "[parameters('VMNames')[copyIndex()]]"
           },
+          "VMNamePrefixLength": {
+            "value": "[parameters('VMNamePrefixLength')]"
+          },
           "VMSize": {
             "value": "[parameters('VMSize')]"
           },
@@ -136,12 +143,15 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "18423800479986568485"
+              "templateHash": "7484271327926153268"
             }
           },
           "parameters": {
             "VMName": {
               "type": "string"
+            },
+            "VMNamePrefixLength": {
+              "type": "int"
             },
             "VMSize": {
               "type": "string"
@@ -200,7 +210,7 @@
           },
           "variables": {
             "varRequireNvidiaGPU": "[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
-            "varVMNumber": "[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
+            "varVMNumber": "[int(substring(parameters('VMName'), parameters('VMNamePrefixLength'), sub(length(parameters('VMName')), parameters('VMNamePrefixLength'))))]",
             "varAvailabilityZone": "[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]"
           },
           "resources": [

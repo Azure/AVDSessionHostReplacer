@@ -76,7 +76,7 @@
 										"required": false
 									}
 								},
-                                {
+								{
 									"name": "sessionHostNamePrefix",
 									"type": "Microsoft.Common.TextBox",
 									"label": "Session Host Name Prefix",
@@ -133,7 +133,7 @@
 									"options": {
 										"icon": "Info",
 										"text": "When using a User Assigned Managed Identity, make sure the identity has the needed permissions in Azure and Entra. Follow the link for more info.",
-										"uri": "https://github.com/Azure/AVDReplacementPlans/blob/v0.3.1/docs/Permissions.md"
+										"uri": "https://github.com/Azure/AVDReplacementPlans/blob/v0.3.2-beta.2/docs/Permissions.md"
 									}
 								}
 							]
@@ -193,7 +193,7 @@
 							"type": "Microsoft.Common.TextBlock",
 							"visible": true,
 							"options": {
-								"text": "AVD session host replacer Portal UI Version: v0.3.1",
+								"text": "AVD session host replacer Portal UI Version: v0.3.2-beta.2",
 								"link": {
 									"label": "GitHub Repository",
 									"uri": "https://github.com/Azure/AVDSessionHostReplacer"
@@ -207,224 +207,304 @@
 					"label": "Session Hosts Template",
 					"elements": [
 						{
-							"name": "SessionHostsRegion",
-							"type": "Microsoft.Common.DropDown",
-							"label": "Session Hosts Region",
-							"visible": true,
-							"filter": true,
-							"multiselect": false,
-							"selectAll": false,
-							"toolTip": "Select region to deploy session hosts.",
-							"constraints": {
-								"required": true,
-								"allowedValues": "[map( first( map( filter( steps('basics').computeApi.value, (resourceTypes) => equals(resourceTypes.resourceType, 'virtualMachines') ), (item) => item.locations) ), (item) => parse(concat('{\"label\":\"', item, '\",\"value\":\"', toLower(replace(item, ' ', '')), '\"}')) )]"
-							}
-						},
-						{
-							"name": "AvailabilityZones",
-							"type": "Microsoft.Common.DropDown",
-							"label": "Availability Zones",
-							"visible": true,
-							"filter": false,
-							"defaultValue": [],
-							"multiselect": true,
-							"selectAll": false,
-							"toolTip": "Select Availability Zones for the session hosts. Make sure the selected size is available in the selected zones. Session hosts will be deployed across the zones.",
-							"constraints": {
-								"required": false,
-								"allowedValues": [
-									{
-										"label": "Zone 1",
-										"value": "1"
+							"name": "SessionHostTemplateTypeSection",
+							"type": "Microsoft.Common.Section",
+							"label": "Session Host Template",
+							"elements": [
+								{
+									"name": "UseStandardTemplate",
+									"type": "Microsoft.Common.OptionsGroup",
+									"label": "Some options group",
+									"defaultValue": "Standard Template",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": [
+											{
+												"label": "Standard Template",
+												"value": true
+											},
+											{
+												"label": "Custom Template",
+												"value": false
+											}
+										],
+										"required": true
 									},
-									{
-										"label": "Zone 2",
-										"value": "2"
-									},
-									{
-										"label": "Zone 3",
-										"value": "3"
-									}
-								]
-							}
-						},
-						{
-							"name": "SessionHostSize",
-							"type": "Microsoft.Compute.SizeSelector",
-							"label": "VM Size",
-							"toolTip": "",
-							"recommendedSizes": [
-								"Standard_D4ads_v5"
+									"visible": true
+								}
 							],
-							"constraints": {
-								"allowedSizes": [],
-								"excludedSizes": [],
-								"required": true
-							},
-							"options": {
-								"hideDiskTypeFilter": true
-							},
-							"osPlatform": "Windows",
-							"imageReference": {
-								"publisher": "MicrosoftWindowsDesktop",
-								"offer": "Windows-11",
-								"sku": "win11-23h2-avd"
-							}
-						},
-						{
-							"name": "AcceleratedNetworking",
-							"type": "Microsoft.Common.CheckBox",
-							"label": "Enable accelerated networking",
-							"defaultValue": true,
-							"toolTip": "Enables low latency and high throughput on the network interface."
-						},
-						{
-							"name": "SessionHostDiskType",
-							"type": "Microsoft.Common.DropDown",
-							"label": "OS Disk type",
-							"filter": false,
-							"defaultValue": "Premium SSD",
-							"toolTip": "Select session host disk type to host the OS.",
-							"constraints": {
-								"required": true,
-								"allowedValues": [
-									{
-										"label": "Standard HDD",
-										"value": "Standard_LRS"
-									},
-									{
-										"label": "Standard SSD",
-										"value": "StandardSSD_LRS"
-									},
-									{
-										"label": "Premium SSD",
-										"value": "Premium_LRS"
-									}
-								]
-							}
-						},
-						{
-							"name": "optionMarketPlaceOrCustomImage",
-							"type": "Microsoft.Common.OptionsGroup",
-							"label": "Image Source",
-							"defaultValue": "Marketplace",
-							"toolTip": "",
-							"constraints": {
-								"allowedValues": [
-									{
-										"label": "Marketplace",
-										"value": "Marketplace"
-									},
-									{
-										"label": "Gallery Image",
-										"value": "Gallery"
-									}
-								],
-								"required": true
-							},
 							"visible": true
 						},
 						{
-							"name": "dropDownMarketPlaceImage",
-							"type": "Microsoft.Common.DropDown",
-							"label": "Select a Marketplace Image",
-							"placeholder": "",
-							"defaultValue": "Windows 11 Enterprise 23h2 multi-session + Microsoft 365 Apps",
-							"toolTip": "Marketplace images are updated on monthly basis. The Session Host Replacer will replace the session hosts when a new image is available.",
-							"multiselect": false,
-							"selectAll": false,
-							"filter": true,
-							"filterPlaceholder": "Filter items ...",
-							"multiLine": true,
-							"constraints": {
-								"allowedValues": [
-									{
-										"label": "Windows 10 Enterprise 21h2 multi-session",
-										"value": "win10-21h2-avd"
+							"name": "CustomTemplateSection",
+							"type": "Microsoft.Common.Section",
+							"label": "Custom Session Hosts Template",
+							"visible": "[not(steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate)]",
+							"elements": [
+								{
+									"name": "CustomTemplateSpecSelector",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"label": "Template Spec",
+									"resourceType": "Microsoft.Resources/templateSpecs",
+									"constraints": {
+										"required": true
 									},
-									{
-										"label": "Windows 10 Enterprise 21h2 multi-session (Gen 2)",
-										"value": "win10-21h2-avd-g2"
-									},
-									{
-										"label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps",
-										"value": "win10-21h2-avd-m365"
-									},
-									{
-										"label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps (Gen 2)",
-										"value": "win10-21h2-avd-m365-g2"
-									},
-									{
-										"label": "Windows 10 Enterprise 22h2 multi-session",
-										"value": "win10-22h2-avd"
-									},
-									{
-										"label": "Windows 10 Enterprise 22h2 multi-session (Gen 2)",
-										"value": "win10-22h2-avd-g2"
-									},
-									{
-										"label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps",
-										"value": "win10-22h2-avd-m365"
-									},
-									{
-										"label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps (Gen 2)",
-										"value": "win10-22h2-avd-m365-g2"
-									},
-									{
-										"label": "Windows 11 Enterprise 21h2 multi-session",
-										"value": "win11-21h2-avd"
-									},
-									{
-										"label": "Windows 11 Enterprise 21h2 multi-session + Microsoft 365 Apps",
-										"value": "win11-21h2-avd-m365"
-									},
-									{
-										"label": "Windows 11 Enterprise 22h2 multi-session",
-										"value": "win11-22h2-avd"
-									},
-									{
-										"label": "Windows 11 Enterprise 22h2 multi-session + Microsoft 365 Apps",
-										"value": "win11-22h2-avd-m365"
-									},
-									{
-										"label": "Windows 11 Enterprise 23h2 multi-session",
-										"value": "win11-23h2-avd"
-									},
-									{
-										"label": "Windows 11 Enterprise 23h2 multi-session + Microsoft 365 Apps",
-										"value": "win11-23h2-avd-m365"
+									"options": {
+										"filter": {}
 									}
-								],
-								"required": true
-							},
-							"visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Marketplace')]"
+								},
+								{
+									"name": "CustomTemplateVMNamesParameterName",
+									"type": "Microsoft.Common.TextBox",
+									"label": "VM Names Parameter Name",
+									"defaultValue": "VMNames",
+									"toolTip": "The custom template spec must have an array parameter that accepts a list of VMs to create.",
+									"constraints": {
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "CustomTemplateParameters",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Template Spec Parameters JSON",
+									"toolTip": "Provide the parameters for the template spec. SHR wil add the VMNames parameter at deployment time.",
+									"multiLine": true,
+									"constraints": {
+										"required": true
+									},
+									"visible": true
+								}
+							]
 						},
 						{
-							"name": "GalleryImageInfoBox",
-							"type": "Microsoft.Common.InfoBox",
-							"visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]",
-							"options": {
-								"icon": "Warning",
-								"text": "The system identity of the Session Host Replacer function is assigned the 'Desktop Virtualization Virtual Machine Contributor' role against the subscription. If the Image Definition is in a different subscription, please make sure you manually assign the permission post deployment."
-							}
-						},
-						{
-							"name": "resourceSelectorSessionHostGalleryImageId",
-							"type": "Microsoft.Solutions.ResourceSelector",
-							"label": "Select Gallery Image",
-							"resourceType": "Microsoft.Compute/galleries/images",
-							"constraints": {
-								"required": true
-							},
-							"options": {
-								"filter": {}
-							},
-							"visible": "[equals(steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage,'Gallery')]"
+							"name": "StandardSessionHostTemplateSection",
+							"type": "Microsoft.Common.Section",
+							"label": "Standard Template Options",
+							"visible": "[steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate]",
+							"elements": [
+								{
+									"name": "SessionHostsRegion",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Session Hosts Region",
+									"visible": true,
+									"filter": true,
+									"multiselect": false,
+									"selectAll": false,
+									"toolTip": "Select region to deploy session hosts.",
+									"constraints": {
+										"required": true,
+										"allowedValues": "[map( first( map( filter( steps('basics').computeApi.value, (resourceTypes) => equals(resourceTypes.resourceType, 'virtualMachines') ), (item) => item.locations) ), (item) => parse(concat('{\"label\":\"', item, '\",\"value\":\"', toLower(replace(item, ' ', '')), '\"}')) )]"
+									}
+								},
+								{
+									"name": "AvailabilityZones",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Availability Zones",
+									"visible": true,
+									"filter": false,
+									"defaultValue": [],
+									"multiselect": true,
+									"selectAll": false,
+									"toolTip": "Select Availability Zones for the session hosts. Make sure the selected size is available in the selected zones. Session hosts will be deployed across the zones.",
+									"constraints": {
+										"required": false,
+										"allowedValues": [
+											{
+												"label": "Zone 1",
+												"value": "1"
+											},
+											{
+												"label": "Zone 2",
+												"value": "2"
+											},
+											{
+												"label": "Zone 3",
+												"value": "3"
+											}
+										]
+									}
+								},
+								{
+									"name": "SessionHostSize",
+									"type": "Microsoft.Compute.SizeSelector",
+									"label": "VM Size",
+									"toolTip": "",
+									"recommendedSizes": [
+										"Standard_D4ads_v5"
+									],
+									"constraints": {
+										"allowedSizes": [],
+										"excludedSizes": [],
+										"required": true
+									},
+									"options": {
+										"hideDiskTypeFilter": true
+									},
+									"osPlatform": "Windows",
+									"imageReference": {
+										"publisher": "MicrosoftWindowsDesktop",
+										"offer": "Windows-11",
+										"sku": "win11-23h2-avd"
+									}
+								},
+								{
+									"name": "AcceleratedNetworking",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Enable accelerated networking",
+									"defaultValue": true,
+									"toolTip": "Enables low latency and high throughput on the network interface."
+								},
+								{
+									"name": "SessionHostDiskType",
+									"type": "Microsoft.Common.DropDown",
+									"label": "OS Disk type",
+									"filter": false,
+									"defaultValue": "Premium SSD",
+									"toolTip": "Select session host disk type to host the OS.",
+									"constraints": {
+										"required": true,
+										"allowedValues": [
+											{
+												"label": "Standard HDD",
+												"value": "Standard_LRS"
+											},
+											{
+												"label": "Standard SSD",
+												"value": "StandardSSD_LRS"
+											},
+											{
+												"label": "Premium SSD",
+												"value": "Premium_LRS"
+											}
+										]
+									}
+								},
+								{
+									"name": "optionMarketPlaceOrCustomImage",
+									"type": "Microsoft.Common.OptionsGroup",
+									"label": "Image Source",
+									"defaultValue": "Marketplace",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": [
+											{
+												"label": "Marketplace",
+												"value": "Marketplace"
+											},
+											{
+												"label": "Gallery Image",
+												"value": "Gallery"
+											}
+										],
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "dropDownMarketPlaceImage",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Select a Marketplace Image",
+									"visible": "[steps('')]",
+									"placeholder": "",
+									"defaultValue": "Windows 11 Enterprise 23h2 multi-session + Microsoft 365 Apps",
+									"toolTip": "Marketplace images are updated on monthly basis. The Session Host Replacer will replace the session hosts when a new image is available.",
+									"multiselect": false,
+									"selectAll": false,
+									"filter": true,
+									"filterPlaceholder": "Filter items ...",
+									"multiLine": true,
+									"constraints": {
+										"allowedValues": [
+											{
+												"label": "Windows 10 Enterprise 21h2 multi-session",
+												"value": "win10-21h2-avd"
+											},
+											{
+												"label": "Windows 10 Enterprise 21h2 multi-session (Gen 2)",
+												"value": "win10-21h2-avd-g2"
+											},
+											{
+												"label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps",
+												"value": "win10-21h2-avd-m365"
+											},
+											{
+												"label": "Windows 10 Enterprise 21h2 multi-session + Microsoft 365 Apps (Gen 2)",
+												"value": "win10-21h2-avd-m365-g2"
+											},
+											{
+												"label": "Windows 10 Enterprise 22h2 multi-session",
+												"value": "win10-22h2-avd"
+											},
+											{
+												"label": "Windows 10 Enterprise 22h2 multi-session (Gen 2)",
+												"value": "win10-22h2-avd-g2"
+											},
+											{
+												"label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps",
+												"value": "win10-22h2-avd-m365"
+											},
+											{
+												"label": "Windows 10 Enterprise 22h2 multi-session + Microsoft 365 Apps (Gen 2)",
+												"value": "win10-22h2-avd-m365-g2"
+											},
+											{
+												"label": "Windows 11 Enterprise 21h2 multi-session",
+												"value": "win11-21h2-avd"
+											},
+											{
+												"label": "Windows 11 Enterprise 21h2 multi-session + Microsoft 365 Apps",
+												"value": "win11-21h2-avd-m365"
+											},
+											{
+												"label": "Windows 11 Enterprise 22h2 multi-session",
+												"value": "win11-22h2-avd"
+											},
+											{
+												"label": "Windows 11 Enterprise 22h2 multi-session + Microsoft 365 Apps",
+												"value": "win11-22h2-avd-m365"
+											},
+											{
+												"label": "Windows 11 Enterprise 23h2 multi-session",
+												"value": "win11-23h2-avd"
+											},
+											{
+												"label": "Windows 11 Enterprise 23h2 multi-session + Microsoft 365 Apps",
+												"value": "win11-23h2-avd-m365"
+											}
+										],
+										"required": true
+									},
+									"visible": "[equals(steps('SessionHostsTemplate').StandardSessionHostTemplateSection.optionMarketPlaceOrCustomImage,'Marketplace')]"
+								},
+								{
+									"name": "GalleryImageInfoBox",
+									"type": "Microsoft.Common.InfoBox",
+									"visible": "[equals(steps('SessionHostsTemplate').StandardSessionHostTemplateSection.optionMarketPlaceOrCustomImage,'Gallery')]",
+									"options": {
+										"icon": "Warning",
+										"text": "The system identity of the Session Host Replacer function is assigned the 'Desktop Virtualization Virtual Machine Contributor' role against the subscription. If the Image Definition is in a different subscription, please make sure you manually assign the permission post deployment."
+									}
+								},
+								{
+									"name": "resourceSelectorSessionHostGalleryImageId",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"label": "Select Gallery Image",
+									"resourceType": "Microsoft.Compute/galleries/images",
+									"constraints": {
+										"required": true
+									},
+									"options": {
+										"filter": {}
+									},
+									"visible": "[equals(steps('SessionHostsTemplate').StandardSessionHostTemplateSection.optionMarketPlaceOrCustomImage,'Gallery')]"
+								}
+							]
 						},
 						{
 							"name": "sessionHostsSecuritySection",
 							"type": "Microsoft.Common.Section",
-							"visible": true,
+							"visible": "[steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate]",
 							"label": "Security profile",
 							"elements": [
 								{
@@ -474,7 +554,7 @@
 							"name": "SubnetId",
 							"type": "Microsoft.Common.TextBox",
 							"label": "Subnet ID",
-							"visible": true,
+							"visible": "[steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate]",
 							"placeholder": "Add resource id of subnet in the same region as the Session Hosts",
 							"constraints": {
 								"required": true,
@@ -489,7 +569,7 @@
 						{
 							"name": "DomainJoinSection",
 							"type": "Microsoft.Common.Section",
-							"visible": true,
+							"visible": "[steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate]",
 							"label": "Domain Join",
 							"elements": [
 								{
@@ -587,6 +667,7 @@
 							"name": "LocalAdminUsername",
 							"type": "Microsoft.Common.TextBox",
 							"label": "Local Administrator Username",
+							"visible": "[steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate]",
 							"toolTip": "Provide username for session host local admin account. Administrator can't be used as username, it is reserved by the system. The password is randomly generated at deployment time.",
 							"placeholder": "Example: avdadmin",
 							"defaultValue": "",
@@ -766,14 +847,15 @@
 				"EnableMonitoring": "[steps('basics').MonitoringSection.EnableMonitoring]",
 				"UseExistingLAW": "[steps('basics').MonitoringSection.UseExistingLAW]",
 				"LogAnalyticsWorkspaceId": "[if(steps('basics').MonitoringSection.UseExistingLAW, steps('basics').MonitoringSection.LAWSelector.id, '')]",
-				"SessionHostsRegion": "[steps('SessionHostsTemplate').SessionHostsRegion]",
-				"AvailabilityZones": "[steps('SessionHostsTemplate').AvailabilityZones]",
-				"SessionHostSize": "[steps('SessionHostsTemplate').SessionHostSize]",
-				"AcceleratedNetworking": "[steps('SessionHostsTemplate').AcceleratedNetworking]",
-				"SessionHostDiskType": "[steps('SessionHostsTemplate').SessionHostDiskType]",
-				"MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').optionMarketPlaceOrCustomImage]",
-				"MarketPlaceImage": "[steps('SessionHostsTemplate').dropDownMarketPlaceImage]",
-				"GalleryImageId": "[steps('SessionHostsTemplate').resourceSelectorSessionHostGalleryImageId.id]",
+				"UseStandardTemplate": "[steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate]",
+				"SessionHostsRegion": "[steps('SessionHostsTemplate').StandardSessionHostTemplateSection.SessionHostsRegion]",
+				"AvailabilityZones": "[steps('SessionHostsTemplate').StandardSessionHostTemplateSection.AvailabilityZones]",
+				"SessionHostSize": "[steps('SessionHostsTemplate').StandardSessionHostTemplateSection.SessionHostSize]",
+				"AcceleratedNetworking": "[steps('SessionHostsTemplate').StandardSessionHostTemplateSection.AcceleratedNetworking]",
+				"SessionHostDiskType": "[steps('SessionHostsTemplate').StandardSessionHostTemplateSection.SessionHostDiskType]",
+				"MarketPlaceOrCustomImage": "[steps('SessionHostsTemplate').StandardSessionHostTemplateSection.optionMarketPlaceOrCustomImage]",
+				"MarketPlaceImage": "[steps('SessionHostsTemplate').StandardSessionHostTemplateSection.dropDownMarketPlaceImage]",
+				"GalleryImageId": "[steps('SessionHostsTemplate').StandardSessionHostTemplateSection.resourceSelectorSessionHostGalleryImageId.id]",
 				"SecurityType": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecurityType]",
 				"SecureBootEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.SecureBootEnabled]",
 				"TpmEnabled": "[steps('SessionHostsTemplate').sessionHostsSecuritySection.TpmEnabled]",
@@ -785,6 +867,9 @@
 				"ADJoinUserPassword": "[steps('SessionHostsTemplate').DomainJoinSection.ADJoinUserPassword]",
 				"ADOUPath": "[steps('SessionHostsTemplate').DomainJoinSection.ADOUPath]",
 				"LocalAdminUsername": "[steps('SessionHostsTemplate').LocalAdminUsername]",
+				"CustomTemplateSpecResourceId": "[if(not(steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate), steps('SessionHostsTemplate').CustomTemplateSection.CustomTemplateSpecSelector.id, '')]",
+				"VMNamesTemplateParameterName": "[if(not(steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate), steps('SessionHostsTemplate').CustomTemplateSection.CustomTemplateVMNamesParameterName, 'VMNames')]",
+				"CustomTemplateSpecParameters": "[if(not(steps('SessionHostsTemplate').SessionHostTemplateTypeSection.UseStandardTemplate), steps('SessionHostsTemplate').CustomTemplateSection.CustomTemplateParameters, '{}')]",
 				"TagIncludeInAutomation": "[steps('optionalParametersStep')._Tag_IncludeInAutomation]",
 				"TagDeployTimestamp": "[steps('optionalParametersStep')._Tag_DeployTimestamp]",
 				"TagPendingDrainTimestamp": "[steps('optionalParametersStep')._Tag_PendingDrainTimestamp]",
@@ -798,7 +883,6 @@
 				"SessionHostNameSeparator": "[if(steps('optionalParametersStep')._SessionHostNameSeparator,'-','')]",
 				"ReplaceSessionHostOnNewImageVersion": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersion]",
 				"ReplaceSessionHostOnNewImageVersionDelayDays": "[steps('optionalParametersStep')._ReplaceSessionHostOnNewImageVersionDelayDays]",
-				"VMNamesTemplateParameterName": "VMNames",
 				"SessionHostResourceGroupName": "[steps('optionalParametersStep')._SessionHostResourceGroupName]"
 			}
 		}

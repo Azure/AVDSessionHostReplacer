@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "7279464651230281485"
+      "templateHash": "8952134574155481823"
     }
   },
   "parameters": {
@@ -25,7 +25,7 @@
     },
     "FunctionAppZipUrl": {
       "type": "string",
-      "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1/FunctionApp.zip",
+      "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2-beta.2/FunctionApp.zip",
       "metadata": {
         "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. Must be provided when OfflineDeploy is set to false | Default: The latest release of the Function App code."
       }
@@ -45,18 +45,25 @@
         "description": "Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights."
       }
     },
+    "UseStandardTemplate": {
+      "type": "bool",
+      "defaultValue": true
+    },
     "SessionHostsRegion": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "AvailabilityZones": {
       "type": "array",
       "defaultValue": []
     },
     "SessionHostSize": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "AcceleratedNetworking": {
-      "type": "bool"
+      "type": "bool",
+      "defaultValue": false
     },
     "SessionHostDiskType": {
       "type": "string",
@@ -69,6 +76,7 @@
     },
     "MarketPlaceOrCustomImage": {
       "type": "string",
+      "defaultValue": "Marketplace",
       "allowedValues": [
         "Marketplace",
         "Gallery"
@@ -116,10 +124,12 @@
       "defaultValue": true
     },
     "SubnetId": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "IdentityServiceProvider": {
       "type": "string",
+      "defaultValue": "EntraID",
       "allowedValues": [
         "EntraID",
         "ActiveDirectory",
@@ -147,7 +157,23 @@
       "defaultValue": ""
     },
     "LocalAdminUsername": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
+    },
+    "CustomTemplateSpecResourceId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "VMNamesTemplateParameterName": {
+      "type": "string",
+      "defaultValue": "VMNames",
+      "metadata": {
+        "description": "Required: No | The name of the parameter in the template that specifies the VM Names array."
+      }
+    },
+    "CustomTemplateSpecParameters": {
+      "type": "string",
+      "defaultValue": "{}"
     },
     "HostPoolResourceGroupName": {
       "type": "string",
@@ -291,13 +317,6 @@
       "defaultValue": 0,
       "metadata": {
         "description": "Required: No | Delay in days before replacing session hosts when a new image version is detected. | Default: 0 (no delay)."
-      }
-    },
-    "VMNamesTemplateParameterName": {
-      "type": "string",
-      "defaultValue": "VMNames",
-      "metadata": {
-        "description": "Required: No | The name of the parameter in the template that specifies the VM Names array."
       }
     },
     "SessionHostResourceGroupName": {
@@ -463,7 +482,7 @@
               },
               {
                 "name": "_SessionHostParameters",
-                "value": "[string(createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'tags', createObject()))]"
+                "value": "[string(if(parameters('UseStandardTemplate'), createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'VMNamePrefixLength', add(length(parameters('SessionHostNamePrefix')), length(parameters('SessionHostNameSeparator'))), 'tags', createObject()), parameters('CustomTemplateSpecParameters')))]"
               },
               {
                 "name": "_SubscriptionId",
@@ -479,11 +498,11 @@
               },
               {
                 "name": "_ClientId",
-                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId]"
+                "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId, '')]"
               },
               {
                 "name": "_TenantId",
-                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId]"
+                "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId, '')]"
               },
               {
                 "name": "_GraphEnvironmentName",
@@ -562,7 +581,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "10735572881969364545"
+              "templateHash": "14614504622325227119"
             }
           },
           "parameters": {
@@ -716,8 +735,7 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('varAppServicePlanName'))]",
                 "siteConfig": {
                   "use32BitWorkerProcess": false,
-                  "powerShellVersion": "7.2",
-                  "netFrameworkVersion": "v6.0",
+                  "powerShellVersion": "7.4",
                   "appSettings": "[union(createArray(createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'AzureWebJobsStorage', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey), createObject('name', 'WEBSITE_CONTENTSHARE', 'value', toLower(parameters('FunctionAppName')))), if(parameters('EnableMonitoring'), createArray(createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey)), createArray()), parameters('ReplacementPlanSettings'))]",
                   "ftpsState": "Disabled",
                   "cors": {
@@ -851,7 +869,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "11915211720288470111"
+              "templateHash": "12635068526585988455"
             }
           },
           "parameters": {
@@ -871,7 +889,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.30.23.60470",
-                  "templateHash": "18178878272492658007"
+                  "templateHash": "14473546331683394413"
                 }
               },
               "parameters": {
@@ -885,6 +903,9 @@
                 },
                 "VMNames": {
                   "type": "array"
+                },
+                "VMNamePrefixLength": {
+                  "type": "int"
                 },
                 "VMSize": {
                   "type": "string"
@@ -970,6 +991,9 @@
                       "VMName": {
                         "value": "[[parameters('VMNames')[copyIndex()]]"
                       },
+                      "VMNamePrefixLength": {
+                        "value": "[[parameters('VMNamePrefixLength')]"
+                      },
                       "VMSize": {
                         "value": "[[parameters('VMSize')]"
                       },
@@ -1002,12 +1026,15 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.30.23.60470",
-                          "templateHash": "18423800479986568485"
+                          "templateHash": "7484271327926153268"
                         }
                       },
                       "parameters": {
                         "VMName": {
                           "type": "string"
+                        },
+                        "VMNamePrefixLength": {
+                          "type": "int"
                         },
                         "VMSize": {
                           "type": "string"
@@ -1066,7 +1093,7 @@
                       },
                       "variables": {
                         "varRequireNvidiaGPU": "[[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
-                        "varVMNumber": "[[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
+                        "varVMNumber": "[[int(substring(parameters('VMName'), parameters('VMNamePrefixLength'), sub(length(parameters('VMName')), parameters('VMNamePrefixLength'))))]",
                         "varAvailabilityZone": "[[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]"
                       },
                       "resources": [

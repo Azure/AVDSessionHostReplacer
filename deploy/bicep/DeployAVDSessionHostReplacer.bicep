@@ -7,7 +7,7 @@ param Location string = resourceGroup().location
 param OfflineDeploy bool = false
 
 @description('Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. Must be provided when OfflineDeploy is set to false | Default: The latest release of the Function App code.')
-param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1/FunctionApp.zip'
+param FunctionAppZipUrl string = 'https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2-beta.2/FunctionApp.zip'
 
 //Monitoring
 param EnableMonitoring bool = true
@@ -15,11 +15,14 @@ param UseExistingLAW bool = false
 @description('Required: Yes | Name of the Log Analytics Workspace used by the Function App Insights.')
 param LogAnalyticsWorkspaceId string = 'none'
 
-// Session Host Template
-param SessionHostsRegion string
+// Template
+param UseStandardTemplate bool = true
+
+// Standard Session Host Template
+param SessionHostsRegion string = ''
 param AvailabilityZones array = []
-param SessionHostSize string
-param AcceleratedNetworking bool
+param SessionHostSize string = ''
+param AcceleratedNetworking bool = false
 
 @allowed([
   'Standard_LRS' // Standard HDD
@@ -32,7 +35,7 @@ param SessionHostDiskType string = 'Premium_LRS'
   'Marketplace'
   'Gallery'
 ])
-param MarketPlaceOrCustomImage string
+param MarketPlaceOrCustomImage string = 'Marketplace'
 
 @allowed([
   '2022-datacenter-smalldisk-g2'
@@ -61,21 +64,29 @@ param GalleryImageId string = ''
 param SecurityType string = 'TrustedLaunch'
 param SecureBootEnabled bool = true
 param TpmEnabled bool = true
-param SubnetId string
+param SubnetId string = ''
 
 @allowed([
   'EntraID'
   'ActiveDirectory'
   'EntraDS'
 ])
-param IdentityServiceProvider string
+param IdentityServiceProvider string = 'EntraID'
 param IntuneEnrollment bool = false
 param ADDomainName string = ''
 param ADDomainJoinUserName string = ''
 @secure()
 param ADJoinUserPassword string = ''
 param ADOUPath string = ''
-param LocalAdminUsername string
+param LocalAdminUsername string = ''
+
+// Custom Session Host Template
+param CustomTemplateSpecResourceId string = ''
+
+@description('Required: No | The name of the parameter in the template that specifies the VM Names array.')
+param VMNamesTemplateParameterName string = 'VMNames'
+
+param CustomTemplateSpecParameters string = '{}' // This is a JSON string
 
 //Required Parameters
 @description('Required: No | Name of the resource group containing the Azure Virtual Desktop Host Pool. | Default: The resource group of the Function App.')
@@ -143,9 +154,6 @@ param ReplaceSessionHostOnNewImageVersion bool = true
 
 @description('Required: No | Delay in days before replacing session hosts when a new image version is detected. | Default: 0 (no delay).')
 param ReplaceSessionHostOnNewImageVersionDelayDays int = 0
-
-@description('Required: No | The name of the parameter in the template that specifies the VM Names array.')
-param VMNamesTemplateParameterName string = 'VMNames'
 
 @description('Required: No | Leave this empty to deploy to same resource group as the host pool.')
 param SessionHostResourceGroupName string = ''
@@ -270,20 +278,23 @@ var varDomainJoinPasswordReference = IdentityServiceProvider == 'EntraID'
         secretName: 'DomainJoinPassword'
       }
     }
-var varSessionHostTemplateParameters = {
-  Location: SessionHostsRegion
-  AvailabilityZones: AvailabilityZones
-  VMSize: SessionHostSize
-  AcceleratedNetworking: AcceleratedNetworking
-  DiskType: SessionHostDiskType
-  ImageReference: varImageReference
-  SecurityProfile: varSecurityProfile
-  SubnetId: SubnetId
-  DomainJoinObject: varDomainJoinObject
-  DomainJoinPassword: varDomainJoinPasswordReference
-  AdminUsername: LocalAdminUsername
-  tags: {}
-}
+var varSessionHostTemplateParameters = UseStandardTemplate
+  ? {
+      Location: SessionHostsRegion
+      AvailabilityZones: AvailabilityZones
+      VMSize: SessionHostSize
+      AcceleratedNetworking: AcceleratedNetworking
+      DiskType: SessionHostDiskType
+      ImageReference: varImageReference
+      SecurityProfile: varSecurityProfile
+      SubnetId: SubnetId
+      DomainJoinObject: varDomainJoinObject
+      DomainJoinPassword: varDomainJoinPasswordReference
+      AdminUsername: LocalAdminUsername
+      VMNamePrefixLength: length(SessionHostNamePrefix) + length(SessionHostNameSeparator) //This is used when deploying in multiple availability zones.
+      tags: {}
+    }
+  : CustomTemplateSpecParameters
 // This variable calculates the Entra Environment Name based on the Azure Environment Name in environment()
 // Define  mapping arrays for environment names and their corresponding Graph name
 var varAzureEnvironments = [
@@ -291,15 +302,17 @@ var varAzureEnvironments = [
   'AzureUSGovernment' // USGov
   'AzureChinaCloud' // China
 ]
-var varGraphEnvironmentNames = UseGovDodGraph ? [
-  'Global' // AzureCloud
-  'USGovDod' // AzureUSGovernment
-  'China' // AzureChinaCloud
-]: [
-  'Global' // AzureCloud
-  'USGov' // AzureUSGovernment
-  'China' // AzureChinaCloud
-]
+var varGraphEnvironmentNames = UseGovDodGraph
+  ? [
+      'Global' // AzureCloud
+      'USGovDod' // AzureUSGovernment
+      'China' // AzureChinaCloud
+    ]
+  : [
+      'Global' // AzureCloud
+      'USGov' // AzureUSGovernment
+      'China' // AzureChinaCloud
+    ]
 var varGraphEnvironmentName = varGraphEnvironmentNames[indexOf(varAzureEnvironments, environment().name)]
 
 var varReplacementPlanSettings = [
@@ -350,11 +363,11 @@ var varReplacementPlanSettings = [
   }
   {
     name: '_ClientId'
-    value: userAssignedIdentity.properties.clientId
+    value: UseUserAssignedManagedIdentity ? userAssignedIdentity.properties.clientId : ''
   }
   {
     name: '_TenantId'
-    value: userAssignedIdentity.properties.tenantId
+    value: UseUserAssignedManagedIdentity ? userAssignedIdentity.properties.tenantId : ''
   }
   {
     name: '_GraphEnvironmentName'
@@ -442,11 +455,11 @@ var varFunctionAppIdentity = UseUserAssignedManagedIdentity
 
 //---- Resources ----//
 
-resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (!empty(UserAssignedManagedIdentityResourceId)) {
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (UseUserAssignedManagedIdentity) {
   scope: resourceGroup(
     split(UserAssignedManagedIdentityResourceId, '/')[2],
     split(UserAssignedManagedIdentityResourceId, '/')[4]
-  ) //
+  )
   name: split(UserAssignedManagedIdentityResourceId, '/')[8]
 }
 

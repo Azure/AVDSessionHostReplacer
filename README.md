@@ -15,6 +15,7 @@ the AVD Session Host Replacer helps you manage the task of replacing old session
 | Command line (Bicep/ARM)  | [![Powershell/Azure CLI](./docs/icons/powershell.png)](./docs/CodeDeploy.md)  |
 | Offline Deployment (no GitHub)  | [![Offline Deployment](./docs/icons/powershell.png)](./docs/CodeDeploy-offline.md) |
 
+
 ## Pre-requisites
 
 The Session Host Replacer requires permissions to manage resources in Azure and, if the session hosts are Entra joined, permissions in Entra. The recommended approach is to create a User Managed Identity, assign the necessary permissions to it, and use it for all instances of the Session Host Replacer.

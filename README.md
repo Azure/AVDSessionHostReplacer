@@ -8,7 +8,7 @@ The best practice for AVD recommends replacing the session hosts instead of main
 
 ### AVD Session Host Replacer vs AVD Session Host Update (Preview)
 
-The Session Host Update feature is a native feature that enables you to update the session hosts in a host pool. It is currently in preview. Below is a comparison of the two features,
+[Session Host Update](https://learn.microsoft.com/en-us/azure/virtual-desktop/session-host-update) is a native feature that enables you to update the session hosts in a host pool. It is currently in preview. Below is a comparison of the two features,
 
 | Point                                               | Session Host Update (Preview)                           | AVD Session Host Replacer                  |
 | --------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------ |

@@ -16,8 +16,8 @@ The Session Host Update feature is a native feature that enables you to update t
 | Availabilty                                         | Public Cloud Only                                       | All clouds including Gov and China         |
 | Entra Join                                          | ❌                                                       | ✅                                          |
 | Customize ARM Template for VM deployment            | ❌                                                       | ✅                                          |
-| Replacement Order                                   | Remove old VMs > Deploy new VMs                         | Deploy new VMs > Remove old VMs *          |
-| Initial test deployment                             | ✅                                                       | ❌ *                                        |
+| Replacement Order                                   | Remove old VMs > Deploy new VMs                         | * Deploy new VMs > Remove old VMs          |
+| Initial test deployment                             | ✅                                                       | * ❌                                        |
 | Session Host VM Name                                | Changes after replacement to reflect the date           | Maintains the  names as per defined prefix |
 | Change total number of session hosts (scale out/in) | ❌                                                       | ✅                                          |
 | Trigger                                             | Based on schedules                                      | Based on criteria (Image Version, VM Age)  |
@@ -28,7 +28,7 @@ The Session Host Update feature is a native feature that enables you to update t
 
 ## Getting started
 
-## Pre-requisites
+### Pre-requisites
 
 The Session Host Replacer requires permissions to manage resources in Azure and, if the session hosts are Entra joined, permissions in Entra. The recommended approach is to create a User Managed Identity, assign the necessary permissions to it, and use it for all instances of the Session Host Replacer.
 
@@ -36,6 +36,7 @@ If you do not select a User Managed Identity, the deployment will create a Syste
 
 Detailed instructions on the required permissions and how to assign them are available [here](docs/Permissions.md).
 
+### Deployment
 | Deployment Type           | Link                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Azure Portal UI           | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.2%2Fdeploy%2Farm%2FDeployAVDSessionHostReplacer.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.2%2Fdeploy%2Fportal-ui%2Fportal-ui.json)  [![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.2%2Fdeploy%2Farm%2FDeployAVDSessionHostReplacer.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.2%2Fdeploy%2Fportal-ui%2Fportal-ui.json)  [![Deploy to Azure China](https://aka.ms/deploytoazurechinabutton)](https://portal.azure.cn/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.2%2Fdeploy%2Farm%2FDeployAVDSessionHostReplacer.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2FAVDSessionHostReplacer%2Fv0.3.2%2Fdeploy%2Fportal-ui%2Fportal-ui.json) |

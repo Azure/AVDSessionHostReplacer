@@ -3,8 +3,8 @@
 This code deploys the AVD Session Host Replacer without dependency on GitHub. Remember to assign the [needed permissions](Permissions.md).
 
 Required Files:
-* [DeployAVDSessionHostReplacer.json](https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2/DeployAVDSessionHostReplacer.json)
-* [FunctionApp.zip](https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.2/FunctionApp.zip)
+* [DeployAVDSessionHostReplacer.json](https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.3-beta.1/DeployAVDSessionHostReplacer.json)
+* [FunctionApp.zip](https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.3-beta.1/FunctionApp.zip)
 
 ### PowerShell
 ```PowerShell

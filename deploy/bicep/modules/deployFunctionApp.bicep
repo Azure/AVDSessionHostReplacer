@@ -76,7 +76,25 @@ param FunctionAppIdentity object = {
 //-------//
 
 //------ Variables ------//
+var cloudSuffix = replace(replace(environment().resourceManager, 'https://management.', ''), '/', '')
+
 var varFunctionAppSettings = [
+  {
+    name: 'AzureWebJobsStorage__blobServiceUri'
+    value: 'https://${storageAccount.name}.blob.${environment().suffixes.storage}'
+  }
+  {
+    name: 'AzureWebJobsStorage__credential'
+    value: 'managedidentity'
+  }
+  {
+    name: 'AzureWebJobsStorage__queueServiceUri'
+    value: 'https://${storageAccount.name}.queue.${environment().suffixes.storage}'
+  }
+  {
+    name: 'AzureWebJobsStorage__tableServiceUri'
+    value: 'https://${storageAccount.name}.table.${environment().suffixes.storage}'
+  }
   {
     name: 'FUNCTIONS_EXTENSION_VERSION'
     value: '~4'
@@ -84,14 +102,6 @@ var varFunctionAppSettings = [
   {
     name: 'FUNCTIONS_WORKER_RUNTIME'
     value: 'powershell'
-  }
-  {
-    name: 'AzureWebJobsStorage'
-    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
-  }
-  {
-    name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
   }
   {
     name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
@@ -118,7 +128,7 @@ var varAppServicePlanName = '${FunctionAppName}-asp'
 //------ Resources ------//
 
 // Deploy Storage Account
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   name: varStorageAccountName
   location: Location
   kind: 'StorageV2'
@@ -126,6 +136,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     name: 'Standard_LRS'
   }
   properties: {
+    allowSharedKeyAccess: false
     // TODO: Discuss securing the storage account (firewall)
   }
 }
@@ -143,7 +154,7 @@ resource deployLogAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2
 }
 
 // Deploy App Service Plan
-resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: varAppServicePlanName
   location: Location
   sku: {
@@ -166,7 +177,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = if (EnableMoni
 }
 
 // Create ReplaceSessionHost function with Managed System Identity (MSI)
-resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
+resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: FunctionAppName
   location: Location
   kind: 'functionApp'
@@ -180,11 +191,16 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
       appSettings: varFunctionAppSettingsAndReplacementPlanSettings
       ftpsState: 'Disabled'
       cors: {
-        allowedOrigins: [ 'https://portal.azure.com' ]
+        allowedOrigins: [
+          '${environment().portal}'
+          'https://functions-next.${cloudSuffix}'
+          'https://functions-staging.${cloudSuffix}'
+          'https://functions.${cloudSuffix}'
+        ]
       }
     }
   }
-  resource deployFromZip 'extensions@2023-12-01' = if (!OfflineDeploy) {
+  resource deployFromZip 'extensions@2024-04-01' = if (!OfflineDeploy) {
     name: 'MSDeploy'
     properties: {
       packageUri: FunctionAppZipUrl

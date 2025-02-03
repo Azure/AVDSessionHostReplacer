@@ -63,7 +63,7 @@ function Get-SHRLatestImageVersion {
                                          Sort-Object -Property {$_.PublishingProfile.PublishedDate} -Descending |
                                          Select-Object -First 1
             if (-not $latestImageVersion) {
-                throw "No available image versions found."
+                throw "No available image versions found. Possible reasons: Make sure at least one image version does not have ExcludeFromLatest set to true."
             }
             Write-PSFMessage -Level Host -Message "Selected image version with resource Id {0}" -StringValues $latestImageVersion.Id
             $azImageVersion = $latestImageVersion.Name
